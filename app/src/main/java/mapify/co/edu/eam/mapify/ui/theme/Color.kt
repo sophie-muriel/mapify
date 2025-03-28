@@ -1,8 +1,8 @@
-package co.edu.eam.mapify.ui.theme
+package mapify.co.edu.eam.mapify.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
+val Blue80 = Color(0xFF76CDFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)
 
