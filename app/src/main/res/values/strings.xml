@@ -21,4 +21,6 @@
     <string name="location_access">Confirm location</string>
     <string name="email_taken">The email is already taken</string>
     <string name="login_account">Already have an account? Login</string>
+    <string name="root_login">root</string>
+    <string name="root_password">root</string>
 </resources>

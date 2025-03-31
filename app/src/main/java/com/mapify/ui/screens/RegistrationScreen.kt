@@ -54,6 +54,8 @@ fun RegistrationScreen() {
 
     val context = LocalContext.current
 
+    val rootLogin = stringResource(id = R.string.root_login)
+
     MapifyTheme {
         Scaffold { padding ->
             Column(
@@ -119,7 +121,7 @@ fun RegistrationScreen() {
                             onValueChange = {
                                 email = it
                                 emailError =
-                                    !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email)
+                                    !(email == rootLogin || Patterns.EMAIL_ADDRESS.matcher(email)
                                         .matches())
                             },
                             onValidate = {
@@ -141,7 +143,7 @@ fun RegistrationScreen() {
                             label = stringResource(id = R.string.password_label),
                             onValueChange = {
                                 password = it
-                                passwordError = !(password == "root" || password.length >= 6)
+                                passwordError = password.length < 6
                             },
                             onValidate = {
                                 passwordError
@@ -198,7 +200,7 @@ fun RegistrationScreen() {
                                     !passwordError &&
                                     !passwordConfirmationError,
                             onClick = {
-                                if (email != "root" && password != "root") {
+                                if (email != rootLogin) {
                                     Toast.makeText(context, locationAccess, Toast.LENGTH_SHORT)
                                         .show()
                                 } else {
