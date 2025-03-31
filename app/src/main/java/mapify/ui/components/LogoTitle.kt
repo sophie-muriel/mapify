@@ -1,4 +1,4 @@
-package mapify.co.edu.eam.mapify.ui.components
+package mapify.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

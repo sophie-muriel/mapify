@@ -1,4 +1,4 @@
-package mapify.co.edu.eam.mapify.ui.theme
+package mapify.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
