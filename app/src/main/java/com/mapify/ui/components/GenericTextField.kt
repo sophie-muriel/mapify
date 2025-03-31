@@ -1,4 +1,4 @@
-package mapify.ui.components
+package com.mapify.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height

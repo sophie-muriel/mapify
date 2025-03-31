@@ -1,4 +1,4 @@
-package mapify.ui.components
+package com.mapify.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -9,7 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import co.edu.eam.mapify.R
+import androidx.compose.ui.res.stringResource
+import com.mapify.R
 
 @Composable
 fun LogoTitle(aspectRatio: Float) {
@@ -18,12 +19,12 @@ fun LogoTitle(aspectRatio: Float) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.mapify_transparent),
-            contentDescription = "Mapify Logo",
+            contentDescription = stringResource(id = R.string.icon_description),
             modifier = Modifier.aspectRatio(aspectRatio)
         )
 
         Text(
-            text = "Mapify",
+            text = stringResource(id = R.string.app_name),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onBackground
         )

@@ -1,4 +1,4 @@
-package mapify.ui.theme
+package com.mapify.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
