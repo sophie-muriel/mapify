@@ -1,8 +1,10 @@
 package mapify.co.edu.eam.mapify.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun GenericTextField(
@@ -36,7 +39,7 @@ fun GenericTextField(
             .fillMaxWidth()
             .padding(
                 start = 24.dp,
-                end = 24.dp
+                end = 24.dp,
             )
         ),
         leadingIcon = leadingIcon,
@@ -50,12 +53,16 @@ fun GenericTextField(
         keyboardOptions = keyboardOptions,
         visualTransformation = if(isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         label = {
-            Text(text = label)
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium
+            )
         },
         value = value,
         onValueChange = {
             onValueChange(it)
             isError = onValidate(it)
         },
+        textStyle = MaterialTheme.typography.bodyMedium,
     )
 }
