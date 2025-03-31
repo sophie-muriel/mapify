@@ -1,4 +1,4 @@
-package co.edu.eam.mapify
+package com
 
 import org.junit.Test
 

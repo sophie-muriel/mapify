@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "co.edu.eam.mapify"
+    namespace = "com.mapify"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "co.edu.eam.mapify"
+        applicationId = "com.mapify"
         minSdk = 28
         targetSdk = 35
         versionCode = 1

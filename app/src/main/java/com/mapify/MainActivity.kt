@@ -1,10 +1,10 @@
-package mapify
+package com.mapify
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import mapify.ui.screens.LoginScreen
+import com.mapify.ui.screens.LoginScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,6 +12,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             LoginScreen()
+            // RegistrationScreen()
         }
     }
 }

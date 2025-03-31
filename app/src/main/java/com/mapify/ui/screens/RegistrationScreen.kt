@@ -1,4 +1,4 @@
-package mapify.ui.screens
+package com.mapify.ui.screens
 
 import android.util.Patterns
 import android.widget.Toast
@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -27,21 +28,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import mapify.ui.components.GenericTextField
-import mapify.ui.components.LogoTitle
-import mapify.ui.theme.MapifyTheme
-import mapify.ui.theme.Spacing
+import com.mapify.R
+import com.mapify.ui.components.GenericTextField
+import com.mapify.ui.components.LogoTitle
+import com.mapify.ui.theme.MapifyTheme
+import com.mapify.ui.theme.Spacing
 
 @Composable
-fun LoginScreen() {
+fun RegistrationScreen() {
+
+    var name by rememberSaveable { mutableStateOf("") }
+    var nameError by rememberSaveable { mutableStateOf(false) }
 
     var email by rememberSaveable { mutableStateOf("") }
     var emailError by rememberSaveable { mutableStateOf(false) }
 
     var password by rememberSaveable { mutableStateOf("") }
     var passwordError by rememberSaveable { mutableStateOf(false) }
+
+    var passwordConfirmation by rememberSaveable { mutableStateOf("") }
+    var passwordConfirmationError by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -61,7 +70,7 @@ fun LoginScreen() {
                 ) {
 
                     // logo + name
-                    LogoTitle(2f)
+                    LogoTitle(3.5f)
 
                     Spacer(modifier = Modifier.weight(1f))
 
@@ -72,10 +81,41 @@ fun LoginScreen() {
                             .padding(horizontal = 24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(start = 24.dp)
+                                .align(Alignment.Start),
+                            text = stringResource(id = R.string.enter_information_label),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+
+                        Spacer(modifier = Modifier.padding(Spacing.Inline))
+
+                        GenericTextField(
+                            value = name,
+                            supportingText = stringResource(id = R.string.name_supporting_text),
+                            label = stringResource(id = R.string.name_label),
+                            onValueChange = {
+                                name = it
+                                nameError = name.isBlank()
+                            },
+                            onValidate = {
+                                nameError
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Rounded.Person,
+                                    contentDescription = stringResource(id = R.string.name_icon_description),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                        )
+
                         GenericTextField(
                             value = email,
-                            supportingText = "Please type a valid email",
-                            label = "Email",
+                            supportingText = stringResource(id = R.string.email_supporting_text),
+                            label = stringResource(id = R.string.email_label),
                             onValueChange = {
                                 email = it
                                 emailError =
@@ -88,7 +128,7 @@ fun LoginScreen() {
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Rounded.Email,
-                                    contentDescription = "Email icon",
+                                    contentDescription = stringResource(id = R.string.email_icon_description),
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             },
@@ -97,8 +137,8 @@ fun LoginScreen() {
 
                         GenericTextField(
                             value = password,
-                            supportingText = "Password has to be 6 characters long at least",
-                            label = "Password",
+                            supportingText = stringResource(id = R.string.password_supporting_text),
+                            label = stringResource(id = R.string.password_label),
                             onValueChange = {
                                 password = it
                                 passwordError = !(password == "root" || password.length >= 6)
@@ -109,38 +149,65 @@ fun LoginScreen() {
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Rounded.Lock,
-                                    contentDescription = "Password icon",
+                                    contentDescription = stringResource(id = R.string.password_icon_description),
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             },
                             isPassword = true
                         )
 
-                        Text(
-                            modifier = Modifier
-                                .padding(end = 36.dp)
-                                .align(Alignment.End),
-                            text = "Forgot your password?",
-                            style = MaterialTheme.typography.labelSmall,
+                        GenericTextField(
+                            value = passwordConfirmation,
+                            supportingText = stringResource(id = R.string.password_confirmation_supporting_text),
+                            label = stringResource(id = R.string.password_confirmation_label),
+                            onValueChange = {
+                                passwordConfirmation = it
+                                passwordConfirmationError = password != it
+                            },
+                            onValidate = {
+                                passwordConfirmationError
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Rounded.Lock,
+                                    contentDescription = stringResource(id = R.string.password_icon_description),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            },
+                            isPassword = true
                         )
 
                         Spacer(modifier = Modifier.padding(Spacing.Inline))
+
+                        val locationAccess = stringResource(id = R.string.location_access)
+                        val emailTaken = stringResource(id = R.string.email_taken)
 
                         Button(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(
-                                    start = 24.dp, end = 24.dp
+                                    start = 24.dp,
+                                    end = 24.dp
                                 )
                                 .height(40.dp),
-                            enabled = email.isNotEmpty() && password.isNotEmpty() && !emailError && !passwordError,
+                            enabled = name.isNotEmpty() &&
+                                    email.isNotEmpty() &&
+                                    password.isNotEmpty() &&
+                                    passwordConfirmation.isNotEmpty() &&
+                                    !emailError &&
+                                    !passwordError &&
+                                    !passwordConfirmationError,
                             onClick = {
-                                if (email == "root" && password == "root") {
-                                    Toast.makeText(context, "Welcome!", Toast.LENGTH_SHORT).show()
+                                if (email != "root" && password != "root") {
+                                    Toast.makeText(context, locationAccess, Toast.LENGTH_SHORT)
+                                        .show()
                                 } else {
                                     Toast.makeText(
-                                        context, "Incorrect credentials", Toast.LENGTH_SHORT
-                                    ).show()
+                                        context,
+                                        emailTaken,
+                                        Toast.LENGTH_SHORT
+                                    )
+                                        .show()
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(
@@ -149,7 +216,7 @@ fun LoginScreen() {
                             ),
                         ) {
                             Text(
-                                text = "Login",
+                                text = stringResource(id = R.string.login_label),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -160,7 +227,7 @@ fun LoginScreen() {
                             onClick = {}
                         ){
                             Text(
-                                text = "Don't have an account? Register",
+                                text = stringResource(id = R.string.login_account),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
