@@ -9,6 +9,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 
 private val DarkColorScheme = darkColorScheme(
     primary = Blue80,
@@ -17,7 +18,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Blue80,
+    primary = Orange80,
     secondary = PurpleGrey40,
     tertiary = Pink40
 
@@ -35,7 +36,6 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun MapifyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -49,9 +49,15 @@ fun MapifyTheme(
         else -> LightColorScheme
     }
 
+
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
         content = content
     )
+}
+
+object Spacing {
+    val Inline = 8.dp
+    val TopBottomScreen = 120.dp
 }
