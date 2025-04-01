@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">Mapify</string>
+    <string name="icon_description">Mapify Logo</string>
+    <string name="email_label">Email</string>
+    <string name="email_supporting_text">Please type a valid email</string>
+    <string name="email_icon_description">Email icon</string>
+    <string name="password_label">Password</string>
+    <string name="password_supporting_text">Password must be at least 6 characters</string>
+    <string name="password_icon_description">Password icon</string>
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="welcome_message">Welcome!</string>
+    <string name="incorrect_credentials">Incorrect credentials</string>
+    <string name="login_label">Login</string>
+    <string name="register_account">Don\'t have an account? Register</string>
+    <string name="enter_information_label">Please enter your information</string>
+    <string name="name_label">Name</string>
+    <string name="name_supporting_text">Please enter your name</string>
+    <string name="name_icon_description">User icon</string>
+    <string name="password_confirmation_label">Confirm password</string>
+    <string name="password_confirmation_supporting_text">Passwords do not match</string>
+    <string name="location_access">Confirm location</string>
+    <string name="email_taken">The email is already taken</string>
+    <string name="registration_label">Register</string>
+    <string name="login_account">Already have an account? Login</string>
+    <string name="root_login">root</string>
+    <string name="root_password">root</string>
 </resources>
