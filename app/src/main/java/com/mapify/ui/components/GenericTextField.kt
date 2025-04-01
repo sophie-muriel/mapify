@@ -22,10 +22,10 @@ import androidx.compose.ui.unit.sp
 fun GenericTextField(
     modifier: Modifier = Modifier,
     value: String,
-    supportingText: String,
+    supportingText: String = "",
     label: String,
     onValueChange: (String) -> Unit,
-    onValidate: (String) -> Boolean,
+    onValidate: ((String) -> Boolean)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     isSingleLine: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -61,7 +61,7 @@ fun GenericTextField(
         value = value,
         onValueChange = {
             onValueChange(it)
-            isError = onValidate(it)
+            isError = onValidate?.invoke(it) ?: false
         },
         textStyle = MaterialTheme.typography.bodyMedium,
     )
