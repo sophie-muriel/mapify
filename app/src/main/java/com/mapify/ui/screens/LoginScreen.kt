@@ -60,28 +60,30 @@ fun LoginScreen(
         ) {
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
 
-            Column(
-                modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            // logo + name
+            LogoTitle(2f)
 
-                // logo + name
-                LogoTitle(2f)
+            Spacer(modifier = Modifier.weight(1f))
 
-                Spacer(modifier = Modifier.weight(1f))
-
-                // text form
-                LoginForm(
-                    email,
-                    password,
-                    rootLogin,
-                    rootPassword,
-                    onValueChangeEmail = { email = it },
-                    onValueChangePassword = { password = it },
-                    navigateToHome = { navigateToHome() },
-                    navigateToRegistration = { navigateToRegistration() },
-                    context
-                )
-            }
+            // text form
+            LoginForm(
+                email,
+                password,
+                onValueChangeEmail = { email = it },
+                onValueChangePassword = { password = it },
+                navigateToRegistration = { navigateToRegistration() },
+                onClickLogin = {
+                    if (email == rootLogin && password == rootPassword) {
+                        navigateToHome()
+                    } else {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.incorrect_credentials),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            )
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
         }
@@ -92,13 +94,10 @@ fun LoginScreen(
 fun LoginForm(
     email: String,
     password: String,
-    rootLogin: String,
-    rootPassword: String,
     onValueChangeEmail: (String) -> Unit,
     onValueChangePassword: (String) -> Unit,
-    navigateToHome: () -> Unit,
     navigateToRegistration: () -> Unit,
-    context: Context
+    onClickLogin: () -> Unit,
 ) {
 
     var dialogVisible by remember { mutableStateOf(false) }
@@ -161,17 +160,7 @@ fun LoginForm(
                 )
                 .height(40.dp),
             enabled = email.isNotEmpty() && password.isNotEmpty(),
-            onClick = {
-                if (email == rootLogin && password == rootPassword) {
-                    navigateToHome()
-                } else {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.incorrect_credentials),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            },
+            onClick = onClickLogin,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary

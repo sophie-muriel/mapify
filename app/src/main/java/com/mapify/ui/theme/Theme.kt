@@ -58,6 +58,7 @@ fun MapifyTheme(
 }
 
 object Spacing {
+    val Small = 4.dp
     val Inline = 8.dp
-    val TopBottomScreen = 80.dp
+    val TopBottomScreen = 50.dp
 }
