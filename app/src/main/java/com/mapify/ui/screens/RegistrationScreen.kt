@@ -56,188 +56,213 @@ fun RegistrationScreen() {
 
     val rootLogin = stringResource(id = R.string.root_login)
 
-    MapifyTheme {
-        Scaffold { padding ->
+    Scaffold { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
+
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
 
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                // logo + name
+                LogoTitle(3.5f)
 
-                    // logo + name
-                    LogoTitle(3.5f)
+                Spacer(modifier = Modifier.weight(1f))
 
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    // text form
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(start = 24.dp)
-                                .align(Alignment.Start),
-                            text = stringResource(id = R.string.enter_information_label),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-
-                        Spacer(modifier = Modifier.padding(Spacing.Inline))
-
-                        GenericTextField(
-                            value = name,
-                            supportingText = stringResource(id = R.string.name_supporting_text),
-                            label = stringResource(id = R.string.name_label),
-                            onValueChange = {
-                                name = it
-                                nameError = name.isBlank()
-                            },
-                            onValidate = {
-                                nameError
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Rounded.Person,
-                                    contentDescription = stringResource(id = R.string.name_icon_description),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                        )
-
-                        GenericTextField(
-                            value = email,
-                            supportingText = stringResource(id = R.string.email_supporting_text),
-                            label = stringResource(id = R.string.email_label),
-                            onValueChange = {
-                                email = it
-                                emailError =
-                                    !(email == rootLogin || Patterns.EMAIL_ADDRESS.matcher(email)
-                                        .matches())
-                            },
-                            onValidate = {
-                                emailError
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Rounded.Email,
-                                    contentDescription = stringResource(id = R.string.email_icon_description),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                        )
-
-                        GenericTextField(
-                            value = password,
-                            supportingText = stringResource(id = R.string.password_supporting_text),
-                            label = stringResource(id = R.string.password_label),
-                            onValueChange = {
-                                password = it
-                                passwordError = password.length < 6
-                            },
-                            onValidate = {
-                                passwordError
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Rounded.Lock,
-                                    contentDescription = stringResource(id = R.string.password_icon_description),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            },
-                            isPassword = true
-                        )
-
-                        GenericTextField(
-                            value = passwordConfirmation,
-                            supportingText = stringResource(id = R.string.password_confirmation_supporting_text),
-                            label = stringResource(id = R.string.password_confirmation_label),
-                            onValueChange = {
-                                passwordConfirmation = it
-                                passwordConfirmationError = password != it
-                            },
-                            onValidate = {
-                                passwordConfirmationError
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Rounded.Lock,
-                                    contentDescription = stringResource(id = R.string.password_icon_description),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            },
-                            isPassword = true
-                        )
-
-                        Spacer(modifier = Modifier.padding(Spacing.Inline))
-
-                        val locationAccess = stringResource(id = R.string.location_access)
-                        val emailTaken = stringResource(id = R.string.email_taken)
-
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    start = 24.dp,
-                                    end = 24.dp
-                                )
-                                .height(40.dp),
-                            enabled = name.isNotEmpty() &&
-                                    email.isNotEmpty() &&
-                                    password.isNotEmpty() &&
-                                    passwordConfirmation.isNotEmpty() &&
-                                    !emailError &&
-                                    !passwordError &&
-                                    !passwordConfirmationError,
-                            onClick = {
-                                if (email != rootLogin) {
-                                    Toast.makeText(context, locationAccess, Toast.LENGTH_SHORT)
-                                        .show()
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        emailTaken,
-                                        Toast.LENGTH_SHORT
-                                    )
-                                        .show()
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            ),
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.login_label),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
+                // text form
+                RegistrationForm(
+                    name,
+                    onValueChangeName = {
+                        name = it
+                        nameError = name.isBlank()
+                    },
+                    nameError,
+                    email,
+                    onValueChangeEmail = {
+                        email = it
+                        emailError =
+                            !(email == rootLogin || Patterns.EMAIL_ADDRESS.matcher(email)
+                                .matches())
+                    },
+                    emailError,
+                    password,
+                    onValueChangePassword = {
+                        password = it
+                        passwordError = password.length < 6
+                    },
+                    passwordError,
+                    passwordConfirmation,
+                    onValueChangePasswordConfirmation = {
+                        passwordConfirmation = it
+                        passwordConfirmationError = password != it
+                    },
+                    passwordConfirmationError,
+                    onClickRegister = {
+                        if (email != rootLogin) {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.location_access),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.email_taken),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+                    },
+                    onClickLogin = { })
 
-                        Spacer(modifier = Modifier.padding(Spacing.Inline))
-
-                        TextButton(
-                            onClick = {}
-                        ){
-                            Text(
-                                text = stringResource(id = R.string.login_account),
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
             }
+
+            Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
+        }
+    }
+}
+
+@Composable
+fun RegistrationForm(
+    name: String,
+    onValueChangeName: (String) -> Unit,
+    nameError: Boolean,
+    email: String,
+    onValueChangeEmail: (String) -> Unit,
+    emailError: Boolean,
+    password: String,
+    onValueChangePassword: (String) -> Unit,
+    passwordError: Boolean,
+    passwordConfirmation: String,
+    onValueChangePasswordConfirmation: (String) -> Unit,
+    passwordConfirmationError: Boolean,
+    onClickRegister: () -> Unit,
+    onClickLogin: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(start = 24.dp)
+                .align(Alignment.Start),
+            text = stringResource(id = R.string.enter_information_label),
+            style = MaterialTheme.typography.labelSmall
+        )
+
+        Spacer(modifier = Modifier.padding(Spacing.Inline))
+
+        GenericTextField(
+            value = name,
+            supportingText = stringResource(id = R.string.name_supporting_text),
+            label = stringResource(id = R.string.name_label),
+            onValueChange = onValueChangeName,
+            onValidate = {
+                nameError
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Rounded.Person,
+                    contentDescription = stringResource(id = R.string.name_icon_description),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+        )
+
+        GenericTextField(
+            value = email,
+            supportingText = stringResource(id = R.string.email_supporting_text),
+            label = stringResource(id = R.string.email_label),
+            onValueChange = onValueChangeEmail,
+            onValidate = {
+                emailError
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Rounded.Email,
+                    contentDescription = stringResource(id = R.string.email_icon_description),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+        )
+
+        GenericTextField(
+            value = password,
+            supportingText = stringResource(id = R.string.password_supporting_text),
+            label = stringResource(id = R.string.password_label),
+            onValueChange = onValueChangePassword,
+            onValidate = {
+                passwordError
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Rounded.Lock,
+                    contentDescription = stringResource(id = R.string.password_icon_description),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            isPassword = true
+        )
+
+        GenericTextField(
+            value = passwordConfirmation,
+            supportingText = stringResource(id = R.string.password_confirmation_supporting_text),
+            label = stringResource(id = R.string.password_confirmation_label),
+            onValueChange = onValueChangePasswordConfirmation,
+            onValidate = {
+                passwordConfirmationError
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Rounded.Lock,
+                    contentDescription = stringResource(id = R.string.password_icon_description),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            isPassword = true
+        )
+
+        Spacer(modifier = Modifier.padding(Spacing.Inline))
+
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = 24.dp, end = 24.dp
+                )
+                .height(40.dp),
+            enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && passwordConfirmation.isNotEmpty() && !emailError && !passwordError && !passwordConfirmationError,
+            onClick = onClickRegister,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+        ) {
+            Text(
+                text = stringResource(id = R.string.login_label),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        Spacer(modifier = Modifier.padding(Spacing.Inline))
+
+        TextButton(
+            onClick = onClickLogin
+        ) {
+            Text(
+                text = stringResource(id = R.string.login_account),
+                style = MaterialTheme.typography.labelSmall
+            )
         }
     }
 }
