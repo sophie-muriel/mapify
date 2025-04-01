@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mapify.ui.screens.LoginScreen
 import com.mapify.ui.screens.RegistrationScreen
+import com.mapify.ui.screens.HomeScreen
 
 @Composable
 fun Navigation(){
@@ -19,10 +20,24 @@ fun Navigation(){
             startDestination = RouteScreen.Login
         ) {
             composable<RouteScreen.Login> {
-                LoginScreen()
+                LoginScreen(
+                    navigateToRegistration = {
+                        navController.navigate(RouteScreen.Registration)
+                    },
+                    navigateToHome = {
+                        navController.navigate(RouteScreen.Home)
+                    }
+                )
             }
             composable<RouteScreen.Registration> {
-                RegistrationScreen()
+                RegistrationScreen(
+                    navigateToLogin = {
+                        navController.navigate(RouteScreen.Login)
+                    }
+                )
+            }
+            composable<RouteScreen.Home> {
+                HomeScreen()
             }
         }
     }

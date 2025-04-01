@@ -1,7 +1,6 @@
 package com.mapify.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -16,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun GenericTextField(
@@ -25,14 +23,12 @@ fun GenericTextField(
     supportingText: String = "",
     label: String,
     onValueChange: (String) -> Unit,
-    onValidate: ((String) -> Boolean)? = null,
+    isError: Boolean,
     leadingIcon: @Composable (() -> Unit)? = null,
     isSingleLine: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isPassword: Boolean = false
 ){
-    var isError by rememberSaveable { mutableStateOf(false) }
-
     OutlinedTextField(
         modifier = modifier.then(
             Modifier
@@ -40,14 +36,20 @@ fun GenericTextField(
             .padding(
                 start = 24.dp,
                 end = 24.dp,
+                top = 4.dp,
+                bottom = 4.dp
             )
         ),
         leadingIcon = leadingIcon,
         singleLine = isSingleLine,
         isError = isError,
         supportingText = {
-            if(isError){
-                Text(text = supportingText)
+            if (isError) {
+                Text(
+                    text = supportingText,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         },
         keyboardOptions = keyboardOptions,
@@ -55,14 +57,11 @@ fun GenericTextField(
         label = {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodySmall
             )
         },
         value = value,
-        onValueChange = {
-            onValueChange(it)
-            isError = onValidate?.invoke(it) ?: false
-        },
+        onValueChange = onValueChange,
         textStyle = MaterialTheme.typography.bodyMedium,
     )
 }

@@ -34,27 +34,34 @@ import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.LogoTitle
-import com.mapify.ui.theme.MapifyTheme
 import com.mapify.ui.theme.Spacing
 
 @Composable
-fun RegistrationScreen() {
+fun RegistrationScreen(
+    navigateToLogin: () -> Unit
+) {
 
     var name by rememberSaveable { mutableStateOf("") }
-    var nameError by rememberSaveable { mutableStateOf(false) }
+    var nameTouched by rememberSaveable { mutableStateOf(false) }
 
     var email by rememberSaveable { mutableStateOf("") }
-    var emailError by rememberSaveable { mutableStateOf(false) }
+    var emailTouched by rememberSaveable { mutableStateOf(false) }
 
     var password by rememberSaveable { mutableStateOf("") }
-    var passwordError by rememberSaveable { mutableStateOf(false) }
+    var passwordTouched by rememberSaveable { mutableStateOf(false) }
 
     var passwordConfirmation by rememberSaveable { mutableStateOf("") }
-    var passwordConfirmationError by rememberSaveable { mutableStateOf(false) }
+    var passwordConfirmationTouched by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
-
     val rootLogin = stringResource(id = R.string.root_login)
+
+    val nameError = nameTouched && name.isBlank()
+    val emailError =
+        emailTouched && !(email == rootLogin || Patterns.EMAIL_ADDRESS.matcher(email).matches())
+    val passwordError = passwordTouched && password.length < 6
+    val passwordConfirmationError = passwordConfirmationTouched && passwordConfirmation != password
+
 
     Scaffold { padding ->
         Column(
@@ -66,8 +73,7 @@ fun RegistrationScreen() {
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
 
             Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
                 // logo + name
@@ -76,50 +82,33 @@ fun RegistrationScreen() {
                 Spacer(modifier = Modifier.weight(1f))
 
                 // text form
-                RegistrationForm(
-                    name,
-                    onValueChangeName = {
-                        name = it
-                        nameError = name.isBlank()
-                    },
-                    nameError,
-                    email,
-                    onValueChangeEmail = {
-                        email = it
-                        emailError =
-                            !(email == rootLogin || Patterns.EMAIL_ADDRESS.matcher(email)
-                                .matches())
-                    },
-                    emailError,
-                    password,
-                    onValueChangePassword = {
-                        password = it
-                        passwordError = password.length < 6
-                    },
-                    passwordError,
-                    passwordConfirmation,
-                    onValueChangePasswordConfirmation = {
-                        passwordConfirmation = it
-                        passwordConfirmationError = password != it
-                    },
-                    passwordConfirmationError,
-                    onClickRegister = {
-                        if (email != rootLogin) {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.location_access),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.email_taken),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    },
-                    onClickLogin = { })
-
+                RegistrationForm(name, onValueChangeName = {
+                    name = it
+                    nameTouched = true
+                }, nameError, email, onValueChangeEmail = {
+                    email = it
+                    emailTouched = true
+                }, emailError, password, onValueChangePassword = {
+                    password = it
+                    passwordTouched = true
+                }, passwordError, passwordConfirmation, onValueChangePasswordConfirmation = {
+                    passwordConfirmation = it
+                    passwordConfirmationTouched = true
+                }, passwordConfirmationError, onClickRegister = {
+                    if (email != rootLogin) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.location_access),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            context, context.getString(R.string.email_taken), Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }, navigateToLogin = {
+                    navigateToLogin()
+                })
             }
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
@@ -142,7 +131,7 @@ fun RegistrationForm(
     onValueChangePasswordConfirmation: (String) -> Unit,
     passwordConfirmationError: Boolean,
     onClickRegister: () -> Unit,
-    onClickLogin: () -> Unit
+    navigateToLogin: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -165,9 +154,7 @@ fun RegistrationForm(
             supportingText = stringResource(id = R.string.name_supporting_text),
             label = stringResource(id = R.string.name_label),
             onValueChange = onValueChangeName,
-            onValidate = {
-                nameError
-            },
+            isError = nameError,
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Rounded.Person,
@@ -180,12 +167,12 @@ fun RegistrationForm(
 
         GenericTextField(
             value = email,
-            supportingText = stringResource(id = R.string.email_supporting_text),
+            supportingText = if (emailError) stringResource(id = R.string.email_supporting_text) else stringResource(
+                id = R.string.email_supporting_text
+            ),
             label = stringResource(id = R.string.email_label),
             onValueChange = onValueChangeEmail,
-            onValidate = {
-                emailError
-            },
+            isError = emailError,
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Rounded.Email,
@@ -196,14 +183,13 @@ fun RegistrationForm(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
 
+
         GenericTextField(
             value = password,
             supportingText = stringResource(id = R.string.password_supporting_text),
             label = stringResource(id = R.string.password_label),
             onValueChange = onValueChangePassword,
-            onValidate = {
-                passwordError
-            },
+            isError = passwordError,
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Rounded.Lock,
@@ -219,9 +205,7 @@ fun RegistrationForm(
             supportingText = stringResource(id = R.string.password_confirmation_supporting_text),
             label = stringResource(id = R.string.password_confirmation_label),
             onValueChange = onValueChangePasswordConfirmation,
-            onValidate = {
-                passwordConfirmationError
-            },
+            isError = passwordConfirmationError,
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Rounded.Lock,
@@ -249,7 +233,7 @@ fun RegistrationForm(
             ),
         ) {
             Text(
-                text = stringResource(id = R.string.login_label),
+                text = stringResource(id = R.string.registration_label),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -257,7 +241,7 @@ fun RegistrationForm(
         Spacer(modifier = Modifier.padding(Spacing.Inline))
 
         TextButton(
-            onClick = onClickLogin
+            onClick = navigateToLogin
         ) {
             Text(
                 text = stringResource(id = R.string.login_account),

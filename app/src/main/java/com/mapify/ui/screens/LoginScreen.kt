@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -38,7 +39,9 @@ import com.mapify.ui.components.LogoTitle
 import com.mapify.ui.theme.Spacing
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    navigateToRegistration: () -> Unit, navigateToHome: () -> Unit
+) {
 
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -58,8 +61,7 @@ fun LoginScreen() {
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
 
             Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
                 // logo + name
@@ -69,36 +71,15 @@ fun LoginScreen() {
 
                 // text form
                 LoginForm(
-                    email = email,
-                    password = password,
-                    onValueChangeEmail = { newEmail ->
-                        email = newEmail
-                    },
-                    onValueChangePassword = { newPassword ->
-                        password = newPassword
-                    },
-                    onClickLogin = {
-                        if (email == rootLogin && password == rootPassword) {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.welcome_message),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.incorrect_credentials),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    },
-                    onClickRegister = {
-                        Toast.makeText(
-                            context,
-                            "Navigate to registration screen",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    email,
+                    password,
+                    rootLogin,
+                    rootPassword,
+                    onValueChangeEmail = { email = it },
+                    onValueChangePassword = { password = it },
+                    navigateToHome = { navigateToHome() },
+                    navigateToRegistration = { navigateToRegistration() },
+                    context
                 )
             }
 
@@ -111,10 +92,13 @@ fun LoginScreen() {
 fun LoginForm(
     email: String,
     password: String,
+    rootLogin: String,
+    rootPassword: String,
     onValueChangeEmail: (String) -> Unit,
     onValueChangePassword: (String) -> Unit,
-    onClickLogin: () -> Unit,
-    onClickRegister: () -> Unit
+    navigateToHome: () -> Unit,
+    navigateToRegistration: () -> Unit,
+    context: Context
 ) {
 
     var dialogVisible by remember { mutableStateOf(false) }
@@ -129,6 +113,7 @@ fun LoginForm(
             value = email,
             label = stringResource(id = R.string.email_label),
             onValueChange = onValueChangeEmail,
+            isError = false,
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Rounded.Email,
@@ -143,6 +128,7 @@ fun LoginForm(
             value = password,
             label = stringResource(id = R.string.password_label),
             onValueChange = onValueChangePassword,
+            isError = false,
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Rounded.Lock,
@@ -156,11 +142,9 @@ fun LoginForm(
         TextButton(
             modifier = Modifier
                 .padding(end = 36.dp)
-                .align(Alignment.End),
-            onClick = {
+                .align(Alignment.End), onClick = {
                 dialogVisible = true
-            }
-        ) {
+            }) {
             Text(
                 text = stringResource(id = R.string.forgot_password),
                 style = MaterialTheme.typography.labelSmall,
@@ -177,7 +161,17 @@ fun LoginForm(
                 )
                 .height(40.dp),
             enabled = email.isNotEmpty() && password.isNotEmpty(),
-            onClick = onClickLogin,
+            onClick = {
+                if (email == rootLogin && password == rootPassword) {
+                    navigateToHome()
+                } else {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.incorrect_credentials),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -192,7 +186,7 @@ fun LoginForm(
         Spacer(modifier = Modifier.padding(Spacing.Inline))
 
         TextButton(
-            onClick = onClickRegister
+            onClick = navigateToRegistration
         ) {
             Text(
                 text = stringResource(id = R.string.register_account),
@@ -205,8 +199,7 @@ fun LoginForm(
         RecoveryPasswordDialog(
             onClose = {
                 dialogVisible = false
-            }
-        )
+            })
     }
 }
 
@@ -217,8 +210,7 @@ fun RecoveryPasswordDialog(
     Dialog(
         onDismissRequest = {
             onClose()
-        }
-    ) {
+        }) {
         Card {
             Column {
                 Text(
@@ -227,8 +219,7 @@ fun RecoveryPasswordDialog(
                 TextButton(
                     onClick = {
                         onClose()
-                    }
-                ) {
+                    }) {
                     Text(
                         text = "Cerrar"
                     )
