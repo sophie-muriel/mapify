@@ -70,46 +70,41 @@ fun RegistrationScreen(
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
+            Spacer(modifier = Modifier.height(Spacing.TopBottomScreen + 15.dp))
 
-            Column(
-                modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            // logo + name
+            LogoTitle(3.5f)
 
-                // logo + name
-                LogoTitle(3.5f)
+            Spacer(modifier = Modifier.weight(1f))
 
-                Spacer(modifier = Modifier.weight(1f))
-
-                // text form
-                RegistrationForm(name, onValueChangeName = {
-                    name = it
-                    nameTouched = true
-                }, nameError, email, onValueChangeEmail = {
-                    email = it
-                    emailTouched = true
-                }, emailError, password, onValueChangePassword = {
-                    password = it
-                    passwordTouched = true
-                }, passwordError, passwordConfirmation, onValueChangePasswordConfirmation = {
-                    passwordConfirmation = it
-                    passwordConfirmationTouched = true
-                }, passwordConfirmationError, onClickRegister = {
-                    if (email != rootLogin) {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.location_access),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        Toast.makeText(
-                            context, context.getString(R.string.email_taken), Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }, navigateToLogin = {
-                    navigateToLogin()
-                })
-            }
+            // text form
+            RegistrationForm(name, onValueChangeName = {
+                name = it
+                nameTouched = true
+            }, nameError, email, onValueChangeEmail = {
+                email = it
+                emailTouched = true
+            }, emailError, password, onValueChangePassword = {
+                password = it
+                passwordTouched = true
+            }, passwordError, passwordConfirmation, onValueChangePasswordConfirmation = {
+                passwordConfirmation = it
+                passwordConfirmationTouched = true
+            }, passwordConfirmationError, onClickRegister = {
+                if (email != rootLogin) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.location_access),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        context, context.getString(R.string.email_taken), Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }, navigateToLogin = {
+                navigateToLogin()
+            })
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
         }
@@ -147,7 +142,7 @@ fun RegistrationForm(
             style = MaterialTheme.typography.labelSmall
         )
 
-        Spacer(modifier = Modifier.padding(Spacing.Inline))
+        Spacer(modifier = Modifier.padding(Spacing.Small))
 
         GenericTextField(
             value = name,
