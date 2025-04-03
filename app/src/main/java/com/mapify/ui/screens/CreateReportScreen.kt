@@ -11,6 +11,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.ImageSearch
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +50,13 @@ fun CreateReportScreen(){
     var description by rememberSaveable { mutableStateOf("") }
     var descriptionTouched by rememberSaveable { mutableStateOf(false) }
     val descriptionError = titleTouched && title.isBlank()
+
+    var location by rememberSaveable { mutableStateOf("") }
+    val LocationError = false
+
+    var photo by rememberSaveable { mutableStateOf("") }
+    var photoTouched by rememberSaveable { mutableStateOf(false) }
+    val photoError = photoTouched && photo.isBlank()
 
     Scaffold(
         topBar = {
@@ -119,7 +128,18 @@ fun CreateReportScreen(){
                     description = it
                     descriptionTouched = true
                 },
-                descriptionError = descriptionError
+                descriptionError = descriptionError,
+                location = location,
+                onValueChangeLocation = {
+                    location = it
+                },
+                locationError = LocationError,
+                photo = photo,
+                onValueChangePhoto = {
+                    photo = it
+                    photoTouched = true
+                },
+                photoError = photoError
             )
         }
 
@@ -144,14 +164,12 @@ fun ReportCreationForm(
     description: String,
     onValueChangeDescription: (String) -> Unit,
     descriptionError: Boolean,
-    //password: String,
-    //onValueChangePassword: (String) -> Unit,
-    //passwordError: Boolean,
-    //passwordConfirmation: String,
-    //onValueChangePasswordConfirmation: (String) -> Unit,
-    //passwordConfirmationError: Boolean,
-    //onClickRegister: () -> Unit,
-    //navigateToLogin: () -> Unit
+    location: String,
+    onValueChangeLocation: (String) -> Unit,
+    locationError: Boolean,
+    photo: String,
+    onValueChangePhoto: (String) -> Unit,
+    photoError: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -192,7 +210,43 @@ fun ReportCreationForm(
             isSingleLine = false,
         )
 
+        GenericTextField(
+            value = location,
+            supportingText = "A location must be provided",
+            label = "Location",
+            onValueChange = onValueChangeLocation,
+            isError = locationError,
+            leadingIcon = {
+                IconButton(
+                    onClick = {  }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.LocationOn,
+                        contentDescription = "Location Icon",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        )
 
+        GenericTextField(
+            value = photo,
+            supportingText = "A photo url must be provided",
+            label = "Photo",
+            onValueChange = onValueChangePhoto,
+            isError = photoError,
+            leadingIcon = {
+                IconButton(
+                    onClick = {  }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.ImageSearch,
+                        contentDescription = "Location Icon",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        )
     }
 }
 
