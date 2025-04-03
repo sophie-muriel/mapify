@@ -16,7 +16,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import com.mapify.R
 import com.mapify.ui.theme.Spacing
 
 @Composable
@@ -53,8 +55,8 @@ fun ReportForm(
 
         GenericTextField(
             value = title,
-            supportingText = "You must provide a title",
-            label = "Title",
+            supportingText = stringResource( id = R.string.title_supporting_text ),
+            label = stringResource( id = R.string.title ),
             onValueChange = onValueChangeTitle,
             isError = titleError,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
@@ -68,7 +70,7 @@ fun ReportForm(
             onValueChange = onValueChange,
             items = items,
             isError = dropDownError,
-            supportingText = "Select a City",
+            supportingText = stringResource( id = R.string.category_suporting_test ),
             isExpanded = isExpanded,
             onExpandedChange = onExpandedChange,
             onDismissRequest = onDismissRequest,
@@ -78,17 +80,17 @@ fun ReportForm(
         GenericTextField(
             modifier = Modifier.aspectRatio(2f),
             value = description,
-            label = "Description",
+            label = stringResource( id = R.string.description ),
             onValueChange = onValueChangeDescription,
             isError = descriptionError,
-            supportingText = "Add a description",
+            supportingText = stringResource( id = R.string.description_supporting_text ),
             isSingleLine = false,
         )
 
         GenericTextField(
             value = location,
-            supportingText = "A location must be provided",
-            label = "Location",
+            supportingText = stringResource( id = R.string.location_supporting_text ),
+            label = stringResource( id = R.string.location ),
             onValueChange = onValueChangeLocation,
             isError = locationError,
             leadingIcon = {
@@ -99,7 +101,7 @@ fun ReportForm(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.LocationOn,
-                        contentDescription = "Location Icon",
+                        contentDescription = stringResource( id = R.string.location_icon ),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -109,8 +111,8 @@ fun ReportForm(
 
         GenericTextField(
             value = photo,
-            supportingText = "A photo url must be provided",
-            label = "Photo",
+            supportingText = stringResource( id = R.string.photo_supporting_text ),
+            label = stringResource( id = R.string.photo ),
             onValueChange = onValueChangePhoto,
             isError = photoError,
             leadingIcon = {
@@ -119,7 +121,7 @@ fun ReportForm(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.ImageSearch,
-                        contentDescription = "Location Icon",
+                        contentDescription = stringResource( id = R.string.photo_icon ),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }

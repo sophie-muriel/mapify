@@ -28,4 +28,15 @@
     <string name="send_email_recovery_link">Send link</string>
     <string name="recovery_email_sent">Recovery email sent</string>
     <string name="back">Back</string>
+    <string name="title">Title</string>
+    <string name="title_supporting_text">You must provide a title</string>
+    <string name="category_suporting_test">You must select a category</string>
+    <string name="description">Description</string>
+    <string name="description_supporting_text">You must provide at least a 10 characters description</string>
+    <string name="location">Location</string>
+    <string name="location_supporting_text">A location must be selected</string>
+    <string name="location_icon">Location Icon</string>
+    <string name="photo">Photo</string>
+    <string name="photo_supporting_text">You must provide a photo URL</string>"
+    <string name="photo_icon">Photo Icon</string>
 </resources>
