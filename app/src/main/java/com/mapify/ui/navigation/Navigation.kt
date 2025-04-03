@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mapify.ui.screens.CreateReportScreen
 import com.mapify.ui.screens.LoginScreen
 import com.mapify.ui.screens.RegistrationScreen
 import com.mapify.ui.screens.HomeScreen
@@ -17,7 +18,7 @@ fun Navigation(){
     Surface {
         NavHost(
             navController = navController,
-            startDestination = RouteScreen.Login
+            startDestination = RouteScreen.CreateReport
         ) {
             composable<RouteScreen.Login> {
                 LoginScreen(
@@ -38,6 +39,10 @@ fun Navigation(){
             }
             composable<RouteScreen.Home> {
                 HomeScreen()
+            }
+
+            composable<RouteScreen.CreateReport> {
+                CreateReportScreen()
             }
         }
     }
