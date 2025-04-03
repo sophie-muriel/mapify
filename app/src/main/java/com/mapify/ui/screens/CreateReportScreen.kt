@@ -88,7 +88,13 @@ fun CreateReportScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = {  }
+                        onClick = {
+                            //Location has to be added here later
+                            if (title.isNotEmpty() && dropDownValue.isNotEmpty()
+                                && description.isEmpty() && photo.isNotEmpty()){
+
+                        }
+                        }
                     )  {
                         Icon(
                             modifier = Modifier.size(48.dp),
