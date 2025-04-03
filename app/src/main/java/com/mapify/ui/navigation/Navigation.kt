@@ -42,7 +42,11 @@ fun Navigation(){
             }
 
             composable<RouteScreen.CreateReport> {
-                CreateReportScreen()
+                CreateReportScreen(
+                    navigateToHome = {
+                        navController.navigate(RouteScreen.Home)
+                    }
+                )
             }
         }
     }
