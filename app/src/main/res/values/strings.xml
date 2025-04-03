@@ -39,4 +39,7 @@
     <string name="photo">Photo</string>
     <string name="photo_supporting_text">You must provide a photo URL</string>"
     <string name="photo_icon">Photo Icon</string>
+    <string name="create_report">Create Report</string>
+    <string name="back_arrow_icon">Back Arrow Icon</string>
+    <string name="check_icon">Check Icon</string>"
 </resources>
