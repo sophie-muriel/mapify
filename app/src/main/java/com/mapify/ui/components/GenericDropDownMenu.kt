@@ -11,27 +11,26 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.mapify.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenericDropDownMenu(
+    isExpanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
     placeholder: String,
     value: String,
     onValueChange: (String) -> Unit,
     items: List<String>,
     isError: Boolean,
-    supportingText: String
+    supportingText: String,
+    isTouched: Boolean,
+    onDismissRequest: () -> Unit
 ){
 
-    var isExpanded by rememberSaveable { mutableStateOf(false) }
-    var isTouched by rememberSaveable { mutableStateOf(false) }
+    //var isExpanded by rememberSaveable { mutableStateOf(false) }
+    //var isTouched by rememberSaveable { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
         modifier = Modifier
@@ -41,10 +40,7 @@ fun GenericDropDownMenu(
                 vertical = Spacing.Small
             ),
         expanded = isExpanded,
-        onExpandedChange = {
-            isExpanded = !isExpanded
-            isTouched = true
-        }
+        onExpandedChange = onExpandedChange
     ) {
         OutlinedTextField(
             modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
@@ -68,14 +64,13 @@ fun GenericDropDownMenu(
 
         ExposedDropdownMenu(
             expanded = isExpanded,
-            onDismissRequest = { isExpanded = false }
+            onDismissRequest = onDismissRequest
         ) {
             items.forEach{ item ->
                 DropdownMenuItem(
                     text = { Text(text = item) },
                     onClick = {
                         onValueChange(item)
-                        isExpanded = false
                     }
                 )
             }
