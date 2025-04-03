@@ -16,4 +16,7 @@ sealed class RouteScreen {
     @Serializable
     data object CreateReport : RouteScreen()
 
+    @Serializable
+    data object ReportLocation : RouteScreen()
+
 }
