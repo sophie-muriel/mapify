@@ -30,7 +30,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.mapify.R
 import com.mapify.ui.components.ReportForm
 import com.mapify.ui.theme.Spacing
 import com.mapify.model.Report
@@ -79,7 +81,7 @@ fun CreateReportScreen(
                     modifier = Modifier.padding(horizontal = Spacing.Small),
                     title = {
                         Text(
-                            text = "Create Report",
+                            text = stringResource(id = R.string.create_report),
                             style = MaterialTheme.typography.titleLarge
                         )
                     },
@@ -91,7 +93,7 @@ fun CreateReportScreen(
                         )  {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Black Arrow"
+                                contentDescription = stringResource(id = R.string.back_arrow_icon)
                             )
                         }
                     },
@@ -116,14 +118,14 @@ fun CreateReportScreen(
                                     val size = reportsList.get(0).category.toString()
                                     Toast.makeText(context, size, Toast.LENGTH_SHORT).show()
                                 }else{
-                                    Toast.makeText(context, "0", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "No report created", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         )  {
                             Icon(
                                 modifier = Modifier.size(48.dp),
                                 imageVector = Icons.Outlined.CheckCircle,
-                                contentDescription = "Check"
+                                contentDescription = stringResource( id = R.string.check_icon)
                             )
                         }
                     },
