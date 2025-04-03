@@ -2,7 +2,11 @@ package com.mapify.ui.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -15,6 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.mapify.ui.components.ReportForm
 import com.mapify.ui.theme.Spacing
@@ -63,61 +70,67 @@ fun CreateReportScreen(
     val reportsList = ArrayList<Report>()
     val context = LocalContext.current
 
+    val isKeyboardActive = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                modifier = Modifier.padding(horizontal = Spacing.Small),
-                title = {
-                    Text(
-                        text = "Create Report",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navigateToHome()
-                        }
-                    )  {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Black Arrow"
+            if(!isKeyboardActive){
+                TopAppBar(
+                    modifier = Modifier.padding(horizontal = Spacing.Small),
+                    title = {
+                        Text(
+                            text = "Create Report",
+                            style = MaterialTheme.typography.titleLarge
                         )
-                    }
-                },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            //Location has to be added here later
-                            if (title.isNotEmpty() && dropDownValue.isNotEmpty()
-                                && description.isNotEmpty() && photo.isNotEmpty()){
-                                val newReport = Report(
-                                    title = title,
-                                    category = Category.entries.find { it.displayName == dropDownValue }!!,
-                                    description = description,
-                                    location = null, //This must be changed
-                                    images = listOf(photo),
-                                    id = "1",
-                                    status = ReportStatus.NOT_VERIFIED,
-                                    userId = "1",
-                                    date = LocalDateTime.now()
-                                )
-                                reportsList.add(newReport)
-                                //val size = reportsList.get(0).category.toString()
-                                //Toast.makeText(context, size, Toast.LENGTH_SHORT).show()
-                            }else{
-                                Toast.makeText(context, "0", Toast.LENGTH_SHORT).show()
+                    },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
+                                navigateToHome()
                             }
+                        )  {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Black Arrow"
+                            )
                         }
-                    )  {
-                        Icon(
-                            modifier = Modifier.size(48.dp),
-                            imageVector = Icons.Outlined.CheckCircle,
-                            contentDescription = "Check"
-                        )
-                    }
-                }
-            )
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                //Location has to be added here later
+                                if (title.isNotEmpty() && dropDownValue.isNotEmpty()
+                                    && description.isNotEmpty() && photo.isNotEmpty()){
+                                    val newReport = Report(
+                                        title = title,
+                                        category = Category.entries.find { it.displayName == dropDownValue }!!,
+                                        description = description,
+                                        location = null, //This must be changed
+                                        images = listOf(photo),
+                                        id = "1",
+                                        status = ReportStatus.NOT_VERIFIED,
+                                        userId = "1",
+                                        date = LocalDateTime.now()
+                                    )
+                                    reportsList.add(newReport)
+                                    val size = reportsList.get(0).category.toString()
+                                    Toast.makeText(context, size, Toast.LENGTH_SHORT).show()
+                                }else{
+                                    Toast.makeText(context, "0", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        )  {
+                            Icon(
+                                modifier = Modifier.size(48.dp),
+                                imageVector = Icons.Outlined.CheckCircle,
+                                contentDescription = "Check"
+                            )
+                        }
+                    },
+                )
+
+            }
+
         }
     ) { padding ->
 
