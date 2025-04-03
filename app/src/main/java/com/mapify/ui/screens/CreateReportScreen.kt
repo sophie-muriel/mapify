@@ -1,33 +1,20 @@
 package com.mapify.ui.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.rounded.Email
-import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,18 +23,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.mapify.R
 import com.mapify.ui.components.GenericDropDownMenu
 import com.mapify.ui.components.GenericTextField
-import com.mapify.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +37,7 @@ fun CreateReportScreen(){
     val titleError = titleTouched && title.isBlank()
 
     var dropDownValue by rememberSaveable { mutableStateOf("") }
+    var dropDownExpanded by rememberSaveable { mutableStateOf(false) }
     var dropDownTouched by rememberSaveable { mutableStateOf(false) }
     val categories = listOf("Security", "Medical Emergency", "Infrastructure", "Pets", "Community")
     val dropDownError = dropDownValue.isBlank()
@@ -114,9 +94,19 @@ fun CreateReportScreen(){
                 onValueChange = {
                     dropDownValue = it
                     dropDownTouched = true
+                    dropDownExpanded = false
                 },
                 dropDownError = dropDownError,
-                items = categories
+                items = categories,
+                isExpanded = dropDownExpanded,
+                onExpandedChange = {
+                    dropDownExpanded = it
+                    dropDownTouched = true
+                },
+                onDismissRequest = {
+                    dropDownExpanded = false
+                },
+                isTouched = dropDownTouched
             )
         }
 
@@ -134,6 +124,10 @@ fun ReportCreationForm(
     onValueChange: (String) -> Unit,
     items: List<String>,
     dropDownError: Boolean,
+    isExpanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    isTouched: Boolean,
+    onDismissRequest: () -> Unit
     //password: String,
     //onValueChangePassword: (String) -> Unit,
     //passwordError: Boolean,
@@ -165,7 +159,11 @@ fun ReportCreationForm(
             onValueChange = onValueChange,
             items = items,
             isError = dropDownError,
-            supportingText = "Select a City"
+            supportingText = "Select a City",
+            isExpanded = isExpanded,
+            onExpandedChange = onExpandedChange,
+            onDismissRequest = onDismissRequest,
+            isTouched = isTouched
         )
 
 
