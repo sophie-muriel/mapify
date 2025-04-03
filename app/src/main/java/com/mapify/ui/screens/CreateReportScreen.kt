@@ -45,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.mapify.R
+import com.mapify.ui.components.GenericDropDownMenu
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.theme.Spacing
 
@@ -55,6 +56,11 @@ fun CreateReportScreen(){
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
     val titleError = titleTouched && title.isBlank()
+
+    var dropDownValue by rememberSaveable { mutableStateOf("") }
+    var dropDownTouched by rememberSaveable { mutableStateOf(false) }
+    val categories = listOf("Security", "Medical Emergency", "Infrastructure", "Pets", "Community")
+    val dropDownError = dropDownValue.isBlank()
 
     Scaffold(
         topBar = {
@@ -98,11 +104,19 @@ fun CreateReportScreen(){
         ) {
             ReportCreationForm(
                 title = title,
-                onValueChangeTitle =  {
+                onValueChangeTitle = {
                     title = it
                     titleTouched = true
                 },
-                titleError = titleError
+                titleError = titleError,
+                placeHolder = "Category",
+                value = dropDownValue,
+                onValueChange = {
+                    dropDownValue = it
+                    dropDownTouched = true
+                },
+                dropDownError = dropDownError,
+                items = categories
             )
         }
 
@@ -115,9 +129,11 @@ fun ReportCreationForm(
     title: String,
     onValueChangeTitle: (String) -> Unit,
     titleError: Boolean,
-    //email: String,
-    //onValueChangeEmail: (String) -> Unit,
-    //emailError: Boolean,
+    placeHolder: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    items: List<String>,
+    dropDownError: Boolean,
     //password: String,
     //onValueChangePassword: (String) -> Unit,
     //passwordError: Boolean,
@@ -141,6 +157,15 @@ fun ReportCreationForm(
             onValueChange = onValueChangeTitle,
             isError = titleError,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+        )
+
+        GenericDropDownMenu(
+            placeholder = placeHolder,
+            value = value,
+            onValueChange = onValueChange,
+            items = items,
+            isError = dropDownError,
+            supportingText = "Select a City"
         )
 
 
