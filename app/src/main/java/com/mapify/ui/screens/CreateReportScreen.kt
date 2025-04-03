@@ -38,7 +38,9 @@ import com.mapify.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateReportScreen(){
+fun CreateReportScreen(
+    navigateToHome: () -> Unit
+){
 
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
@@ -64,6 +66,7 @@ fun CreateReportScreen(){
     Scaffold(
         topBar = {
             TopAppBar(
+                modifier = Modifier.padding(horizontal = Spacing.Small),
                 title = {
                     Text(
                         text = "Create Report",
@@ -72,7 +75,9 @@ fun CreateReportScreen(){
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = {  }
+                        onClick = {
+                            navigateToHome()
+                        }
                     )  {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
