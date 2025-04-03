@@ -50,4 +50,11 @@
     <string name="publish">Publish</string>
     <string name="pulish_report">Do you want to publish your Report now?</string>
     <string name="publish_report_description">The report will be published with the information you have provided. However, you will be able to modify and update it later</string>
+    <string name="enable_location_access">Enable location access</string>
+    <string name="enable_location_access_message">
+        Location access is required for this app to function properly. Please enable location services to continue.
+    </string>
+    <string name="location_enabled">Welcome, %1$s!</string>
+    <string name="finish_registration">Finish registration</string>
+    <string name="registration_successful">Account registered successfully</string>
 </resources>
