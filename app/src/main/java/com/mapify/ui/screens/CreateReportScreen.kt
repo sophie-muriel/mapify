@@ -39,7 +39,8 @@ import com.mapify.ui.theme.Spacing
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateReportScreen(
-    navigateToHome: () -> Unit
+    navigateToHome: () -> Unit,
+    navigateToReportLocation: () -> Unit
 ){
 
     var title by rememberSaveable { mutableStateOf("") }
@@ -147,7 +148,10 @@ fun CreateReportScreen(
                     photo = it
                     photoTouched = true
                 },
-                photoError = photoError
+                photoError = photoError,
+                navigateToReportLocation = {
+                    navigateToReportLocation()
+                }
             )
         }
 

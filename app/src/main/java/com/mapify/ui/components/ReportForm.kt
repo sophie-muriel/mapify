@@ -41,6 +41,7 @@ fun ReportForm(
     locationError: Boolean,
     photo: String,
     onValueChangePhoto: (String) -> Unit,
+    navigateToReportLocation: () -> Unit,
     photoError: Boolean
 ) {
     Column(
@@ -92,7 +93,9 @@ fun ReportForm(
             isError = locationError,
             leadingIcon = {
                 IconButton(
-                    onClick = {  }
+                    onClick = {
+                        navigateToReportLocation()
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.LocationOn,
