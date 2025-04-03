@@ -22,7 +22,9 @@ import com.mapify.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportLocationScreen(){
+fun ReportLocationScreen(
+    navigateToCreateReport: () -> Unit
+){
     Scaffold(
         topBar = {
             TopAppBar(
@@ -36,7 +38,7 @@ fun ReportLocationScreen(){
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            //navigateToHome()
+                            navigateToCreateReport()
                         }
                     )  {
                         Icon(
