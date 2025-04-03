@@ -1,6 +1,7 @@
 package com.mapify.ui.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.mapify.ui.components.GenericDropDownMenu
 import com.mapify.ui.components.GenericTextField
+import com.mapify.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -186,6 +188,8 @@ fun ReportCreationForm(
             isError = titleError,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
+
+        Spacer(modifier = Modifier.height(Spacing.Inline))
 
         GenericDropDownMenu(
             placeholder = placeHolder,
