@@ -1,19 +1,13 @@
 package com.mapify.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.ImageSearch
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,13 +22,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.mapify.ui.components.GenericDropDownMenu
-import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.ReportForm
 import com.mapify.ui.theme.Spacing
+import com.mapify.model.Report
+import com.mapify.model.ReportStatus
+import com.mapify.model.Category
+import java.time.LocalDateTime
+import kotlin.math.log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +46,7 @@ fun CreateReportScreen(
     var dropDownValue by rememberSaveable { mutableStateOf("") }
     var dropDownExpanded by rememberSaveable { mutableStateOf(false) }
     var dropDownTouched by rememberSaveable { mutableStateOf(false) }
-    val categories = listOf("Security", "Medical Emergency", "Infrastructure", "Pets", "Community")
+    val categories = Category.entries.map { it.displayName }
     val dropDownError = dropDownValue.isBlank()
 
     var description by rememberSaveable { mutableStateOf("") }
@@ -58,11 +54,14 @@ fun CreateReportScreen(
     val descriptionError = descriptionTouched && (description.isBlank() || description.length < 10)
 
     var location by rememberSaveable { mutableStateOf("") }
-    val LocationError = false
+    val locationError = false
 
     var photo by rememberSaveable { mutableStateOf("") }
     var photoTouched by rememberSaveable { mutableStateOf(false) }
     val photoError = photoTouched && photo.isBlank()
+
+    val reportsList = ArrayList<Report>()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -91,9 +90,24 @@ fun CreateReportScreen(
                         onClick = {
                             //Location has to be added here later
                             if (title.isNotEmpty() && dropDownValue.isNotEmpty()
-                                && description.isEmpty() && photo.isNotEmpty()){
-
-                        }
+                                && description.isNotEmpty() && photo.isNotEmpty()){
+                                val newReport = Report(
+                                    title = title,
+                                    category = Category.entries.find { it.displayName == dropDownValue }!!,
+                                    description = description,
+                                    location = null, //This must be changed
+                                    images = listOf(photo),
+                                    id = "1",
+                                    status = ReportStatus.NOT_VERIFIED,
+                                    userId = "1",
+                                    date = LocalDateTime.now()
+                                )
+                                reportsList.add(newReport)
+                                //val size = reportsList.get(0).category.toString()
+                                //Toast.makeText(context, size, Toast.LENGTH_SHORT).show()
+                            }else{
+                                Toast.makeText(context, "0", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     )  {
                         Icon(
@@ -148,7 +162,7 @@ fun CreateReportScreen(
                 onValueChangeLocation = {
                     location = it
                 },
-                locationError = LocationError,
+                locationError = locationError,
                 photo = photo,
                 onValueChangePhoto = {
                     photo = it

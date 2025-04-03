@@ -8,7 +8,7 @@ class Report(
     var category: Category,
     var description: String,
     var images: List<String>,
-    var location: Location,
+    var location: Location?,
     var status: ReportStatus,
     var userId: String,
     var date: LocalDateTime,
