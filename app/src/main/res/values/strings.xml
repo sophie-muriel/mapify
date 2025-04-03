@@ -24,4 +24,8 @@
     <string name="login_account">Already have an account? Login</string>
     <string name="root_login">root</string>
     <string name="root_password">root</string>
+    <string name="forgot_password_description">To recover your password please enter the email you used to register/sign in.</string>
+    <string name="send_email_recovery_link">Send link</string>
+    <string name="recovery_email_sent">Recovery email sent</string>
+    <string name="back">Back</string>
 </resources>

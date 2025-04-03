@@ -1,13 +1,17 @@
 package com.mapify.ui.screens
 
-import android.content.Context
+import android.util.Patterns
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
@@ -31,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.mapify.R
@@ -44,12 +49,17 @@ fun LoginScreen(
 ) {
 
     var email by rememberSaveable { mutableStateOf("") }
+    var recoveryEmail by rememberSaveable { mutableStateOf("") }
+    var recoveryEmailTouched by rememberSaveable { mutableStateOf(false) }
     var password by rememberSaveable { mutableStateOf("") }
 
     val context = LocalContext.current
 
     val rootLogin = stringResource(id = R.string.root_login)
     val rootPassword = stringResource(id = R.string.root_password)
+
+    val recoveryEmailError =
+        recoveryEmailTouched && !Patterns.EMAIL_ADDRESS.matcher(recoveryEmail).matches()
 
     Scaffold { padding ->
         Column(
@@ -82,7 +92,20 @@ fun LoginScreen(
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                }
+                },
+                recoveryEmail,
+                onValueChangeRecoveryEmail = {
+                    recoveryEmail = it
+                    recoveryEmailTouched = true
+                },
+                onClickRecovery = {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.recovery_email_sent),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                },
+                recoveryEmailError
             )
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
@@ -98,6 +121,10 @@ fun LoginForm(
     onValueChangePassword: (String) -> Unit,
     navigateToRegistration: () -> Unit,
     onClickLogin: () -> Unit,
+    recoveryEmail: String,
+    onValueChangeRecoveryEmail: (String) -> Unit,
+    onClickRecovery: () -> Unit,
+    recoveryEmailError: Boolean
 ) {
 
     var dialogVisible by remember { mutableStateOf(false) }
@@ -105,7 +132,7 @@ fun LoginForm(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = Spacing.Sides),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         GenericTextField(
@@ -155,9 +182,7 @@ fun LoginForm(
         Button(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    start = 24.dp, end = 24.dp
-                )
+                .padding(horizontal = Spacing.Sides)
                 .height(40.dp),
             enabled = email.isNotEmpty() && password.isNotEmpty(),
             onClick = onClickLogin,
@@ -186,35 +211,108 @@ fun LoginForm(
 
     if (dialogVisible) {
         RecoveryPasswordDialog(
+            recoveryEmail,
+            onValueChangeRecoveryEmail,
+            onClickRecovery,
             onClose = {
                 dialogVisible = false
-            })
+            },
+            recoveryEmailError
+        )
     }
 }
 
 @Composable
 fun RecoveryPasswordDialog(
-    onClose: () -> Unit
+    recoveryEmail: String,
+    onValueChangeRecoveryEmail: (String) -> Unit,
+    onClickRecovery: () -> Unit,
+    onClose: () -> Unit,
+    recoveryEmailError: Boolean
 ) {
     Dialog(
-        onDismissRequest = {
-            onClose()
-        }) {
-        Card {
-            Column {
-                Text(
-                    text = "Texto de ejemplo"
-                )
+        onDismissRequest = { onClose() }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentSize(),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Spacer(modifier = Modifier.height(Spacing.Sides))
+
+            Text(
+                text = stringResource(id = R.string.forgot_password),
+                textAlign = TextAlign.Left,
+                modifier = Modifier.padding(
+                    horizontal = Spacing.Sides,
+                    vertical = Spacing.Small
+                ),
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Text(
+                text = stringResource(id = R.string.forgot_password_description),
+                textAlign = TextAlign.Left,
+                modifier = Modifier.padding(
+                    horizontal = Spacing.Sides,
+                    vertical = Spacing.Small
+                ),
+                style = MaterialTheme.typography.bodySmall
+            )
+            GenericTextField(
+                value = recoveryEmail,
+                supportingText = stringResource(id = R.string.email_supporting_text),
+                label = stringResource(id = R.string.email_label),
+                onValueChange = onValueChangeRecoveryEmail,
+                isError = recoveryEmailError,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Email,
+                        contentDescription = stringResource(id = R.string.email_icon_description),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = Spacing.Sides
+                    ),
+                horizontalArrangement = Arrangement.End
+            ) {
                 TextButton(
-                    onClick = {
-                        onClose()
-                    }) {
+                    onClick = onClose
+                ) {
                     Text(
-                        text = "Cerrar"
+                        text = stringResource(id = R.string.back),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+
+                Button(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .height(40.dp),
+                    enabled = recoveryEmail.isNotEmpty() && !recoveryEmailError,
+                    onClick = {
+                        onClickRecovery()
+                        onClose()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.send_email_recovery_link),
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
 
+            Spacer(modifier = Modifier.height(Spacing.Sides))
         }
 
     }

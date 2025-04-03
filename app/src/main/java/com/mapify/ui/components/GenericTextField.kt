@@ -1,6 +1,7 @@
 package com.mapify.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.mapify.ui.theme.Spacing
 
 @Composable
 fun GenericTextField(
@@ -34,10 +36,8 @@ fun GenericTextField(
             Modifier
             .fillMaxWidth()
             .padding(
-                start = 24.dp,
-                end = 24.dp,
-                top = 4.dp,
-                bottom = 4.dp
+                horizontal = Spacing.Sides,
+                vertical = Spacing.Small
             )
         ),
         leadingIcon = leadingIcon,
@@ -57,7 +57,7 @@ fun GenericTextField(
         label = {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodyMedium
             )
         },
         value = value,
