@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.ui.theme.Spacing
 
@@ -78,7 +79,7 @@ fun ReportForm(
         )
 
         GenericTextField(
-            modifier = Modifier.aspectRatio(2f),
+            modifier = Modifier.height(160.dp),
             value = description,
             label = stringResource( id = R.string.description ),
             onValueChange = onValueChangeDescription,

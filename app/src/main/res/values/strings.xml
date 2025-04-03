@@ -30,6 +30,7 @@
     <string name="back">Back</string>
     <string name="title">Title</string>
     <string name="title_supporting_text">You must provide a title</string>
+    <string name="category">Category</string>
     <string name="category_suporting_test">You must select a category</string>
     <string name="description">Description</string>
     <string name="description_supporting_text">You must provide at least a 10 characters description</string>
@@ -42,4 +43,11 @@
     <string name="create_report">Create Report</string>
     <string name="back_arrow_icon">Back Arrow Icon</string>
     <string name="check_icon">Check Icon</string>"
+    <string name="exit_report_creation">Are you sure you want to exit the report creation?</string>
+    <string name="exit_report_creation_description">If you exit now, all changes will be lost, and the report will not be created.</string>
+    <string name="cancel">Cancel</string>
+    <string name="exit">Exit</string>
+    <string name="publish">Publish</string>
+    <string name="pulish_report">Do you want to publish your Report now?</string>
+    <string name="publish_report_description">The report will be published with the information you have provided. However, you will be able to modify and update it later</string>
 </resources>

@@ -1,30 +1,39 @@
 package com.mapify.ui.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -32,7 +41,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.mapify.R
 import com.mapify.ui.components.ReportForm
 import com.mapify.ui.theme.Spacing
@@ -43,7 +54,6 @@ import com.mapify.model.Location
 import com.mapify.model.Role
 import com.mapify.model.User
 import java.time.LocalDateTime
-import kotlin.math.log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,7 +83,7 @@ fun CreateReportScreen(
     var photoTouched by rememberSaveable { mutableStateOf(false) }
     val photoError = photoTouched && photo.isBlank()
 
-    val reportsList = ArrayList<Report>()
+    val reportsList = remember { mutableStateListOf<Report>() }
     val embeddedUser = User(
         id = "1",
         fullName = "Embedded User",
@@ -87,11 +97,14 @@ fun CreateReportScreen(
             city = "Armenia"
         )
     )
-    var reportsIdsCounter = reportsList.size + 1
+    var reportsIdCounter by rememberSaveable { mutableIntStateOf(1) }
 
     val context = LocalContext.current
 
     val isKeyboardActive = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+
+    var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var publishReportVisible by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -107,7 +120,7 @@ fun CreateReportScreen(
                     navigationIcon = {
                         IconButton(
                             onClick = {
-                                navigateToHome()
+                                exitDialogVisible = true
                             }
                         )  {
                             Icon(
@@ -122,21 +135,7 @@ fun CreateReportScreen(
                                 //Location has to be added here later
                                 if (title.isNotBlank() && dropDownValue.isNotBlank()
                                     && description.isNotBlank() && photo.isNotBlank()){
-                                    val newReport = Report(
-                                        title = title,
-                                        category = Category.entries.find { it.displayName == dropDownValue }!!,
-                                        description = description,
-                                        location = null, //This must be changed here and in Report model erase the "?"
-                                        images = listOf(photo),
-                                        id = reportsIdsCounter.toString(),
-                                        status = ReportStatus.NOT_VERIFIED,
-                                        userId = embeddedUser.id,
-                                        date = LocalDateTime.now()
-                                    )
-                                    reportsIdsCounter++
-                                    reportsList.add(newReport)
-                                    val size = reportsList.get(0).id
-                                    Toast.makeText(context, size, Toast.LENGTH_SHORT).show()
+                                    publishReportVisible = true
                                 }else{
                                     //Location has to be added here later
                                     if(title.isBlank()){
@@ -151,7 +150,6 @@ fun CreateReportScreen(
                                     if(photo.isBlank()){
                                         photoTouched = true
                                     }
-                                    Toast.makeText(context, "No report created", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         )  {
@@ -180,7 +178,7 @@ fun CreateReportScreen(
                     titleTouched = true
                 },
                 titleError = titleError,
-                placeHolder = "Category",
+                placeHolder = stringResource( id = R.string.category),
                 value = dropDownValue,
                 onValueChange = {
                     dropDownValue = it
@@ -222,8 +220,201 @@ fun CreateReportScreen(
         }
 
     }
+    if (exitDialogVisible) {
+        ExitReportCreationDialog(
+            onClose = {
+                exitDialogVisible = false
+            },
+            onExit = {
+                exitDialogVisible = false
+                navigateToHome()
+            }
+        )
+    }
+
+    if (publishReportVisible) {
+        PublishReportDialog(
+            onClose = {
+                publishReportVisible = false
+            },
+            onPublish = {
+                publishReportVisible = false
+                val newReport = Report(
+                    title = title,
+                    category = Category.entries.find { it.displayName == dropDownValue }!!,
+                    description = description,
+                    location = null, //This must be changed here and in Report model erase the "?"
+                    images = listOf(photo),
+                    id = reportsIdCounter.toString(),
+                    status = ReportStatus.NOT_VERIFIED,
+                    userId = embeddedUser.id,
+                    date = LocalDateTime.now()
+                )
+                reportsIdCounter++
+                reportsList.add(newReport)
+                for (report in reportsList){
+                    Toast.makeText(context, report.id, Toast.LENGTH_LONG).show()
+                }
+            }
+        )
+    }
 
 }
 
+@Composable
+fun ExitReportCreationDialog(
+    onClose: () -> Unit,
+    onExit: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = { onClose() }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentSize(),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Spacer(modifier = Modifier.height(Spacing.Sides))
+
+            Text(
+                text = stringResource(id = R.string.exit_report_creation),
+                textAlign = TextAlign.Left,
+                modifier = Modifier.padding(
+                    horizontal = Spacing.Sides,
+                    vertical = Spacing.Small
+                ),
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Text(
+                text = stringResource(id = R.string.exit_report_creation_description),
+                textAlign = TextAlign.Left,
+                modifier = Modifier.padding(
+                    horizontal = Spacing.Sides,
+                    vertical = Spacing.Small
+                ),
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = Spacing.Sides
+                    ),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(
+                    onClick = {
+                        onClose()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.cancel),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+
+                Button(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .height(40.dp),
+                    onClick = {
+                        onExit()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.exit),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(Spacing.Sides))
+        }
+
+    }
+}
+
+@Composable
+fun PublishReportDialog(
+    onClose: () -> Unit,
+    onPublish: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = { onClose() }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentSize(),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Spacer(modifier = Modifier.height(Spacing.Sides))
+
+            Text(
+                text = stringResource(id = R.string.pulish_report),
+                textAlign = TextAlign.Left,
+                modifier = Modifier.padding(
+                    horizontal = Spacing.Sides,
+                    vertical = Spacing.Small
+                ),
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Text(
+                text = stringResource(id = R.string.publish_report_description),
+                textAlign = TextAlign.Left,
+                modifier = Modifier.padding(
+                    horizontal = Spacing.Sides,
+                    vertical = Spacing.Small
+                ),
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = Spacing.Sides
+                    ),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(
+                    onClick = {
+                        onClose()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.cancel),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+
+                Button(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .height(40.dp),
+                    onClick = {
+                        onPublish()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.publish),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(Spacing.Sides))
+        }
+
+    }
+}
 
 
