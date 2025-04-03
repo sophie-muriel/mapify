@@ -1,8 +1,10 @@
 package com.mapify.ui.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.mapify.ui.components.GenericDropDownMenu
@@ -41,6 +44,10 @@ fun CreateReportScreen(){
     var dropDownTouched by rememberSaveable { mutableStateOf(false) }
     val categories = listOf("Security", "Medical Emergency", "Infrastructure", "Pets", "Community")
     val dropDownError = dropDownValue.isBlank()
+
+    var description by rememberSaveable { mutableStateOf("") }
+    var descriptionTouched by rememberSaveable { mutableStateOf(false) }
+    val descriptionError = titleTouched && title.isBlank()
 
     Scaffold(
         topBar = {
@@ -106,7 +113,13 @@ fun CreateReportScreen(){
                 onDismissRequest = {
                     dropDownExpanded = false
                 },
-                isTouched = dropDownTouched
+                isTouched = dropDownTouched,
+                description = description,
+                onValueChangeDescription = {
+                    description = it
+                    descriptionTouched = true
+                },
+                descriptionError = descriptionError
             )
         }
 
@@ -127,7 +140,10 @@ fun ReportCreationForm(
     isExpanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     isTouched: Boolean,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    description: String,
+    onValueChangeDescription: (String) -> Unit,
+    descriptionError: Boolean,
     //password: String,
     //onValueChangePassword: (String) -> Unit,
     //passwordError: Boolean,
@@ -164,6 +180,16 @@ fun ReportCreationForm(
             onExpandedChange = onExpandedChange,
             onDismissRequest = onDismissRequest,
             isTouched = isTouched
+        )
+        
+        GenericTextField(
+            modifier = Modifier.aspectRatio(2f),
+            value = description,
+            label = "Description",
+            onValueChange = onValueChangeDescription,
+            isError = descriptionError,
+            supportingText = "Add a description",
+            isSingleLine = false,
         )
 
 
