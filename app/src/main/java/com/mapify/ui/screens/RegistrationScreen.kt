@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.ui.components.GenericTextField
@@ -43,15 +44,16 @@ fun RegistrationScreen(
 
     var name by rememberSaveable { mutableStateOf("") }
     var nameTouched by rememberSaveable { mutableStateOf(false) }
-
     var email by rememberSaveable { mutableStateOf("") }
     var emailTouched by rememberSaveable { mutableStateOf(false) }
-
     var password by rememberSaveable { mutableStateOf("") }
     var passwordTouched by rememberSaveable { mutableStateOf(false) }
-
     var passwordConfirmation by rememberSaveable { mutableStateOf("") }
     var passwordConfirmationTouched by rememberSaveable { mutableStateOf(false) }
+
+    var locationShared by rememberSaveable { mutableStateOf(false) }
+    var locationForm by rememberSaveable { mutableStateOf(false) }
+    val location = "Colombia" // fixed for now, change when location access is explained in class
 
     val context = LocalContext.current
     val rootLogin = stringResource(id = R.string.root_login)
@@ -62,6 +64,16 @@ fun RegistrationScreen(
     val passwordError = passwordTouched && password.length < 6
     val passwordConfirmationError = passwordConfirmationTouched && passwordConfirmation != password
 
+    fun resetFields() {
+        name = ""
+        nameTouched = false
+        email = ""
+        emailTouched = false
+        password = ""
+        passwordTouched = false
+        passwordConfirmation = ""
+        passwordConfirmationTouched = false
+    }
 
     Scaffold { padding ->
         Column(
@@ -70,43 +82,88 @@ fun RegistrationScreen(
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.height(Spacing.TopBottomScreen + 15.dp))
+            // registration form first part
+            if (!locationForm) {
+                Spacer(modifier = Modifier.height(Spacing.TopBottomScreen + 15.dp))
 
-            // logo + name
-            LogoTitle(3.5f)
+                // logo + name
+                LogoTitle(3.5f)
 
-            Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
 
-            // text form
-            RegistrationForm(name, onValueChangeName = {
-                name = it
-                nameTouched = true
-            }, nameError, email, onValueChangeEmail = {
-                email = it
-                emailTouched = true
-            }, emailError, password, onValueChangePassword = {
-                password = it
-                passwordTouched = true
-            }, passwordError, passwordConfirmation, onValueChangePasswordConfirmation = {
-                passwordConfirmation = it
-                passwordConfirmationTouched = true
-            }, passwordConfirmationError, onClickRegister = {
-                if (email != rootLogin) {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.location_access),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    Toast.makeText(
-                        context, context.getString(R.string.email_taken), Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }, navigateToLogin = {
-                navigateToLogin()
-            })
+                RegistrationForm(name, onValueChangeName = {
+                    name = it
+                    nameTouched = true
+                }, nameError, email, onValueChangeEmail = {
+                    email = it
+                    emailTouched = true
+                }, emailError, password, onValueChangePassword = {
+                    password = it
+                    passwordTouched = true
+                }, passwordError, passwordConfirmation, onValueChangePasswordConfirmation = {
+                    passwordConfirmation = it
+                    passwordConfirmationTouched = true
+                }, passwordConfirmationError, onClickRegister = {
+                    if (email != rootLogin) {
+                        locationForm = true
+                    } else {
+                        Toast.makeText(
+                            context, context.getString(R.string.email_taken), Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }, navigateToLogin = {
+                    navigateToLogin()
+                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                        resetFields()
+                    }, 100)
+                })
 
-            Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
+                Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
+            } else { // registration form part 2
+                Spacer(modifier = Modifier.height(Spacing.TopBottomScreen * 2))
+
+                // TODO: change this into actual location icon and title
+                LogoTitle(2f)
+
+                Spacer(modifier = Modifier.height(Spacing.Inline * 2))
+
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = Spacing.Sides * 2
+                        )
+                        .align(Alignment.CenterHorizontally),
+                    text = if (locationShared) stringResource(
+                        id = R.string.location_enabled,
+                        location
+                    ) else stringResource(id = R.string.enable_location_access_message),
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                ConfirmLocationForm(
+                    locationShared,
+                    onClickConfirmLocation = {
+                        if (locationShared) {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.registration_successful),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            navigateToLogin()
+                            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                                resetFields()
+                            }, 100)
+                        } else {
+                            locationShared = true
+                        }
+                    }
+                )
+
+            }
         }
     }
 }
@@ -131,12 +188,12 @@ fun RegistrationForm(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = Spacing.Sides),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             modifier = Modifier
-                .padding(start = 24.dp)
+                .padding(start = Spacing.Sides)
                 .align(Alignment.Start),
             text = stringResource(id = R.string.enter_information_label),
             style = MaterialTheme.typography.labelSmall
@@ -244,4 +301,53 @@ fun RegistrationForm(
             )
         }
     }
+}
+
+@Composable
+fun ConfirmLocationForm(
+    locationShared: Boolean,
+    onClickConfirmLocation: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Spacing.Sides),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = Spacing.Sides               )
+                .height(40.dp),
+            enabled = true,
+            onClick = onClickConfirmLocation,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+        ) {
+            Text(
+                text = if (locationShared) stringResource(id = R.string.finish_registration) else stringResource(
+                    id = R.string.enable_location_access
+                ),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+
+    Spacer(modifier = Modifier.padding(Spacing.Inline))
+
+    TextButton(
+        onClick = {},
+        enabled = false
+    ) {
+        Text(
+            text = "",
+            style = MaterialTheme.typography.labelSmall
+        )
+    }
+
+    Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
 }

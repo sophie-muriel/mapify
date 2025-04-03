@@ -28,4 +28,11 @@
     <string name="send_email_recovery_link">Send link</string>
     <string name="recovery_email_sent">Recovery email sent</string>
     <string name="back">Back</string>
+    <string name="enable_location_access">Enable location access</string>
+    <string name="enable_location_access_message">
+        Location access is required for this app to function properly. Please enable location services to continue.
+    </string>
+    <string name="location_enabled">Welcome, %1$s!</string>
+    <string name="finish_registration">Finish registration</string>
+    <string name="registration_successful">Account registered successfully</string>
 </resources>
