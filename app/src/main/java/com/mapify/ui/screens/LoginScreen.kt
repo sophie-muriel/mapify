@@ -61,6 +61,16 @@ fun LoginScreen(
     val recoveryEmailError =
         recoveryEmailTouched && !Patterns.EMAIL_ADDRESS.matcher(recoveryEmail).matches()
 
+    fun resetFields() {
+        email = ""
+        password = ""
+    }
+
+    fun resetRecoveryFields(){
+        recoveryEmail = ""
+        recoveryEmailTouched = false
+    }
+
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -81,10 +91,12 @@ fun LoginScreen(
                 password,
                 onValueChangeEmail = { email = it },
                 onValueChangePassword = { password = it },
-                navigateToRegistration = { navigateToRegistration() },
                 onClickLogin = {
                     if (email == rootLogin && password == rootPassword) {
                         navigateToHome()
+                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                            resetFields()
+                        }, 200)
                     } else {
                         Toast.makeText(
                             context,
@@ -92,6 +104,12 @@ fun LoginScreen(
                             Toast.LENGTH_SHORT
                         ).show()
                     }
+                },
+                onClickRegistration = {
+                    navigateToRegistration()
+                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                        resetFields()
+                    }, 100)
                 },
                 recoveryEmail,
                 onValueChangeRecoveryEmail = {
@@ -105,7 +123,11 @@ fun LoginScreen(
                         Toast.LENGTH_SHORT
                     ).show()
                 },
-                recoveryEmailError
+                recoveryEmailError,
+                resetRecoveryFields = {
+                    resetRecoveryFields()
+                }
+
             )
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
@@ -119,12 +141,13 @@ fun LoginForm(
     password: String,
     onValueChangeEmail: (String) -> Unit,
     onValueChangePassword: (String) -> Unit,
-    navigateToRegistration: () -> Unit,
     onClickLogin: () -> Unit,
+    onClickRegistration: () -> Unit,
     recoveryEmail: String,
     onValueChangeRecoveryEmail: (String) -> Unit,
     onClickRecovery: () -> Unit,
-    recoveryEmailError: Boolean
+    recoveryEmailError: Boolean,
+    resetRecoveryFields: () -> Unit
 ) {
 
     var dialogVisible by remember { mutableStateOf(false) }
@@ -168,9 +191,9 @@ fun LoginForm(
         TextButton(
             modifier = Modifier
                 .padding(end = 36.dp)
-                .align(Alignment.End), onClick = {
-                dialogVisible = true
-            }) {
+                .align(Alignment.End),
+            onClick = { dialogVisible = true })
+        {
             Text(
                 text = stringResource(id = R.string.forgot_password),
                 style = MaterialTheme.typography.labelSmall,
@@ -200,7 +223,7 @@ fun LoginForm(
         Spacer(modifier = Modifier.padding(Spacing.Inline))
 
         TextButton(
-            onClick = navigateToRegistration
+            onClick = onClickRegistration
         ) {
             Text(
                 text = stringResource(id = R.string.register_account),
@@ -215,6 +238,7 @@ fun LoginForm(
             onValueChangeRecoveryEmail,
             onClickRecovery,
             onClose = {
+                resetRecoveryFields()
                 dialogVisible = false
             },
             recoveryEmailError
