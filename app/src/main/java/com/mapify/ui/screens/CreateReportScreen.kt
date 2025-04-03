@@ -23,6 +23,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -38,6 +39,9 @@ import com.mapify.ui.theme.Spacing
 import com.mapify.model.Report
 import com.mapify.model.ReportStatus
 import com.mapify.model.Category
+import com.mapify.model.Location
+import com.mapify.model.Role
+import com.mapify.model.User
 import java.time.LocalDateTime
 import kotlin.math.log
 
@@ -70,6 +74,21 @@ fun CreateReportScreen(
     val photoError = photoTouched && photo.isBlank()
 
     val reportsList = ArrayList<Report>()
+    val embeddedUser = User(
+        id = "1",
+        fullName = "Embedded User",
+        email = "embedded@mail.com",
+        password = "ThisIsATestPass",
+        role = Role.CLIENT,
+        registrationLocation = Location(
+            latitude = 43230.1,
+            longitude = 753948.7,
+            country = "Colombia",
+            city = "Armenia"
+        )
+    )
+    var reportsIdsCounter = reportsList.size + 1
+
     val context = LocalContext.current
 
     val isKeyboardActive = WindowInsets.ime.getBottom(LocalDensity.current) > 0
@@ -107,15 +126,16 @@ fun CreateReportScreen(
                                         title = title,
                                         category = Category.entries.find { it.displayName == dropDownValue }!!,
                                         description = description,
-                                        location = null, //This must be changed
+                                        location = null, //This must be changed here and in Report model erase the "?"
                                         images = listOf(photo),
-                                        id = "1",
+                                        id = reportsIdsCounter.toString(),
                                         status = ReportStatus.NOT_VERIFIED,
-                                        userId = "1",
+                                        userId = embeddedUser.id,
                                         date = LocalDateTime.now()
                                     )
+                                    reportsIdsCounter++
                                     reportsList.add(newReport)
-                                    val size = reportsList.get(0).category.toString()
+                                    val size = reportsList.get(0).id
                                     Toast.makeText(context, size, Toast.LENGTH_SHORT).show()
                                 }else{
                                     //Location has to be added here later
@@ -144,7 +164,6 @@ fun CreateReportScreen(
                     },
                 )
             }
-
         }
     ) { padding ->
 
