@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.mapify.ui.components.GenericDropDownMenu
 import com.mapify.ui.components.GenericTextField
+import com.mapify.ui.components.ReportForm
 import com.mapify.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +52,7 @@ fun CreateReportScreen(){
 
     var description by rememberSaveable { mutableStateOf("") }
     var descriptionTouched by rememberSaveable { mutableStateOf(false) }
-    val descriptionError = titleTouched && title.isBlank()
+    val descriptionError = descriptionTouched && (description.isBlank() || description.length < 10)
 
     var location by rememberSaveable { mutableStateOf("") }
     val LocationError = false
@@ -100,7 +101,7 @@ fun CreateReportScreen(){
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            ReportCreationForm(
+            ReportForm(
                 title = title,
                 onValueChangeTitle = {
                     title = it
@@ -149,108 +150,5 @@ fun CreateReportScreen(){
 
 }
 
-@Composable
-fun ReportCreationForm(
-    title: String,
-    onValueChangeTitle: (String) -> Unit,
-    titleError: Boolean,
-    placeHolder: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    items: List<String>,
-    dropDownError: Boolean,
-    isExpanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
-    isTouched: Boolean,
-    onDismissRequest: () -> Unit,
-    description: String,
-    onValueChangeDescription: (String) -> Unit,
-    descriptionError: Boolean,
-    location: String,
-    onValueChangeLocation: (String) -> Unit,
-    locationError: Boolean,
-    photo: String,
-    onValueChangePhoto: (String) -> Unit,
-    photoError: Boolean
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
 
-        GenericTextField(
-            value = title,
-            supportingText = "You must provide a title",
-            label = "Title",
-            onValueChange = onValueChangeTitle,
-            isError = titleError,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-
-        Spacer(modifier = Modifier.height(Spacing.Inline))
-
-        GenericDropDownMenu(
-            placeholder = placeHolder,
-            value = value,
-            onValueChange = onValueChange,
-            items = items,
-            isError = dropDownError,
-            supportingText = "Select a City",
-            isExpanded = isExpanded,
-            onExpandedChange = onExpandedChange,
-            onDismissRequest = onDismissRequest,
-            isTouched = isTouched
-        )
-        
-        GenericTextField(
-            modifier = Modifier.aspectRatio(2f),
-            value = description,
-            label = "Description",
-            onValueChange = onValueChangeDescription,
-            isError = descriptionError,
-            supportingText = "Add a description",
-            isSingleLine = false,
-        )
-
-        GenericTextField(
-            value = location,
-            supportingText = "A location must be provided",
-            label = "Location",
-            onValueChange = onValueChangeLocation,
-            isError = locationError,
-            leadingIcon = {
-                IconButton(
-                    onClick = {  }
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.LocationOn,
-                        contentDescription = "Location Icon",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-        )
-
-        GenericTextField(
-            value = photo,
-            supportingText = "A photo url must be provided",
-            label = "Photo",
-            onValueChange = onValueChangePhoto,
-            isError = photoError,
-            leadingIcon = {
-                IconButton(
-                    onClick = {  }
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.ImageSearch,
-                        contentDescription = "Location Icon",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-        )
-    }
-}
 

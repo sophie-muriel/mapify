@@ -29,7 +29,8 @@ fun GenericTextField(
     leadingIcon: @Composable (() -> Unit)? = null,
     isSingleLine: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    readOnly: Boolean = false
 ){
     OutlinedTextField(
         modifier = modifier.then(
@@ -63,5 +64,6 @@ fun GenericTextField(
         value = value,
         onValueChange = onValueChange,
         textStyle = MaterialTheme.typography.bodyMedium,
+        readOnly = readOnly
     )
 }
