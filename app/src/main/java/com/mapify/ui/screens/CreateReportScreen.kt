@@ -101,8 +101,8 @@ fun CreateReportScreen(
                         IconButton(
                             onClick = {
                                 //Location has to be added here later
-                                if (title.isNotEmpty() && dropDownValue.isNotEmpty()
-                                    && description.isNotEmpty() && photo.isNotEmpty()){
+                                if (title.isNotBlank() && dropDownValue.isNotBlank()
+                                    && description.isNotBlank() && photo.isNotBlank()){
                                     val newReport = Report(
                                         title = title,
                                         category = Category.entries.find { it.displayName == dropDownValue }!!,
@@ -118,6 +118,19 @@ fun CreateReportScreen(
                                     val size = reportsList.get(0).category.toString()
                                     Toast.makeText(context, size, Toast.LENGTH_SHORT).show()
                                 }else{
+                                    //Location has to be added here later
+                                    if(title.isBlank()){
+                                        titleTouched = true
+                                    }
+                                    if(dropDownValue.isBlank()){
+                                        dropDownTouched = true
+                                    }
+                                    if(description.isBlank() || description.length < 10){
+                                        descriptionTouched = true
+                                    }
+                                    if(photo.isBlank()){
+                                        photoTouched = true
+                                    }
                                     Toast.makeText(context, "No report created", Toast.LENGTH_SHORT).show()
                                 }
                             }
