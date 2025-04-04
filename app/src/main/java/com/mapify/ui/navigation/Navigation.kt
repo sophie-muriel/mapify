@@ -38,6 +38,9 @@ fun Navigation() {
                 HomeScreen(
                     navigateToProfile = {
                         navController.navigate(RouteScreen.Profile)
+                    },
+                    navigateToCreateReport = {
+                        navController.navigate(RouteScreen.CreateReport)
                     })
             }
             composable<RouteScreen.CreateReport> {
