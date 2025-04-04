@@ -128,38 +128,7 @@ fun CreateReportScreen(
                                 contentDescription = stringResource(id = R.string.back_arrow_icon)
                             )
                         }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                //Location has to be added here later
-                                if (title.isNotBlank() && dropDownValue.isNotBlank()
-                                    && description.isNotBlank() && photo.isNotBlank()){
-                                    publishReportVisible = true
-                                }else{
-                                    //Location has to be added here later
-                                    if(title.isBlank()){
-                                        titleTouched = true
-                                    }
-                                    if(dropDownValue.isBlank()){
-                                        dropDownTouched = true
-                                    }
-                                    if(description.isBlank() || description.length < 10){
-                                        descriptionTouched = true
-                                    }
-                                    if(photo.isBlank()){
-                                        photoTouched = true
-                                    }
-                                }
-                            }
-                        )  {
-                            Icon(
-                                modifier = Modifier.size(48.dp),
-                                imageVector = Icons.Outlined.CheckCircle,
-                                contentDescription = stringResource( id = R.string.check_icon)
-                            )
-                        }
-                    },
+                    }
                 )
             }
         }
@@ -178,7 +147,7 @@ fun CreateReportScreen(
                     titleTouched = true
                 },
                 titleError = titleError,
-                placeHolder = stringResource( id = R.string.category),
+                placeHolder = stringResource(id = R.string.category),
                 value = dropDownValue,
                 onValueChange = {
                     dropDownValue = it
@@ -215,6 +184,9 @@ fun CreateReportScreen(
                 photoError = photoError,
                 navigateToReportLocation = {
                     navigateToReportLocation()
+                },
+                onClickCreate = {
+                    publishReportVisible = true
                 }
             )
         }
@@ -258,7 +230,6 @@ fun CreateReportScreen(
             }
         )
     }
-
 }
 
 @Composable
@@ -332,10 +303,8 @@ fun ExitReportCreationDialog(
                     )
                 }
             }
-
             Spacer(modifier = Modifier.height(Spacing.Sides))
         }
-
     }
 }
 
@@ -410,10 +379,8 @@ fun PublishReportDialog(
                     )
                 }
             }
-
             Spacer(modifier = Modifier.height(Spacing.Sides))
         }
-
     }
 }
 

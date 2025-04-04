@@ -10,9 +10,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ImageSearch
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +48,8 @@ fun ReportForm(
     photo: String,
     onValueChangePhoto: (String) -> Unit,
     navigateToReportLocation: () -> Unit,
-    photoError: Boolean
+    photoError: Boolean,
+    onClickCreate: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -128,5 +132,25 @@ fun ReportForm(
                 }
             }
         )
+
+        Spacer(modifier = Modifier.padding(Spacing.Inline))
+
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.Sides)
+                .height(40.dp),
+            enabled = title.isNotBlank() && value.isNotBlank() && description.isNotBlank() && photo.isNotBlank(), //Location has to be added here later
+            onClick = onClickCreate,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+        ) {
+            Text(
+                text = stringResource(id = R.string.create),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }
