@@ -78,7 +78,7 @@ fun TopNavigationBar(
             IconButton(onClick = onClickTop) {
                 Icon(
                     Icons.Filled.AccountCircle,
-                    contentDescription = stringResource(id = R.string.profile_name_icon_description)
+                    contentDescription = stringResource(id = R.string.name_icon_description)
                 )
             }
         },
