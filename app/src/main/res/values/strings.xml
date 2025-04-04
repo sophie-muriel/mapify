@@ -73,5 +73,8 @@
     <string name="edit_profile_label">Edit Profile</string>
     <string name="save_changes_label">Save Changes</string>
 
-    <string name="edit_icon_description">Edit icon</string>}
+    <string name="edit_icon_description">Edit icon</string>
+    <string name="title_icon_description">Title icon</string>
+    <string name="description_icon_description">Description icon</string> <!--funny, no?-->
+    <string name="category_icon_description">Category icon</string>
 </resources>
