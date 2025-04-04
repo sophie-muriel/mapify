@@ -25,43 +25,34 @@ import com.mapify.ui.theme.Spacing
 @Composable
 fun ReportLocationScreen(
     navigateToCreateReport: () -> Unit
-){
+) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                modifier = Modifier.padding(horizontal = Spacing.Small),
-                title = {
-                    Text(
-                        text = "Report Location",
-                        style = MaterialTheme.typography.titleLarge
+            TopAppBar(modifier = Modifier.padding(horizontal = Spacing.Small), title = {
+                Text(
+                    text = "Report Location", style = MaterialTheme.typography.titleLarge
+                )
+            }, navigationIcon = {
+                IconButton(
+                    onClick = {
+                        navigateToCreateReport()
+                    }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Close icon"
                     )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navigateToCreateReport()
-                        }
-                    )  {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Close icon"
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(
-                        onClick = {  }
-                    )  {
-                        Icon(
-                            modifier = Modifier.size(48.dp),
-                            imageVector = Icons.Outlined.CheckCircle,
-                            contentDescription = "Check"
-                        )
-                    }
                 }
-            )
-        }
-    ) { padding ->
+            }, actions = {
+                IconButton(
+                    onClick = { }) {
+                    Icon(
+                        modifier = Modifier.size(48.dp),
+                        imageVector = Icons.Outlined.CheckCircle,
+                        contentDescription = "Check"
+                    )
+                }
+            })
+        }) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()

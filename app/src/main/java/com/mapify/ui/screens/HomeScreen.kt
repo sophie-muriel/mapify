@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun HomeScreen(){
+fun HomeScreen() {
     Scaffold { padding ->
         Column(
             modifier = Modifier

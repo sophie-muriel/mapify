@@ -31,15 +31,14 @@ fun GenericTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isPassword: Boolean = false,
     readOnly: Boolean = false
-){
+) {
     OutlinedTextField(
         modifier = modifier.then(
             Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = Spacing.Sides,
-                vertical = Spacing.Small
-            )
+                .fillMaxWidth()
+                .padding(
+                    horizontal = Spacing.Sides, vertical = Spacing.Small
+                )
         ),
         leadingIcon = leadingIcon,
         singleLine = isSingleLine,
@@ -54,11 +53,10 @@ fun GenericTextField(
             }
         },
         keyboardOptions = keyboardOptions,
-        visualTransformation = if(isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         label = {
             Text(
-                text = label,
-                style = MaterialTheme.typography.bodyMedium
+                text = label, style = MaterialTheme.typography.bodyMedium
             )
         },
         value = value,
