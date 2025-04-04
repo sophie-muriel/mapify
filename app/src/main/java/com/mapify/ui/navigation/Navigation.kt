@@ -6,13 +6,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mapify.ui.screens.CreateReportScreen
-import com.mapify.ui.screens.EditProfileScreen
 import com.mapify.ui.screens.LoginScreen
 import com.mapify.ui.screens.RegistrationScreen
 import com.mapify.ui.screens.HomeScreen
 import com.mapify.ui.screens.ProfileScreen
 import com.mapify.ui.screens.ReportLocationScreen
-import com.mapify.ui.screens.ReportViewScreen
 
 @Composable
 fun Navigation() {
@@ -63,16 +61,8 @@ fun Navigation() {
             }
             composable<RouteScreen.Profile> {
                 ProfileScreen(
-                    navigateToEditProfile = {
-                        navController.navigate(RouteScreen.EditProfile)
-                    }
-                )
-            }
-
-            composable<RouteScreen.EditProfile> {
-                EditProfileScreen(
-                    navigateBack = {
-                        navController.popBackStack()
+                    navigateToHome = {
+                        navController.navigate(RouteScreen.Home)
                     }
                 )
             }
