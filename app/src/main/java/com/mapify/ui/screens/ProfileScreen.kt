@@ -29,9 +29,12 @@ import com.mapify.ui.theme.Spacing
 fun ProfileScreen(
     navigateToHome: () -> Unit
 ) {
-    val name = stringResource(id = R.string.profile_name_value)
-    val email = stringResource(id = R.string.profile_email_value)
-    val password = stringResource(id = R.string.profile_password_value)
+    var name = stringResource(id = R.string.profile_name_value)
+    var nameTouched by rememberSaveable { mutableStateOf(false) }
+    var email = stringResource(id = R.string.profile_email_value)
+    var emailTouched by rememberSaveable { mutableStateOf(false) }
+    var password = stringResource(id = R.string.profile_password_value)
+    var passwordTouched by rememberSaveable { mutableStateOf(false) }
     val location = stringResource(id = R.string.profile_location_value)
 
     var newName by rememberSaveable { mutableStateOf(name) }
@@ -85,7 +88,16 @@ fun ProfileScreen(
             if (!editMode) {
                 ProfileInformation(name, email, password, location)
             } else {
-                ProfileEdit()
+                ProfileEdit(name, email, password, location, onValueChangeName = {
+                    name = it
+                    nameTouched = true
+                }, onValueChangeEmail = {
+                    email = it
+                    emailTouched = true
+                }, onValueChangePassword = {
+                    password = it
+                    passwordTouched = true
+                }, onClickEdit = { editMode = !editMode })
             }
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen / 2))
@@ -187,7 +199,78 @@ fun ProfileInformation(
 }
 
 @Composable
-fun ProfileEdit() {
-    //TODO: add profile edit (previously edit profile screen composable)
+fun ProfileEdit(
+    name: String,
+    email: String,
+    password: String,
+    location: String, // ?
+    onValueChangeName: (String) -> Unit,
+    onValueChangeEmail: (String) -> Unit,
+    onValueChangePassword: (String) -> Unit,
+    onClickEdit: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Spacing.Sides),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {}
 
+    GenericTextField(
+        value = name,
+        label = stringResource(id = R.string.name_label),
+        onValueChange = onValueChangeName,
+        isError = false
+    )
+
+    GenericTextField(
+        value = email,
+        label = stringResource(id = R.string.email_label),
+        onValueChange = onValueChangeEmail,
+        isError = false
+    )
+
+    GenericTextField(
+        value = password,
+        label = stringResource(id = R.string.password_label),
+        onValueChange = onValueChangePassword,
+        isError = false,
+        isPassword = true
+    )
+
+    GenericTextField(
+        value = location,
+        label = stringResource(id = R.string.location),
+        onValueChange = {},
+        isError = false,
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Outlined.LocationOn,
+                contentDescription = stringResource(id = R.string.profile_location_icon_description),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        },
+        isSingleLine = true,
+        readOnly = true
+    )
+
+    Spacer(modifier = Modifier.height(Spacing.Inline * 2))
+
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Spacing.Sides)
+            .height(40.dp),
+        enabled = true, // check errors ahahahahahaha
+        onClick = { onClickEdit() },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        ),
+    ) {
+        Text(
+            text = stringResource(id = R.string.save_changes_label),
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
 }
