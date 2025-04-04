@@ -46,7 +46,7 @@ import com.mapify.ui.theme.Spacing
 fun RegistrationScreen(
     navigateToLogin: () -> Unit
 ) {
-    //TODO: add show/hide password functionality (only in first password field) and validate name field
+    //TODO: validate name field
 
     var name by rememberSaveable { mutableStateOf("") }
     var nameTouched by rememberSaveable { mutableStateOf(false) }
@@ -285,7 +285,8 @@ fun RegistrationForm(
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
-            isPassword = true
+            isPassword = true,
+            showTrailingIcon = false
         )
 
         Spacer(modifier = Modifier.padding(Spacing.Inline))

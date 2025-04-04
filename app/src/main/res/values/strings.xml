@@ -77,4 +77,6 @@
     <string name="title_icon_description">Title icon</string>
     <string name="description_icon_description">Description icon</string> <!--funny, no?-->
     <string name="category_icon_description">Category icon</string>
+
+    <string name="password_visibility_description">Toggle password visibility</string>
 </resources>

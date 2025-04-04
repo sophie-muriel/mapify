@@ -69,7 +69,7 @@ fun ProfileScreen(
                     //TODO: add popup to confirm discarding changes (if fields touched) AND saved changes (if fields touched)
                     IconButton(
                         onClick = {
-                            if (editMode) { // temporary
+                            if (editMode) { // temporary (i think)
                                 name = oldName
                                 email = oldEmail
                                 password = oldPassword
@@ -303,7 +303,7 @@ fun ProfileEdit(
                 .fillMaxWidth()
                 .padding(horizontal = Spacing.Sides)
                 .height(40.dp),
-            enabled = true, // check errors ahahahahahaha
+            enabled = true, // TODO: check for field errors ahahahahahaha
             onClick = { onClickEdit() },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
