@@ -1,6 +1,5 @@
 package com.mapify.ui.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -59,7 +58,7 @@ fun CreateReportScreen(
     navigateToHome: () -> Unit,
     navigateToReportLocation: () -> Unit,
     navigateToReportView: () -> Unit
-){
+) {
 
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
