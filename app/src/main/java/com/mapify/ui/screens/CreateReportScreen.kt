@@ -59,8 +59,6 @@ fun CreateReportScreen(
     navigateToReportLocation: () -> Unit,
     navigateToReportView: () -> Unit
 ) {
-    //TODO: could add icons in title, category, and description fields?
-
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
     val titleError = titleTouched && title.isBlank()
@@ -95,8 +93,6 @@ fun CreateReportScreen(
         )
     )
     var reportsIdCounter by rememberSaveable { mutableIntStateOf(1) }
-
-    val context = LocalContext.current
 
     val isKeyboardActive = WindowInsets.ime.getBottom(LocalDensity.current) > 0
 

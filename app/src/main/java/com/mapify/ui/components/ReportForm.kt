@@ -1,15 +1,19 @@
 package com.mapify.ui.components
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Category
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.ImageSearch
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -64,6 +68,16 @@ fun ReportForm(
             label = stringResource(id = R.string.title),
             onValueChange = onValueChangeTitle,
             isError = titleError,
+            leadingIcon = {
+                IconButton(
+                    onClick = { }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Title,
+                        contentDescription = stringResource(id = R.string.title_icon_description),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
 
@@ -79,8 +93,17 @@ fun ReportForm(
             isExpanded = isExpanded,
             onExpandedChange = onExpandedChange,
             onDismissRequest = onDismissRequest,
-            isTouched = isTouched
-        )
+            isTouched = isTouched,
+            leadingIcon = {
+                IconButton(
+                    onClick = { }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Category,
+                        contentDescription = stringResource(id = R.string.category_icon_description),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            })
 
         GenericTextField(
             modifier = Modifier.height(160.dp),
@@ -90,7 +113,20 @@ fun ReportForm(
             isError = descriptionError,
             supportingText = stringResource(id = R.string.description_supporting_text),
             isSingleLine = false,
-        )
+            leadingIcon = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(top = 16.dp),
+                    contentAlignment = Alignment.TopStart
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Description,
+                        contentDescription = stringResource(id = R.string.description_icon_description),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            })
 
         GenericTextField(
             value = location,
