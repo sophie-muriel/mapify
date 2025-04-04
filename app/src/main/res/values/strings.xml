@@ -58,4 +58,7 @@
     <string name="location_enabled">Welcome, %1$s!</string>
     <string name="finish_registration">Finish registration</string>
     <string name="registration_successful">Account registered successfully</string>
+    <string name="report_view">Report View</string>
+    <string name="report_location">Report Location</string>
+    <string name="close_icon">Close Icon</string>
 </resources>

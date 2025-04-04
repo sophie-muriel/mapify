@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,14 +22,15 @@ import com.mapify.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportLocationScreen(
+fun ReportViewScreen(
     navigateToCreateReport: () -> Unit
-) {
+){
+
     Scaffold(
         topBar = {
             TopAppBar(modifier = Modifier.padding(horizontal = Spacing.Small), title = {
                 Text(
-                    text = stringResource(id = R.string.report_location), style = MaterialTheme.typography.titleLarge
+                    text = stringResource(id = R.string.report_view), style = MaterialTheme.typography.titleLarge
                 )
             }, navigationIcon = {
                 IconButton(
@@ -38,8 +38,8 @@ fun ReportLocationScreen(
                         navigateToCreateReport()
                     }) {
                     Icon(
-                        imageVector = Icons.Outlined.Close,
-                        contentDescription = stringResource(id = R.string.close_icon)
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(id = R.string.back_arrow_icon)
                     )
                 }
             })
@@ -51,7 +51,7 @@ fun ReportLocationScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Map here")
+            Text(text = "Report info here")
 
         }
     }
