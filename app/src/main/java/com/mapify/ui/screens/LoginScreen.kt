@@ -66,7 +66,7 @@ fun LoginScreen(
         password = ""
     }
 
-    fun resetRecoveryFields(){
+    fun resetRecoveryFields() {
         recoveryEmail = ""
         recoveryEmailTouched = false
     }
@@ -118,9 +118,7 @@ fun LoginScreen(
                 },
                 onClickRecovery = {
                     Toast.makeText(
-                        context,
-                        context.getString(R.string.recovery_email_sent),
-                        Toast.LENGTH_SHORT
+                        context, context.getString(R.string.recovery_email_sent), Toast.LENGTH_SHORT
                     ).show()
                 },
                 recoveryEmailError,
@@ -192,8 +190,7 @@ fun LoginForm(
             modifier = Modifier
                 .padding(end = 36.dp)
                 .align(Alignment.End),
-            onClick = { dialogVisible = true })
-        {
+            onClick = { dialogVisible = true }) {
             Text(
                 text = stringResource(id = R.string.forgot_password),
                 style = MaterialTheme.typography.labelSmall,
@@ -234,14 +231,10 @@ fun LoginForm(
 
     if (dialogVisible) {
         RecoveryPasswordDialog(
-            recoveryEmail,
-            onValueChangeRecoveryEmail,
-            onClickRecovery,
-            onClose = {
+            recoveryEmail, onValueChangeRecoveryEmail, onClickRecovery, onClose = {
                 resetRecoveryFields()
                 dialogVisible = false
-            },
-            recoveryEmailError
+            }, recoveryEmailError
         )
     }
 }
@@ -268,8 +261,7 @@ fun RecoveryPasswordDialog(
                 text = stringResource(id = R.string.forgot_password),
                 textAlign = TextAlign.Left,
                 modifier = Modifier.padding(
-                    horizontal = Spacing.Sides,
-                    vertical = Spacing.Small
+                    horizontal = Spacing.Sides, vertical = Spacing.Small
                 ),
                 style = MaterialTheme.typography.headlineSmall
             )
@@ -277,8 +269,7 @@ fun RecoveryPasswordDialog(
                 text = stringResource(id = R.string.forgot_password_description),
                 textAlign = TextAlign.Left,
                 modifier = Modifier.padding(
-                    horizontal = Spacing.Sides,
-                    vertical = Spacing.Small
+                    horizontal = Spacing.Sides, vertical = Spacing.Small
                 ),
                 style = MaterialTheme.typography.bodySmall
             )
@@ -303,8 +294,7 @@ fun RecoveryPasswordDialog(
                     .fillMaxWidth()
                     .padding(
                         horizontal = Spacing.Sides
-                    ),
-                horizontalArrangement = Arrangement.End
+                    ), horizontalArrangement = Arrangement.End
             ) {
                 TextButton(
                     onClick = onClose

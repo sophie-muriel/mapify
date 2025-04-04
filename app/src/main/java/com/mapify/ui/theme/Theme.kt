@@ -12,15 +12,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Blue80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Blue80, secondary = PurpleGrey80, tertiary = Pink80
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Blue80,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = Blue80, secondary = PurpleGrey40, tertiary = Pink40
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -51,9 +47,7 @@ fun MapifyTheme(
 
 
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
+        colorScheme = colorScheme, typography = Typography, content = content
     )
 }
 

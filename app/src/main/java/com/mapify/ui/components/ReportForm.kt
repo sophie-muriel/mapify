@@ -60,8 +60,8 @@ fun ReportForm(
 
         GenericTextField(
             value = title,
-            supportingText = stringResource( id = R.string.title_supporting_text ),
-            label = stringResource( id = R.string.title ),
+            supportingText = stringResource(id = R.string.title_supporting_text),
+            label = stringResource(id = R.string.title),
             onValueChange = onValueChangeTitle,
             isError = titleError,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
@@ -75,7 +75,7 @@ fun ReportForm(
             onValueChange = onValueChange,
             items = items,
             isError = dropDownError,
-            supportingText = stringResource( id = R.string.category_suporting_test ),
+            supportingText = stringResource(id = R.string.category_suporting_test),
             isExpanded = isExpanded,
             onExpandedChange = onExpandedChange,
             onDismissRequest = onDismissRequest,
@@ -85,28 +85,27 @@ fun ReportForm(
         GenericTextField(
             modifier = Modifier.height(160.dp),
             value = description,
-            label = stringResource( id = R.string.description ),
+            label = stringResource(id = R.string.description),
             onValueChange = onValueChangeDescription,
             isError = descriptionError,
-            supportingText = stringResource( id = R.string.description_supporting_text ),
+            supportingText = stringResource(id = R.string.description_supporting_text),
             isSingleLine = false,
         )
 
         GenericTextField(
             value = location,
-            supportingText = stringResource( id = R.string.location_supporting_text ),
-            label = stringResource( id = R.string.location ),
+            supportingText = stringResource(id = R.string.location_supporting_text),
+            label = stringResource(id = R.string.location),
             onValueChange = onValueChangeLocation,
             isError = locationError,
             leadingIcon = {
                 IconButton(
                     onClick = {
                         navigateToReportLocation()
-                    }
-                ) {
+                    }) {
                     Icon(
                         imageVector = Icons.Outlined.LocationOn,
-                        contentDescription = stringResource( id = R.string.location_icon ),
+                        contentDescription = stringResource(id = R.string.location_icon),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -116,17 +115,16 @@ fun ReportForm(
 
         GenericTextField(
             value = photo,
-            supportingText = stringResource( id = R.string.photo_supporting_text ),
-            label = stringResource( id = R.string.photo ),
+            supportingText = stringResource(id = R.string.photo_supporting_text),
+            label = stringResource(id = R.string.photo),
             onValueChange = onValueChangePhoto,
             isError = photoError,
             leadingIcon = {
                 IconButton(
-                    onClick = {  }
-                ) {
+                    onClick = { }) {
                     Icon(
                         imageVector = Icons.Outlined.ImageSearch,
-                        contentDescription = stringResource( id = R.string.photo_icon ),
+                        contentDescription = stringResource(id = R.string.photo_icon),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }

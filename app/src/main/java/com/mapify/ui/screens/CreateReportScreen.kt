@@ -91,10 +91,7 @@ fun CreateReportScreen(
         password = "ThisIsATestPass",
         role = Role.CLIENT,
         registrationLocation = Location(
-            latitude = 43230.1,
-            longitude = 753948.7,
-            country = "Colombia",
-            city = "Armenia"
+            latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
         )
     )
     var reportsIdCounter by rememberSaveable { mutableIntStateOf(1) }
@@ -108,7 +105,7 @@ fun CreateReportScreen(
 
     Scaffold(
         topBar = {
-            if(!isKeyboardActive){
+            if (!isKeyboardActive) {
                 TopAppBar(
                     modifier = Modifier.padding(horizontal = Spacing.Small),
                     title = {
@@ -121,8 +118,7 @@ fun CreateReportScreen(
                         IconButton(
                             onClick = {
                                 exitDialogVisible = true
-                            }
-                        )  {
+                            }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = stringResource(id = R.string.back_arrow_icon)
@@ -131,8 +127,7 @@ fun CreateReportScreen(
                     }
                 )
             }
-        }
-    ) { padding ->
+        }) { padding ->
 
         Column(
             modifier = Modifier
@@ -193,49 +188,42 @@ fun CreateReportScreen(
 
     }
     if (exitDialogVisible) {
-        ExitReportCreationDialog(
-            onClose = {
-                exitDialogVisible = false
-            },
-            onExit = {
-                exitDialogVisible = false
-                navigateToHome()
-            }
-        )
+        ExitReportCreationDialog(onClose = {
+            exitDialogVisible = false
+        }, onExit = {
+            exitDialogVisible = false
+            navigateToHome()
+        })
     }
 
     if (publishReportVisible) {
-        PublishReportDialog(
-            onClose = {
-                publishReportVisible = false
-            },
-            onPublish = {
-                publishReportVisible = false
-                val newReport = Report(
-                    title = title,
-                    category = Category.entries.find { it.displayName == dropDownValue }!!,
-                    description = description,
-                    location = null, //This must be changed here and in Report model erase the "?"
-                    images = listOf(photo),
-                    id = reportsIdCounter.toString(),
-                    status = ReportStatus.NOT_VERIFIED,
-                    userId = embeddedUser.id,
-                    date = LocalDateTime.now()
-                )
-                reportsIdCounter++
-                reportsList.add(newReport)
-                for (report in reportsList){
-                    Toast.makeText(context, report.id, Toast.LENGTH_LONG).show()
-                }
+        PublishReportDialog(onClose = {
+            publishReportVisible = false
+        }, onPublish = {
+            publishReportVisible = false
+            val newReport = Report(
+                title = title,
+                category = Category.entries.find { it.displayName == dropDownValue }!!,
+                description = description,
+                location = null, //This must be changed here and in Report model erase the "?"
+                images = listOf(photo),
+                id = reportsIdCounter.toString(),
+                status = ReportStatus.NOT_VERIFIED,
+                userId = embeddedUser.id,
+                date = LocalDateTime.now()
+            )
+            reportsIdCounter++
+            reportsList.add(newReport)
+            for (report in reportsList) {
+                Toast.makeText(context, report.id, Toast.LENGTH_LONG).show()
             }
-        )
+        })
     }
 }
 
 @Composable
 fun ExitReportCreationDialog(
-    onClose: () -> Unit,
-    onExit: () -> Unit
+    onClose: () -> Unit, onExit: () -> Unit
 ) {
     Dialog(
         onDismissRequest = { onClose() }) {
@@ -251,8 +239,7 @@ fun ExitReportCreationDialog(
                 text = stringResource(id = R.string.exit_report_creation),
                 textAlign = TextAlign.Left,
                 modifier = Modifier.padding(
-                    horizontal = Spacing.Sides,
-                    vertical = Spacing.Small
+                    horizontal = Spacing.Sides, vertical = Spacing.Small
                 ),
                 style = MaterialTheme.typography.headlineSmall
             )
@@ -260,8 +247,7 @@ fun ExitReportCreationDialog(
                 text = stringResource(id = R.string.exit_report_creation_description),
                 textAlign = TextAlign.Left,
                 modifier = Modifier.padding(
-                    horizontal = Spacing.Sides,
-                    vertical = Spacing.Small
+                    horizontal = Spacing.Sides, vertical = Spacing.Small
                 ),
                 style = MaterialTheme.typography.bodySmall
             )
@@ -271,14 +257,12 @@ fun ExitReportCreationDialog(
                     .fillMaxWidth()
                     .padding(
                         horizontal = Spacing.Sides
-                    ),
-                horizontalArrangement = Arrangement.End
+                    ), horizontalArrangement = Arrangement.End
             ) {
                 TextButton(
                     onClick = {
                         onClose()
-                    }
-                ) {
+                    }) {
                     Text(
                         text = stringResource(id = R.string.cancel),
                         style = MaterialTheme.typography.labelSmall
@@ -310,8 +294,7 @@ fun ExitReportCreationDialog(
 
 @Composable
 fun PublishReportDialog(
-    onClose: () -> Unit,
-    onPublish: () -> Unit
+    onClose: () -> Unit, onPublish: () -> Unit
 ) {
     Dialog(
         onDismissRequest = { onClose() }) {
@@ -327,8 +310,7 @@ fun PublishReportDialog(
                 text = stringResource(id = R.string.pulish_report),
                 textAlign = TextAlign.Left,
                 modifier = Modifier.padding(
-                    horizontal = Spacing.Sides,
-                    vertical = Spacing.Small
+                    horizontal = Spacing.Sides, vertical = Spacing.Small
                 ),
                 style = MaterialTheme.typography.headlineSmall
             )
@@ -336,8 +318,7 @@ fun PublishReportDialog(
                 text = stringResource(id = R.string.publish_report_description),
                 textAlign = TextAlign.Left,
                 modifier = Modifier.padding(
-                    horizontal = Spacing.Sides,
-                    vertical = Spacing.Small
+                    horizontal = Spacing.Sides, vertical = Spacing.Small
                 ),
                 style = MaterialTheme.typography.bodySmall
             )
@@ -347,14 +328,12 @@ fun PublishReportDialog(
                     .fillMaxWidth()
                     .padding(
                         horizontal = Spacing.Sides
-                    ),
-                horizontalArrangement = Arrangement.End
+                    ), horizontalArrangement = Arrangement.End
             ) {
                 TextButton(
                     onClick = {
                         onClose()
-                    }
-                ) {
+                    }) {
                     Text(
                         text = stringResource(id = R.string.cancel),
                         style = MaterialTheme.typography.labelSmall

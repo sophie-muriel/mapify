@@ -135,8 +135,7 @@ fun RegistrationScreen(
                         )
                         .align(Alignment.CenterHorizontally),
                     text = if (locationShared) stringResource(
-                        id = R.string.location_enabled,
-                        location
+                        id = R.string.location_enabled, location
                     ) else stringResource(id = R.string.enable_location_access_message),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
@@ -145,8 +144,7 @@ fun RegistrationScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 ConfirmLocationForm(
-                    locationShared,
-                    onClickConfirmLocation = {
+                    locationShared, onClickConfirmLocation = {
                         if (locationShared) {
                             Toast.makeText(
                                 context,
@@ -160,8 +158,7 @@ fun RegistrationScreen(
                         } else {
                             locationShared = true
                         }
-                    }
-                )
+                    })
 
             }
         }
@@ -305,8 +302,7 @@ fun RegistrationForm(
 
 @Composable
 fun ConfirmLocationForm(
-    locationShared: Boolean,
-    onClickConfirmLocation: () -> Unit
+    locationShared: Boolean, onClickConfirmLocation: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -319,7 +315,8 @@ fun ConfirmLocationForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = Spacing.Sides               )
+                    horizontal = Spacing.Sides
+                )
                 .height(40.dp),
             enabled = true,
             onClick = onClickConfirmLocation,
@@ -331,8 +328,7 @@ fun ConfirmLocationForm(
             Text(
                 text = if (locationShared) stringResource(id = R.string.finish_registration) else stringResource(
                     id = R.string.enable_location_access
-                ),
-                style = MaterialTheme.typography.bodyMedium
+                ), style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -340,12 +336,10 @@ fun ConfirmLocationForm(
     Spacer(modifier = Modifier.padding(Spacing.Inline))
 
     TextButton(
-        onClick = {},
-        enabled = false
+        onClick = {}, enabled = false
     ) {
         Text(
-            text = "",
-            style = MaterialTheme.typography.labelSmall
+            text = "", style = MaterialTheme.typography.labelSmall
         )
     }
 
