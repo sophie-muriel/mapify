@@ -124,7 +124,6 @@ fun ReportForm(
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
-            }
-        )
+            })
     }
 }
