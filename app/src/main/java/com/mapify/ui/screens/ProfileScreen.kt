@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.ui.components.GenericTextField
@@ -29,18 +30,17 @@ import com.mapify.ui.theme.Spacing
 fun ProfileScreen(
     navigateToHome: () -> Unit
 ) {
-    var name = stringResource(id = R.string.profile_name_value)
-    var nameTouched by rememberSaveable { mutableStateOf(false) }
-    var email = stringResource(id = R.string.profile_email_value)
-    var emailTouched by rememberSaveable { mutableStateOf(false) }
-    var password = stringResource(id = R.string.profile_password_value)
-    var passwordTouched by rememberSaveable { mutableStateOf(false) }
+    val oldName = stringResource(id = R.string.profile_name_value)
+    val oldEmail = stringResource(id = R.string.profile_email_value)
+    val oldPassword = stringResource(id = R.string.profile_password_value)
     val location = stringResource(id = R.string.profile_location_value)
 
-    var newName by rememberSaveable { mutableStateOf(name) }
-    var newEmail by rememberSaveable { mutableStateOf(email) }
-    var newPassword by rememberSaveable { mutableStateOf(password) }
-    var newLocation by rememberSaveable { mutableStateOf(location) }
+    var name by rememberSaveable { mutableStateOf(oldName) }
+    var nameTouched by rememberSaveable { mutableStateOf(false) }
+    var email by rememberSaveable { mutableStateOf(oldEmail) }
+    var emailTouched by rememberSaveable { mutableStateOf(false) }
+    var password by rememberSaveable { mutableStateOf(oldPassword) }
+    var passwordTouched by rememberSaveable { mutableStateOf(false) }
 
     val isKeyboardActive = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     var editMode by rememberSaveable { mutableStateOf(false) }
@@ -66,7 +66,14 @@ fun ProfileScreen(
                 }, actions = {
                     //TODO: add popup to confirm discarding changes (if fields touched)
                     IconButton(
-                        onClick = { editMode = !editMode }) {
+                        onClick = {
+                            if (editMode) { // temporary
+                                name = oldName
+                                email = oldEmail
+                                password = oldPassword
+                            }
+                            editMode = !editMode
+                        }) {
                         Icon(
                             imageVector = if (editMode) Icons.Outlined.Close else Icons.Outlined.Edit,
                             contentDescription = stringResource(
@@ -86,7 +93,7 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen / 2))
 
             if (!editMode) {
-                ProfileInformation(name, email, password, location)
+                ProfileInformation(oldName, oldEmail, oldPassword, location)
             } else {
                 ProfileEdit(name, email, password, location, onValueChangeName = {
                     name = it
@@ -207,70 +214,104 @@ fun ProfileEdit(
     onValueChangeName: (String) -> Unit,
     onValueChangeEmail: (String) -> Unit,
     onValueChangePassword: (String) -> Unit,
-    onClickEdit: () -> Unit
+    onClickEdit: () -> Unit // show popup to confirm changes or something idk
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = Spacing.Sides),
         horizontalAlignment = Alignment.CenterHorizontally
-    ) {}
-
-    GenericTextField(
-        value = name,
-        label = stringResource(id = R.string.name_label),
-        onValueChange = onValueChangeName,
-        isError = false
-    )
-
-    GenericTextField(
-        value = email,
-        label = stringResource(id = R.string.email_label),
-        onValueChange = onValueChangeEmail,
-        isError = false
-    )
-
-    GenericTextField(
-        value = password,
-        label = stringResource(id = R.string.password_label),
-        onValueChange = onValueChangePassword,
-        isError = false,
-        isPassword = true
-    )
-
-    GenericTextField(
-        value = location,
-        label = stringResource(id = R.string.location),
-        onValueChange = {},
-        isError = false,
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Outlined.LocationOn,
-                contentDescription = stringResource(id = R.string.profile_location_icon_description),
-                tint = MaterialTheme.colorScheme.primary
-            )
-        },
-        isSingleLine = true,
-        readOnly = true
-    )
-
-    Spacer(modifier = Modifier.height(Spacing.Inline * 2))
-
-    Button(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = Spacing.Sides)
-            .height(40.dp),
-        enabled = true, // check errors ahahahahahaha
-        onClick = { onClickEdit() },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-        ),
     ) {
+        Spacer(Modifier.height(100.dp))
+
         Text(
-            text = stringResource(id = R.string.save_changes_label),
-            style = MaterialTheme.typography.bodyMedium
+            text = stringResource(id = R.string.edit_profile_label),
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.Sides),
+            textAlign = TextAlign.Start
         )
+
+        Spacer(Modifier.padding(Spacing.Inline))
+
+        GenericTextField(
+            value = name,
+            label = stringResource(id = R.string.name_label),
+            onValueChange = onValueChangeName,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.AccountCircle,
+                    contentDescription = stringResource(id = R.string.profile_name_icon_description),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            isError = false
+        )
+
+        GenericTextField(
+            value = email,
+            label = stringResource(id = R.string.email_label),
+            onValueChange = onValueChangeEmail,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Email,
+                    contentDescription = stringResource(id = R.string.email_icon_description),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            isError = false
+        )
+
+        GenericTextField(
+            value = password,
+            label = stringResource(id = R.string.password_label),
+            onValueChange = onValueChangePassword,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Lock,
+                    contentDescription = stringResource(id = R.string.password_icon_description),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            isError = false,
+            isPassword = true
+        )
+
+        GenericTextField(
+            value = location,
+            label = stringResource(id = R.string.location),
+            onValueChange = {},
+            isError = false,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.LocationOn,
+                    contentDescription = stringResource(id = R.string.profile_location_icon_description),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            isSingleLine = true,
+            readOnly = true
+        )
+
+        Spacer(modifier = Modifier.height(Spacing.Inline * 2))
+
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.Sides)
+                .height(40.dp),
+            enabled = true, // check errors ahahahahahaha
+            onClick = { onClickEdit() },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+        ) {
+            Text(
+                text = stringResource(id = R.string.save_changes_label),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }
