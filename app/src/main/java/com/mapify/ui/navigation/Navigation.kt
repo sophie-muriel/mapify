@@ -12,53 +12,42 @@ import com.mapify.ui.screens.HomeScreen
 import com.mapify.ui.screens.ReportLocationScreen
 
 @Composable
-fun Navigation(){
+fun Navigation() {
 
     val navController = rememberNavController()
 
     Surface {
         NavHost(
-            navController = navController,
-            startDestination = RouteScreen.CreateReport
+            navController = navController, startDestination = RouteScreen.CreateReport
         ) {
             composable<RouteScreen.Login> {
-                LoginScreen(
-                    navigateToRegistration = {
-                        navController.navigate(RouteScreen.Registration)
-                    },
-                    navigateToHome = {
-                        navController.navigate(RouteScreen.Home)
-                    }
-                )
+                LoginScreen(navigateToRegistration = {
+                    navController.navigate(RouteScreen.Registration)
+                }, navigateToHome = {
+                    navController.navigate(RouteScreen.Home)
+                })
             }
             composable<RouteScreen.Registration> {
                 RegistrationScreen(
                     navigateToLogin = {
                         navController.navigate(RouteScreen.Login)
-                    }
-                )
+                    })
             }
             composable<RouteScreen.Home> {
                 HomeScreen()
             }
-
             composable<RouteScreen.CreateReport> {
-                CreateReportScreen(
-                    navigateToHome = {
-                        navController.navigate(RouteScreen.Home)
-                    },
-                    navigateToReportLocation = {
-                        navController.navigate(RouteScreen.ReportLocation)
-                    }
-                )
+                CreateReportScreen(navigateToHome = {
+                    navController.navigate(RouteScreen.Home)
+                }, navigateToReportLocation = {
+                    navController.navigate(RouteScreen.ReportLocation)
+                })
             }
-
             composable<RouteScreen.ReportLocation> {
                 ReportLocationScreen(
                     navigateToCreateReport = {
                         navController.navigate(RouteScreen.CreateReport)
-                    }
-                )
+                    })
             }
         }
     }

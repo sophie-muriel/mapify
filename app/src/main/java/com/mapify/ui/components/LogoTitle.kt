@@ -23,7 +23,7 @@ fun LogoTitle(ratio: Float) {
     val isDarkTheme = isSystemInDarkTheme()
     val logo = if (isDarkTheme) R.drawable.mapify_dark else R.drawable.mapify_light
 
-    Column (
+    Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
         modifier = Modifier.wrapContentHeight()
