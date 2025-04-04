@@ -126,7 +126,7 @@ fun ProfileInformation(
     ) {
         Icon(
             imageVector = Icons.Outlined.AccountCircle,
-            contentDescription = stringResource(id = R.string.profile_name_icon_description),
+            contentDescription = stringResource(id = R.string.name_icon_description),
             modifier = Modifier
                 .size(100.dp)
                 .padding(bottom = Spacing.Inline),
@@ -148,7 +148,7 @@ fun ProfileInformation(
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Outlined.AccountCircle,
-                    contentDescription = stringResource(id = R.string.profile_name_icon_description),
+                    contentDescription = stringResource(id = R.string.name_icon_description),
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
@@ -197,7 +197,7 @@ fun ProfileInformation(
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Outlined.LocationOn,
-                    contentDescription = stringResource(id = R.string.profile_location_icon_description),
+                    contentDescription = stringResource(id = R.string.location_icon_description),
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
@@ -244,7 +244,7 @@ fun ProfileEdit(
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Outlined.AccountCircle,
-                    contentDescription = stringResource(id = R.string.profile_name_icon_description),
+                    contentDescription = stringResource(id = R.string.name_icon_description),
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
@@ -288,7 +288,7 @@ fun ProfileEdit(
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Outlined.LocationOn,
-                    contentDescription = stringResource(id = R.string.profile_location_icon_description),
+                    contentDescription = stringResource(id = R.string.location_icon_description),
                     tint = MaterialTheme.colorScheme.primary
                 )
             },

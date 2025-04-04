@@ -55,6 +55,7 @@
     <string name="enable_location_access_message">
         Location access is required for this app to function properly. Please enable location services to continue.
     </string>
+    <string name="enable_location_title_message">Know what\'s nearby</string>
     <string name="location_enabled">Welcome, %1$s!</string>
     <string name="finish_registration">Finish registration</string>
     <string name="registration_successful">Account registered successfully</string>
@@ -68,8 +69,7 @@
     <string name="profile_email_value">root</string>
     <string name="profile_password_value">123456</string>
     <string name="profile_location_value">4°32;30.1;N 75°39;48.7;W</string>
-    <string name="profile_name_icon_description">Name icon</string>
-    <string name="profile_location_icon_description">Location Icon</string>
+    <string name="location_icon_description">Location Icon</string>
     <string name="edit_profile_label">Edit Profile</string>
     <string name="save_changes_label">Save Changes</string>
 
