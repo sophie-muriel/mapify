@@ -26,26 +26,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mapify.R
+import com.mapify.ui.theme.Spacing
 
 @Composable
 fun HomeScreen(
     navigateToProfile: () -> Unit, navigateToCreateReport: () -> Unit
 ) {
-    Scaffold(
-        topBar = { TopBar(title = stringResource(id = R.string.app_name), navigateToProfile) },
-        bottomBar = { BottomNavigationBar() },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navigateToCreateReport()
-                }, containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add",
-                )
-            }
-        }) { padding ->
+    Scaffold(topBar = {
+        TopNavigationBar(
+            onClickTop = {
+                navigateToProfile()
+            })
+    }, bottomBar = { BottomNavigationBar() }, floatingActionButton = {
+        FloatingActionButton(
+            onClick = {
+                navigateToCreateReport()
+            }, containerColor = MaterialTheme.colorScheme.primary
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add",
+            )
+        }
+    }) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -58,15 +61,25 @@ fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(title: String, navigateToProfile: () -> Unit) {
+fun TopNavigationBar(
+    onClickTop: () -> Unit
+) {
     TopAppBar(
-        title = { Text(text = title, style = MaterialTheme.typography.titleLarge) },
+        modifier = Modifier.padding(horizontal = Spacing.Small),
+        title = {
+            Text(
+                text = stringResource(id = R.string.app_name),
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
         navigationIcon = {
-            IconButton(onClick = { navigateToProfile() }) {
-                Icon(Icons.Filled.AccountCircle, contentDescription = "Profile")
+            IconButton(onClick = onClickTop) {
+                Icon(
+                    Icons.Filled.AccountCircle,
+                    contentDescription = stringResource(id = R.string.profile_name_icon_description)
+                )
             }
         },
-        modifier = Modifier.fillMaxWidth()
     )
 }
 
