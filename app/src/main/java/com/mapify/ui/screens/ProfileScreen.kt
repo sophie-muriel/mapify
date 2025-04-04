@@ -29,6 +29,15 @@ import com.mapify.ui.theme.Spacing
 fun ProfileScreen(
     navigateToHome: () -> Unit
 ) {
+    val name = stringResource(id = R.string.profile_name_value)
+    val email = stringResource(id = R.string.profile_email_value)
+    val password = stringResource(id = R.string.profile_password_value)
+    val location = stringResource(id = R.string.profile_location_value)
+
+    var newName by rememberSaveable { mutableStateOf(name) }
+    var newEmail by rememberSaveable { mutableStateOf(email) }
+    var newPassword by rememberSaveable { mutableStateOf(password) }
+    var newLocation by rememberSaveable { mutableStateOf(location) }
 
     val isKeyboardActive = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     var editMode by rememberSaveable { mutableStateOf(false) }
@@ -74,7 +83,7 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen / 2))
 
             if (!editMode) {
-                ProfileInformation()
+                ProfileInformation(name, email, password, location)
             } else {
                 ProfileEdit()
             }
@@ -85,7 +94,9 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileInformation() {
+fun ProfileInformation(
+    name: String, email: String, password: String, location: String // ?
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -109,7 +120,7 @@ fun ProfileInformation() {
         Spacer(modifier = Modifier.height(Spacing.Inline * 2))
 
         GenericTextField(
-            value = stringResource(id = R.string.profile_name_value),
+            value = name,
             label = stringResource(id = R.string.name_label),
             onValueChange = {},
             isError = false,
@@ -125,7 +136,7 @@ fun ProfileInformation() {
         )
 
         GenericTextField(
-            value = stringResource(id = R.string.profile_email_value),
+            value = email,
             label = stringResource(id = R.string.email_label),
             onValueChange = {},
             isError = false,
@@ -141,7 +152,7 @@ fun ProfileInformation() {
         )
 
         GenericTextField(
-            value = stringResource(id = R.string.profile_password_value),
+            value = password,
             label = stringResource(id = R.string.password_label),
             onValueChange = {},
             isError = false,
@@ -158,7 +169,7 @@ fun ProfileInformation() {
         )
 
         GenericTextField(
-            value = stringResource(id = R.string.profile_location_value),
+            value = location,
             label = stringResource(id = R.string.location),
             onValueChange = {},
             isError = false,
@@ -178,4 +189,5 @@ fun ProfileInformation() {
 @Composable
 fun ProfileEdit() {
     //TODO: add profile edit (previously edit profile screen composable)
+
 }
