@@ -176,5 +176,5 @@ fun ProfileInformation() {
 
 @Composable
 fun ProfileEdit() {
-
+    //TODO: add profile edit (previously edit profile screen composable)
 }
