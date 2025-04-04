@@ -302,7 +302,7 @@ fun PublishReportDialog(
             Spacer(modifier = Modifier.height(Spacing.Sides))
 
             Text(
-                text = stringResource(id = R.string.pulish_report),
+                text = stringResource(id = R.string.publish_report),
                 textAlign = TextAlign.Left,
                 modifier = Modifier.padding(
                     horizontal = Spacing.Sides, vertical = Spacing.Small

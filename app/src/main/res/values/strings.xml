@@ -11,7 +11,7 @@
     <string name="welcome_message">Welcome!</string>
     <string name="incorrect_credentials">Incorrect credentials</string>
     <string name="login_label">Login</string>
-    <string name="register_account">Don\'t have an account? Register</string>
+    <string name="register_account">Dont have an account? Register</string>
     <string name="enter_information_label">Please enter your information</string>
     <string name="name_label">Name</string>
     <string name="name_supporting_text">Please enter your name</string>
@@ -38,18 +38,18 @@
     <string name="location_supporting_text">A location must be selected</string>
     <string name="location_icon">Location Icon</string>
     <string name="photo">Photo</string>
-    <string name="photo_supporting_text">You must provide a photo URL</string>"
+    <string name="photo_supporting_text">You must provide a photo URL</string>
     <string name="photo_icon">Photo Icon</string>
     <string name="create_report">Create Report</string>
     <string name="create">Create</string>
     <string name="back_arrow_icon">Back Arrow Icon</string>
-    <string name="check_icon">Check Icon</string>"
+    <string name="check_icon">Check Icon</string>
     <string name="exit_report_creation">Are you sure you want to exit report creation?</string>
     <string name="exit_report_creation_description">If you exit now, all changes will be discarded, and the report will not be created.</string>
     <string name="cancel">Cancel</string>
     <string name="exit">Exit</string>
     <string name="publish">Publish</string>
-    <string name="pulish_report">Do you want to publish your Report now?</string>
+    <string name="publish_report">Do you want to publish your Report now?</string>
     <string name="publish_report_description">The report will be published with the information you have provided. However, you will be able to modify and update it later.</string>
     <string name="enable_location_access">Enable location access</string>
     <string name="enable_location_access_message">
@@ -72,7 +72,7 @@
     <string name="profile_name_value">Perdomeo Crack</string>
     <string name="profile_email_value">perdomeo@mail.com</string>
     <string name="profile_password_value">***********</string>
-    <string name="profile_location_value">4°32&apos;30.1&quot;N 75°39&apos;48.7&quot;W</string>
+    <string name="profile_location_value">4°32;30.1;N 75°39;48.7;W</string>
 
     <string name="profile_back_icon_description">Go Back</string>
     <string name="profile_settings_icon_description">Edit Profile</string>
