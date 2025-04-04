@@ -26,7 +26,8 @@ fun GenericDropDownMenu(
     isError: Boolean,
     supportingText: String,
     isTouched: Boolean,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    leadingIcon: (@Composable () -> Unit)? = null
 ) {
 
     //var isExpanded by rememberSaveable { mutableStateOf(false) }
@@ -52,6 +53,7 @@ fun GenericDropDownMenu(
                     text = "Select a $placeholder", style = MaterialTheme.typography.bodyMedium
                 )
             },
+            leadingIcon = leadingIcon,
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
             },
