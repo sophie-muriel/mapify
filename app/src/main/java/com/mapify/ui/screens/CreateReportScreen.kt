@@ -57,7 +57,8 @@ import java.time.LocalDateTime
 @Composable
 fun CreateReportScreen(
     navigateToHome: () -> Unit,
-    navigateToReportLocation: () -> Unit
+    navigateToReportLocation: () -> Unit,
+    navigateToReportView: () -> Unit
 ){
 
     var title by rememberSaveable { mutableStateOf("") }
@@ -213,9 +214,7 @@ fun CreateReportScreen(
             )
             reportsIdCounter++
             reportsList.add(newReport)
-            for (report in reportsList) {
-                Toast.makeText(context, report.id, Toast.LENGTH_LONG).show()
-            }
+            navigateToReportView()
         })
     }
 }
