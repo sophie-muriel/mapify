@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mapify.ui.screens.CreateReportScreen
+import com.mapify.ui.screens.ExploreScreen
 import com.mapify.ui.screens.LoginScreen
 import com.mapify.ui.screens.RegistrationScreen
 import com.mapify.ui.screens.HomeScreen
@@ -65,6 +66,9 @@ fun Navigation() {
                         navController.navigate(RouteScreen.Home)
                     }
                 )
+            }
+            composable<RouteScreen.Explore> {
+                ExploreScreen()
             }
         }
     }
