@@ -301,7 +301,7 @@ fun RecoveryPasswordDialog(
                 ) {
                     Text(
                         text = stringResource(id = R.string.back),
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
 

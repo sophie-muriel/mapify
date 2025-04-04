@@ -128,8 +128,7 @@ fun ReportForm(
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
-            }
-        )
+            })
 
         Spacer(modifier = Modifier.padding(Spacing.Inline))
 
@@ -138,7 +137,7 @@ fun ReportForm(
                 .fillMaxWidth()
                 .padding(horizontal = Spacing.Sides)
                 .height(40.dp),
-            enabled = title.isNotBlank() && value.isNotBlank() && description.isNotBlank() && photo.isNotBlank(), //Location has to be added here later
+            enabled = title.isNotBlank() && value.isNotBlank() && description.isNotBlank() && photo.isNotBlank(), //TODO: Location has to be added here later
             onClick = onClickCreate,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,

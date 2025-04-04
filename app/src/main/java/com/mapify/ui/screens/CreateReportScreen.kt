@@ -11,12 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -58,9 +56,8 @@ import java.time.LocalDateTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateReportScreen(
-    navigateToHome: () -> Unit,
-    navigateToReportLocation: () -> Unit
-){
+    navigateToHome: () -> Unit, navigateToReportLocation: () -> Unit
+) {
 
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
@@ -106,26 +103,22 @@ fun CreateReportScreen(
     Scaffold(
         topBar = {
             if (!isKeyboardActive) {
-                TopAppBar(
-                    modifier = Modifier.padding(horizontal = Spacing.Small),
-                    title = {
-                        Text(
-                            text = stringResource(id = R.string.create_report),
-                            style = MaterialTheme.typography.titleLarge
+                TopAppBar(modifier = Modifier.padding(horizontal = Spacing.Small), title = {
+                    Text(
+                        text = stringResource(id = R.string.create_report),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }, navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            exitDialogVisible = true
+                        }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(id = R.string.back_arrow_icon)
                         )
-                    },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                exitDialogVisible = true
-                            }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(id = R.string.back_arrow_icon)
-                            )
-                        }
                     }
-                )
+                })
             }
         }) { padding ->
 
@@ -182,8 +175,7 @@ fun CreateReportScreen(
                 },
                 onClickCreate = {
                     publishReportVisible = true
-                }
-            )
+                })
         }
 
     }
@@ -205,7 +197,7 @@ fun CreateReportScreen(
                 title = title,
                 category = Category.entries.find { it.displayName == dropDownValue }!!,
                 description = description,
-                location = null, //This must be changed here and in Report model erase the "?"
+                location = null, //TODO: This must be changed here and in Report model erase the "?"
                 images = listOf(photo),
                 id = reportsIdCounter.toString(),
                 status = ReportStatus.NOT_VERIFIED,
@@ -252,6 +244,8 @@ fun ExitReportCreationDialog(
                 style = MaterialTheme.typography.bodySmall
             )
 
+            Spacer(modifier = Modifier.height(Spacing.Small))
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -265,7 +259,7 @@ fun ExitReportCreationDialog(
                     }) {
                     Text(
                         text = stringResource(id = R.string.cancel),
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
 
@@ -323,6 +317,8 @@ fun PublishReportDialog(
                 style = MaterialTheme.typography.bodySmall
             )
 
+            Spacer(modifier = Modifier.height(Spacing.Small))
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -336,7 +332,7 @@ fun PublishReportDialog(
                     }) {
                     Text(
                         text = stringResource(id = R.string.cancel),
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
 
