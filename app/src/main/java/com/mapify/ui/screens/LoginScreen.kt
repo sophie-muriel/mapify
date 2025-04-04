@@ -47,6 +47,7 @@ import com.mapify.ui.theme.Spacing
 fun LoginScreen(
     navigateToRegistration: () -> Unit, navigateToHome: () -> Unit
 ) {
+    //TODO: add show/hide password functionality
 
     var email by rememberSaveable { mutableStateOf("") }
     var recoveryEmail by rememberSaveable { mutableStateOf("") }

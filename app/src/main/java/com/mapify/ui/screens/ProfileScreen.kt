@@ -52,6 +52,7 @@ fun ProfileScreen(
                         )
                     }
                 }, actions = {
+                    //TODO: add popup to confirm discarding changes (if fields touched)
                     IconButton(
                         onClick = { editMode = !editMode }) {
                         Icon(

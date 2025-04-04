@@ -59,6 +59,7 @@ fun CreateReportScreen(
     navigateToReportLocation: () -> Unit,
     navigateToReportView: () -> Unit
 ) {
+    //TODO: could add icons in title, category, and description fields?
 
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }

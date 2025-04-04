@@ -41,6 +41,7 @@ import com.mapify.ui.theme.Spacing
 fun RegistrationScreen(
     navigateToLogin: () -> Unit
 ) {
+    //TODO: add show/hide password functionality (only in first password field)
 
     var name by rememberSaveable { mutableStateOf("") }
     var nameTouched by rememberSaveable { mutableStateOf(false) }
