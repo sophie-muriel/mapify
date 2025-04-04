@@ -17,10 +17,14 @@ import com.mapify.R
 
 @Composable
 fun BottomNavigationBar(
-    homeSelected: Boolean = true,
+    homeSelected: Boolean = false,
+    navigateToHome: () -> Unit = {},
     searchSelected: Boolean = false,
+    navigateToExplore: () -> Unit = {},
     notificationsSelected: Boolean = false,
-    messagesSelected: Boolean = false
+    navigateToNotifications: () -> Unit = {},
+    messagesSelected: Boolean = false,
+    navigateToMessages: () -> Unit = {},
 ) {
     NavigationBar(
         modifier = Modifier.fillMaxWidth(),
@@ -33,8 +37,12 @@ fun BottomNavigationBar(
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
-            selected = true,
-            onClick = { },
+            selected = homeSelected,
+            onClick = {
+                if(!homeSelected){
+                    navigateToHome()
+                }
+            },
         )
         NavigationBarItem(icon = {
             Icon(
@@ -42,20 +50,38 @@ fun BottomNavigationBar(
                 contentDescription = stringResource(id = R.string.search_icon),
                 tint = MaterialTheme.colorScheme.primary
             )
-        }, selected = false, onClick = { })
+        }, selected = searchSelected,
+            onClick = {
+                if(!searchSelected){
+                    navigateToExplore()
+                }
+            }
+        )
         NavigationBarItem(icon = {
             Icon(
                 Icons.Filled.Notifications,
                 contentDescription = stringResource(id = R.string.notifications_icon),
                 tint = MaterialTheme.colorScheme.primary
             )
-        }, selected = false, onClick = { })
+        }, selected = notificationsSelected,
+            onClick = {
+                if(!notificationsSelected){
+                    navigateToNotifications()
+                }
+            }
+        )
         NavigationBarItem(icon = {
             Icon(
                 Icons.Filled.QuestionAnswer,
                 contentDescription = stringResource(id = R.string.messages_icon),
                 tint = MaterialTheme.colorScheme.primary
             )
-        }, selected = false, onClick = { })
+        }, selected = messagesSelected,
+            onClick = {
+                if(!messagesSelected){
+                    navigateToMessages()
+                }
+            }
+        )
     }
 }
