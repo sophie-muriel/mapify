@@ -72,4 +72,6 @@
     <string name="profile_location_icon_description">Location Icon</string>
     <string name="edit_profile_label">Edit Profile</string>
     <string name="save_changes_label">Save Changes</string>
+
+    <string name="edit_icon_description">Edit icon</string>
 </resources>
