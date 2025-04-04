@@ -11,12 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -79,9 +77,10 @@ fun CreateReportScreen(
     var location by rememberSaveable { mutableStateOf("") }
     val locationError = false
 
+    val regex = Regex("^(https?:\\/\\/)?([a-zA-Z0-9.-]+)\\.([a-zA-Z]{2,})(\\/\\S*)?$")
     var photo by rememberSaveable { mutableStateOf("") }
     var photoTouched by rememberSaveable { mutableStateOf(false) }
-    val photoError = photoTouched && photo.isBlank()
+    val photoError = photoTouched && !regex.matches(photo)
 
     val reportsList = remember { mutableStateListOf<Report>() }
     val embeddedUser = User(
