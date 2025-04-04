@@ -60,7 +60,7 @@
     <string name="registration_successful">Account registered successfully</string>
     <string name="report_view">Report View</string>
     <string name="report_location">Report Location</string>
-    <string name="close_icon">Close Icon</string>
+    <string name="close_icon_description">Close Icon</string>
 
     <string name="profile_title">Profile</string>
     <string name="profile_greeting">Hi, Root!</string>
@@ -73,5 +73,5 @@
     <string name="edit_profile_label">Edit Profile</string>
     <string name="save_changes_label">Save Changes</string>
 
-    <string name="edit_icon_description">Edit icon</string>
+    <string name="edit_icon_description">Edit icon</string>}
 </resources>
