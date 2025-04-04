@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.ui.theme.Spacing
+import com.mapify.ui.components.BottomNavigationBar
 
 @Composable
 fun HomeScreen(
@@ -83,44 +84,4 @@ fun TopNavigationBar(
             }
         },
     )
-}
-
-@Composable
-fun BottomNavigationBar() {
-    NavigationBar(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Filled.Home,
-                    contentDescription = "Home",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            selected = true,
-            onClick = { },
-        )
-        NavigationBarItem(icon = {
-            Icon(
-                Icons.Filled.Search,
-                contentDescription = "Search",
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }, selected = false, onClick = { })
-        NavigationBarItem(icon = {
-            Icon(
-                Icons.Filled.Notifications,
-                contentDescription = "Notifications",
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }, selected = false, onClick = { })
-        NavigationBarItem(icon = {
-            Icon(
-                Icons.Filled.QuestionAnswer,
-                contentDescription = "Messages",
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }, selected = false, onClick = { })
-    }
 }

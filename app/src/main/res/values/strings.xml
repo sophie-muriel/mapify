@@ -75,8 +75,13 @@
 
     <string name="edit_icon_description">Edit icon</string>
     <string name="title_icon_description">Title icon</string>
-    <string name="description_icon_description">Description icon</string> <!--funny, no?-->
+    <string name="description_icon_description">Description icon</string>
     <string name="category_icon_description">Category icon</string>
 
     <string name="password_visibility_description">Toggle password visibility</string>
+
+    <string name="home_icon">Home Icon</string>
+    <string name="search_icon">Search Icon</string>
+    <string name="notifications_icon">Notifications Icon</string>
+    <string name="messages_icon">Messages Icon</string>
 </resources>

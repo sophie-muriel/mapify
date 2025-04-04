@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.mapify.R
 import com.mapify.ui.theme.Spacing
+import com.mapify.ui.components.BottomNavigationBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +29,7 @@ fun ExploreScreen(){
         topBar = {
             TopAppBar(modifier = Modifier.padding(horizontal = Spacing.Small), title = {
                 Text(
-                    text = stringResource(id = R.string.report_view), style = MaterialTheme.typography.titleLarge
+                    text = "Explore Screen"
                 )
             }, navigationIcon = {
                 IconButton(
@@ -41,6 +42,8 @@ fun ExploreScreen(){
                     )
                 }
             })
+        }, bottomBar = {
+            BottomNavigationBar()
         }) { padding ->
         Column(
             modifier = Modifier
@@ -49,7 +52,6 @@ fun ExploreScreen(){
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Report info here")
 
         }
     }

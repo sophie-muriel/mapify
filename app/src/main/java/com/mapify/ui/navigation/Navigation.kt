@@ -20,7 +20,7 @@ fun Navigation() {
 
     Surface {
         NavHost(
-            navController = navController, startDestination = RouteScreen.Login
+            navController = navController, startDestination = RouteScreen.Home
         ) {
             composable<RouteScreen.Login> {
                 LoginScreen(navigateToRegistration = {
