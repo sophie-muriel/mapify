@@ -42,15 +42,6 @@ fun ReportLocationScreen(
                         contentDescription = "Close icon"
                     )
                 }
-            }, actions = {
-                IconButton(
-                    onClick = { }) {
-                    Icon(
-                        modifier = Modifier.size(48.dp),
-                        imageVector = Icons.Outlined.CheckCircle,
-                        contentDescription = "Check"
-                    )
-                }
             })
         }) { padding ->
         Column(
