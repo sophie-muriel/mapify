@@ -32,6 +32,8 @@ import com.mapify.ui.theme.Spacing
 fun HomeScreen(
     navigateToProfile: () -> Unit, navigateToCreateReport: () -> Unit
 ) {
+    //TODO: add logout icon (convenient for tests, anyway)
+
     Scaffold(topBar = {
         TopNavigationBar(
             onClickTop = {
