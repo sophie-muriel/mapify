@@ -41,6 +41,7 @@
     <string name="photo_supporting_text">You must provide a photo URL</string>"
     <string name="photo_icon">Photo Icon</string>
     <string name="create_report">Create Report</string>
+    <string name="create">Create</string>
     <string name="back_arrow_icon">Back Arrow Icon</string>
     <string name="check_icon">Check Icon</string>"
     <string name="exit_report_creation">Are you sure you want to exit the report creation?</string>
