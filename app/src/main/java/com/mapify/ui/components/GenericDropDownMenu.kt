@@ -27,7 +27,7 @@ fun GenericDropDownMenu(
     supportingText: String,
     isTouched: Boolean,
     onDismissRequest: () -> Unit
-){
+) {
 
     //var isExpanded by rememberSaveable { mutableStateOf(false) }
     //var isTouched by rememberSaveable { mutableStateOf(false) }
@@ -36,14 +36,13 @@ fun GenericDropDownMenu(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                horizontal = Spacing.Sides,
-                vertical = Spacing.Small
-            ),
-        expanded = isExpanded,
-        onExpandedChange = onExpandedChange
+                horizontal = Spacing.Sides, vertical = Spacing.Small
+            ), expanded = isExpanded, onExpandedChange = onExpandedChange
     ) {
         OutlinedTextField(
-            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
+            modifier = Modifier
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+                .fillMaxWidth(),
             value = value,
             onValueChange = { },
             readOnly = true,
@@ -59,20 +58,15 @@ fun GenericDropDownMenu(
                         color = MaterialTheme.colorScheme.error
                     )
                 }
-            }
-        )
+            })
 
         ExposedDropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = onDismissRequest
+            expanded = isExpanded, onDismissRequest = onDismissRequest
         ) {
-            items.forEach{ item ->
-                DropdownMenuItem(
-                    text = { Text(text = item) },
-                    onClick = {
-                        onValueChange(item)
-                    }
-                )
+            items.forEach { item ->
+                DropdownMenuItem(text = { Text(text = item) }, onClick = {
+                    onValueChange(item)
+                })
             }
         }
     }
