@@ -46,7 +46,12 @@ fun GenericDropDownMenu(
             value = value,
             onValueChange = { },
             readOnly = true,
-            placeholder = { Text(text = "Select a $placeholder") },
+            textStyle = MaterialTheme.typography.bodyMedium,
+            placeholder = {
+                Text(
+                    text = "Select a $placeholder", style = MaterialTheme.typography.bodyMedium
+                )
+            },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
             },
@@ -64,7 +69,11 @@ fun GenericDropDownMenu(
             expanded = isExpanded, onDismissRequest = onDismissRequest
         ) {
             items.forEach { item ->
-                DropdownMenuItem(text = { Text(text = item) }, onClick = {
+                DropdownMenuItem(text = {
+                    Text(
+                        text = item, style = MaterialTheme.typography.bodyMedium
+                    )
+                }, onClick = {
                     onValueChange(item)
                 })
             }
