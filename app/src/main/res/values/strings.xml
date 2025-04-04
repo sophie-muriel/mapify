@@ -61,4 +61,27 @@
     <string name="report_view">Report View</string>
     <string name="report_location">Report Location</string>
     <string name="close_icon">Close Icon</string>
+
+    <string name="profile_screen_title">Profile</string>
+    <string name="profile_greeting">Hi, Perdomeo Crack!</string>
+    <string name="profile_name_label">Name</string>
+    <string name="profile_email_label">Email</string>
+    <string name="profile_password_label">Password</string>
+    <string name="profile_location_label">Location</string>
+
+    <string name="profile_name_value">Perdomeo Crack</string>
+    <string name="profile_email_value">perdomeo@mail.com</string>
+    <string name="profile_password_value">***********</string>
+    <string name="profile_location_value">4°32&apos;30.1&quot;N 75°39&apos;48.7&quot;W</string>
+
+    <string name="profile_back_icon_description">Go Back</string>
+    <string name="profile_settings_icon_description">Edit Profile</string>
+    <string name="profile_avatar_icon_description">User Avatar</string>
+    <string name="profile_name_icon_description">User Name</string>
+    <string name="profile_email_icon_description">Email Icon</string>
+    <string name="profile_password_icon_description">Password Icon</string>
+    <string name="profile_location_icon_description">Location Icon</string>
+
+    <string name="edit_profile_screen_title">Edit Profile</string>
+    <string name="save_changes">Save Changes</string>
 </resources>
