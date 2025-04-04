@@ -2,12 +2,16 @@ package com.mapify.ui.screens
 
 import android.util.Patterns
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
@@ -28,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -41,7 +46,7 @@ import com.mapify.ui.theme.Spacing
 fun RegistrationScreen(
     navigateToLogin: () -> Unit
 ) {
-    //TODO: add show/hide password functionality (only in first password field)
+    //TODO: add show/hide password functionality (only in first password field) and validate name field
 
     var name by rememberSaveable { mutableStateOf("") }
     var nameTouched by rememberSaveable { mutableStateOf(false) }
@@ -123,8 +128,25 @@ fun RegistrationScreen(
             } else { // registration form part 2
                 Spacer(modifier = Modifier.height(Spacing.TopBottomScreen * 2))
 
-                // TODO: change this into actual location icon and title
-                LogoTitle(2f)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top,
+                    modifier = Modifier.wrapContentHeight()
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.mapify_dark), // placeholder
+                        contentDescription = stringResource(id = R.string.location_icon_description),
+                        modifier = Modifier
+                            .fillMaxWidth(1f)
+                            .aspectRatio(2f)
+                    )
+
+                    Text(
+                        text = stringResource(id = R.string.enable_location_title_message),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(Spacing.Inline * 2))
 
