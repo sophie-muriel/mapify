@@ -30,6 +30,8 @@ import com.mapify.ui.theme.Spacing
 fun ProfileScreen(
     navigateToHome: () -> Unit
 ) {
+    // TODO: take variables and replace old variables with them maybe?
+
     val oldName = stringResource(id = R.string.profile_name_value)
     val oldEmail = stringResource(id = R.string.profile_email_value)
     val oldPassword = stringResource(id = R.string.profile_password_value)
@@ -64,7 +66,7 @@ fun ProfileScreen(
                         )
                     }
                 }, actions = {
-                    //TODO: add popup to confirm discarding changes (if fields touched)
+                    //TODO: add popup to confirm discarding changes (if fields touched) AND saved changes (if fields touched)
                     IconButton(
                         onClick = {
                             if (editMode) { // temporary
