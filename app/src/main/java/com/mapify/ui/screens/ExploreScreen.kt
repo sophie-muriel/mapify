@@ -43,7 +43,7 @@ fun ExploreScreen(){
                 }
             })
         }, bottomBar = {
-            BottomNavigationBar()
+            BottomNavigationBar(searchSelected = true)
         }) { padding ->
         Column(
             modifier = Modifier

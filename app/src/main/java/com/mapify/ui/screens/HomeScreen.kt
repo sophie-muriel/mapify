@@ -40,7 +40,7 @@ fun HomeScreen(
             onClickTop = {
                 navigateToProfile()
             })
-    }, bottomBar = { BottomNavigationBar() }, floatingActionButton = {
+    }, bottomBar = { BottomNavigationBar(homeSelected = true) }, floatingActionButton = {
         FloatingActionButton(
             onClick = {
                 navigateToCreateReport()
