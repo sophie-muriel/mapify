@@ -20,10 +20,13 @@ import androidx.compose.ui.res.stringResource
 import com.mapify.R
 import com.mapify.ui.theme.Spacing
 import com.mapify.ui.components.BottomNavigationBar
+import com.mapify.ui.components.CreateReportFloatingButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExploreScreen(){
+fun ExploreScreen(
+        navigateToCreateReport: () -> Unit
+){
 
     Scaffold(
         topBar = {
@@ -44,6 +47,12 @@ fun ExploreScreen(){
             })
         }, bottomBar = {
             BottomNavigationBar(searchSelected = true)
+        }, floatingActionButton = {
+            CreateReportFloatingButton(
+                navigateToCreateReport = {
+                    navigateToCreateReport()
+                }
+            )
         }) { padding ->
         Column(
             modifier = Modifier

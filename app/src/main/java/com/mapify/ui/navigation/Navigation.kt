@@ -68,7 +68,11 @@ fun Navigation() {
                 )
             }
             composable<RouteScreen.Explore> {
-                ExploreScreen()
+                ExploreScreen(
+                    navigateToCreateReport = {
+                        navController.navigate(RouteScreen.CreateReport)
+                    }
+                )
             }
         }
     }
