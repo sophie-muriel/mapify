@@ -1,11 +1,8 @@
 package com.mapify.ui.components
 
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,9 +23,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,14 +60,13 @@ fun ReportForm(
     onClickCreate: () -> Unit
 ) {
 
-    val images = remember {  mutableStateListOf("")  }
+    val images = remember { mutableStateListOf("") }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = Spacing.Sides),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = Spacing.Sides), horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         GenericTextField(
@@ -127,12 +121,12 @@ fun ReportForm(
             supportingText = stringResource(id = R.string.description_supporting_text),
             isSingleLine = false,
             leadingIcon = {
-                    Icon(
-                        modifier = Modifier.align(Alignment.Start),
-                        imageVector = Icons.Outlined.Description,
-                        contentDescription = stringResource(id = R.string.description_icon_description),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                Icon(
+                    modifier = Modifier.align(Alignment.Start),
+                    imageVector = Icons.Outlined.Description,
+                    contentDescription = stringResource(id = R.string.description_icon_description),
+                    tint = MaterialTheme.colorScheme.primary
+                )
 
             })
 
@@ -158,8 +152,7 @@ fun ReportForm(
         )
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
         ) {
             GenericTextField(
                 modifier = Modifier.weight(1f),
@@ -181,17 +174,15 @@ fun ReportForm(
             IconButton(
                 onClick = {
                     images.add("")
-                }
-            ) {
+                }) {
                 Icon(
-                    imageVector = Icons.Outlined.Add,
-                    contentDescription = null
+                    imageVector = Icons.Outlined.Add, contentDescription = null
                 )
             }
         }
 
-        images.forEachIndexed{ i, image ->
-            if(i==0){
+        images.forEachIndexed { i, image ->
+            if (i == 0) {
                 return@forEachIndexed
             }
             GenericTextField(
