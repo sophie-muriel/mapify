@@ -41,6 +41,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.ColorScheme
@@ -117,6 +120,15 @@ fun ExploreScreen(
                     contentDescription = stringResource(id = R.string.back_arrow_icon)
                 )
             }
+        }, actions = {
+            IconButton(
+                onClick = {
+                }) {
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = stringResource(id = R.string.settings_icon)
+                )
+            }
         })
     }, bottomBar = {
         BottomNavigationBar(searchSelected = true)
@@ -188,7 +200,7 @@ fun ReportCard(
                 ) {
                     if(report.isResolved){
                         Text(
-                            text = "Resolved",
+                            text = stringResource(id = R.string.resolved),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -236,7 +248,7 @@ fun ReportCard(
             ) {
                 Icon(
                     imageVector = if(report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline,
-                    contentDescription = "Star Icon",
+                    contentDescription = stringResource(id = R.string.star_icon),
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(top = 4.dp),
