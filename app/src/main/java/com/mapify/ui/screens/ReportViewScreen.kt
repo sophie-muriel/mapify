@@ -24,13 +24,14 @@ import com.mapify.R
 @Composable
 fun ReportViewScreen(
     navigateToCreateReport: () -> Unit
-){
+) {
 
     Scaffold(
         topBar = {
             TopAppBar(modifier = Modifier.padding(horizontal = Spacing.Small), title = {
                 Text(
-                    text = stringResource(id = R.string.report_view), style = MaterialTheme.typography.titleLarge
+                    text = stringResource(id = R.string.report_view),
+                    style = MaterialTheme.typography.titleLarge
                 )
             }, navigationIcon = {
                 IconButton(

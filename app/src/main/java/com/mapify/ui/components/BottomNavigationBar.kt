@@ -39,7 +39,7 @@ fun BottomNavigationBar(
             },
             selected = homeSelected,
             onClick = {
-                if(!homeSelected){
+                if (!homeSelected) {
                     navigateToHome()
                 }
             },
@@ -50,38 +50,32 @@ fun BottomNavigationBar(
                 contentDescription = stringResource(id = R.string.search_icon),
                 tint = MaterialTheme.colorScheme.primary
             )
-        }, selected = searchSelected,
-            onClick = {
-                if(!searchSelected){
-                    navigateToExplore()
-                }
+        }, selected = searchSelected, onClick = {
+            if (!searchSelected) {
+                navigateToExplore()
             }
-        )
+        })
         NavigationBarItem(icon = {
             Icon(
                 Icons.Filled.Notifications,
                 contentDescription = stringResource(id = R.string.notifications_icon),
                 tint = MaterialTheme.colorScheme.primary
             )
-        }, selected = notificationsSelected,
-            onClick = {
-                if(!notificationsSelected){
-                    navigateToNotifications()
-                }
+        }, selected = notificationsSelected, onClick = {
+            if (!notificationsSelected) {
+                navigateToNotifications()
             }
-        )
+        })
         NavigationBarItem(icon = {
             Icon(
                 Icons.Filled.QuestionAnswer,
                 contentDescription = stringResource(id = R.string.messages_icon),
                 tint = MaterialTheme.colorScheme.primary
             )
-        }, selected = messagesSelected,
-            onClick = {
-                if(!messagesSelected){
-                    navigateToMessages()
-                }
+        }, selected = messagesSelected, onClick = {
+            if (!messagesSelected) {
+                navigateToMessages()
             }
-        )
+        })
     }
 }
