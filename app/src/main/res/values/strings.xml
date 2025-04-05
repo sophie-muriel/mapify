@@ -82,4 +82,7 @@
     <string name="messages_icon">Messages Icon</string>
     
     <string name="report_image">The report image</string>
+    <string name="settings_icon">Settings Icon</string>
+    <string name="resolved">Resolved</string>
+    <string name="star_icon">Star Icon</string>
 </resources>
