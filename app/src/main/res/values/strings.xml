@@ -64,11 +64,7 @@
     <string name="close_icon_description">Close Icon</string>
 
     <string name="profile_title">Profile</string>
-    <string name="profile_greeting">Hi, Root!</string>
-    <string name="profile_name_value">Root</string>
-    <string name="profile_email_value">root</string>
-    <string name="profile_password_value">123456</string>
-    <string name="profile_location_value">4°32;30.1;N 75°39;48.7;W</string>
+    <string name="profile_greeting">Hi, %1$s!</string>
     <string name="location_icon_description">Location Icon</string>
     <string name="edit_profile_label">Edit Profile</string>
     <string name="save_changes_label">Save Changes</string>
