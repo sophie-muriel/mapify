@@ -56,7 +56,7 @@ import java.time.LocalDateTime
 fun CreateReportScreen(
     navigateToHome: () -> Unit,
     navigateToReportLocation: () -> Unit,
-    navigateToReportView: () -> Unit
+    navigateToReportView: (String) -> Unit
 ) {
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
@@ -91,7 +91,7 @@ fun CreateReportScreen(
             latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
         )
     )
-    var reportsIdCounter by rememberSaveable { mutableIntStateOf(1) }
+    var reportsIdCounter by rememberSaveable { mutableIntStateOf(4) }
 
     val isKeyboardActive = WindowInsets.ime.getBottom(LocalDensity.current) > 0
 
@@ -204,7 +204,7 @@ fun CreateReportScreen(
             )
             reportsIdCounter++
             reportsList.add(newReport)
-            navigateToReportView()
+            navigateToReportView(newReport.id)
         })
     }
 }

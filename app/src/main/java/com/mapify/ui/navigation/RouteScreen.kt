@@ -20,7 +20,7 @@ sealed class RouteScreen {
     data object ReportLocation : RouteScreen()
 
     @Serializable
-    data object ReportView : RouteScreen()
+    data class ReportView(val reportId: String) : RouteScreen()
 
     @Serializable
     data object Profile : RouteScreen()
