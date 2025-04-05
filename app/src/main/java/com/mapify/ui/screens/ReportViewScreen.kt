@@ -23,8 +23,7 @@ import com.mapify.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportViewScreen(
-    reportId: String,
-    navigateToCreateReport: () -> Unit
+    reportId: String, navigateToCreateReport: () -> Unit
 ) {
 
     Scaffold(
