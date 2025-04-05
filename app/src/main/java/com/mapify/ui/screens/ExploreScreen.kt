@@ -18,7 +18,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -38,31 +37,22 @@ import com.mapify.ui.components.CreateReportFloatingButton
 import java.time.LocalDateTime
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExploreScreen(
-    navigateToCreateReport: () -> Unit,
-    navigateToReportView: (String) -> Unit
+    navigateToCreateReport: () -> Unit, navigateToReportView: (String) -> Unit
 ) {
 
-    var storedReports = listOf(
+    val storedReports = listOf(
         Report(
             id = "1",
             title = "Report 1",
@@ -123,8 +113,7 @@ fun ExploreScreen(
             }
         }, actions = {
             IconButton(
-                onClick = {
-                }) {
+                onClick = {}) {
                 Icon(
                     imageVector = Icons.Outlined.Settings,
                     contentDescription = stringResource(id = R.string.settings_icon)
@@ -150,10 +139,9 @@ fun ExploreScreen(
                     .padding(horizontal = Spacing.Sides),
                 verticalArrangement = Arrangement.spacedBy(Spacing.Large),
             ) {
-                items(storedReports){ report ->
+                items(storedReports) { report ->
                     ReportCard(
-                        report = report,
-                        navigateToReportView = navigateToReportView
+                        report = report, navigateToReportView = navigateToReportView
                     )
                 }
 
@@ -164,15 +152,14 @@ fun ExploreScreen(
 
 @Composable
 fun ReportCard(
-    report: Report,
-    navigateToReportView: (String) -> Unit
-){
+    report: Report, navigateToReportView: (String) -> Unit
+) {
     ElevatedCard(
         onClick = {
             navigateToReportView(report.id)
-        },
-        modifier = Modifier
-            .fillMaxWidth().height(100.dp)
+        }, modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -180,7 +167,9 @@ fun ReportCard(
             horizontalArrangement = Arrangement.spacedBy(Spacing.Large),
         ) {
             AsyncImage(
-                modifier = Modifier.width(100.dp).height(100.dp),
+                modifier = Modifier
+                    .width(100.dp)
+                    .height(100.dp),
                 model = report.images[0],
                 contentDescription = stringResource(id = R.string.report_image)
             )
@@ -199,7 +188,7 @@ fun ReportCard(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(Spacing.Inline)
                 ) {
-                    if(report.isResolved){
+                    if (report.isResolved) {
                         Text(
                             text = stringResource(id = R.string.resolved),
                             style = MaterialTheme.typography.bodySmall,
@@ -211,8 +200,7 @@ fun ReportCard(
                                 .width(3.dp)
                                 .height(3.dp)
                                 .background(
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    shape = CircleShape
+                                    color = MaterialTheme.colorScheme.secondary, shape = CircleShape
                                 )
                                 .align(alignment = Alignment.CenterVertically)
                         )
@@ -227,8 +215,7 @@ fun ReportCard(
                             .width(3.5.dp)
                             .height(3.5.dp)
                             .background(
-                                color = Color.Black,
-                                shape = CircleShape
+                                color = Color.Black, shape = CircleShape
                             )
                             .align(alignment = Alignment.CenterVertically)
                     )
@@ -239,22 +226,26 @@ fun ReportCard(
                     )
                 }
                 Text(
-                    text = if(report.description.length > 30) report.description.substring(0,30) + "..."
-                        else report.description.substring(0,report.description.length),
+                    text = if (report.description.length > 30) report.description.substring(
+                        0, 30
+                    ) + "..."
+                    else report.description.substring(0, report.description.length),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
 
             Box(
-                modifier = Modifier.fillMaxHeight().padding(top = 12.dp, bottom = 12.dp),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(top = 12.dp, bottom = 12.dp),
             ) {
                 Icon(
-                    imageVector = if(report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline,
+                    imageVector = if (report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline,
                     contentDescription = stringResource(id = R.string.star_icon),
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(top = 4.dp),
-                    tint = if(report.priorityCounter > 20) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                    tint = if (report.priorityCounter > 20) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
                 )
             }
         }
