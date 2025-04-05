@@ -9,7 +9,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -25,35 +24,33 @@ import com.mapify.ui.components.CreateReportFloatingButton
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExploreScreen(
-        navigateToCreateReport: () -> Unit
-){
+    navigateToCreateReport: () -> Unit
+) {
 
-    Scaffold(
-        topBar = {
-            TopAppBar(modifier = Modifier.padding(horizontal = Spacing.Small), title = {
-                Text(
-                    text = "Explore Screen"
-                )
-            }, navigationIcon = {
-                IconButton(
-                    onClick = {
-                        //navigateToCreateReport()
-                    }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(id = R.string.back_arrow_icon)
-                    )
-                }
-            })
-        }, bottomBar = {
-            BottomNavigationBar(searchSelected = true)
-        }, floatingActionButton = {
-            CreateReportFloatingButton(
-                navigateToCreateReport = {
-                    navigateToCreateReport()
-                }
+    Scaffold(topBar = {
+        TopAppBar(modifier = Modifier.padding(horizontal = Spacing.Small), title = {
+            Text(
+                text = "Explore Screen"
             )
-        }) { padding ->
+        }, navigationIcon = {
+            IconButton(
+                onClick = {
+                    //navigateToCreateReport()
+                }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(id = R.string.back_arrow_icon)
+                )
+            }
+        })
+    }, bottomBar = {
+        BottomNavigationBar(searchSelected = true)
+    }, floatingActionButton = {
+        CreateReportFloatingButton(
+            navigateToCreateReport = {
+                navigateToCreateReport()
+            })
+    }) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()

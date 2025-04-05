@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 @Composable
 fun CreateReportFloatingButton(
     navigateToCreateReport: () -> Unit
-){
+) {
 
     FloatingActionButton(
         onClick = {
