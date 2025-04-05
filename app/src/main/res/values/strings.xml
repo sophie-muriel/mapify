@@ -80,4 +80,6 @@
     <string name="search_icon">Search Icon</string>
     <string name="notifications_icon">Notifications Icon</string>
     <string name="messages_icon">Messages Icon</string>
+    
+    <string name="report_image">The report image</string>
 </resources>
