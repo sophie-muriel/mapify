@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.ui.theme.Spacing
 import com.mapify.ui.components.BottomNavigationBar
+import com.mapify.ui.components.CreateReportFloatingButton
 
 @Composable
 fun HomeScreen(
@@ -41,16 +42,7 @@ fun HomeScreen(
                 navigateToProfile()
             })
     }, bottomBar = { BottomNavigationBar(homeSelected = true) }, floatingActionButton = {
-        FloatingActionButton(
-            onClick = {
-                navigateToCreateReport()
-            }, containerColor = MaterialTheme.colorScheme.primary
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add",
-            )
-        }
+        CreateReportFloatingButton(navigateToCreateReport = navigateToCreateReport)
     }) { padding ->
         Box(
             modifier = Modifier
