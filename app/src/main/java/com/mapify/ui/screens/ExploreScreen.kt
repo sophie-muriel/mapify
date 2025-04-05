@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -32,6 +34,7 @@ import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.CreateReportFloatingButton
 import java.time.LocalDateTime
 import androidx.compose.foundation.lazy.items
+import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -142,6 +145,12 @@ fun ReportCard(
             .fillMaxWidth()
     ) {
         Row {
+
+            AsyncImage(
+                modifier = Modifier.width(100.dp).height(100.dp),
+                model = report.images[0],
+                contentDescription = stringResource(id = R.string.report_image)
+            )
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
