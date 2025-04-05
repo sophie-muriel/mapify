@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.mapify.ui.screens.CreateReportScreen
 import com.mapify.ui.screens.ExploreScreen
 import com.mapify.ui.screens.LoginScreen
@@ -52,7 +53,7 @@ fun Navigation() {
                 }, navigateToReportLocation = {
                     navController.navigate(RouteScreen.ReportLocation)
                 }, navigateToReportView = {
-                    navController.navigate(RouteScreen.ReportView)
+                    navController.navigate(RouteScreen.ReportView(it))
                 })
             }
             composable<RouteScreen.ReportLocation> {
@@ -62,7 +63,9 @@ fun Navigation() {
                     })
             }
             composable<RouteScreen.ReportView> {
+                val args = it.toRoute<RouteScreen.ReportView>()
                 ReportViewScreen(
+                    reportId = args.reportId,
                     navigateToCreateReport = {
                         navController.navigate(RouteScreen.CreateReport)
                     })
@@ -78,6 +81,9 @@ fun Navigation() {
                 ExploreScreen(
                     navigateToCreateReport = {
                         navController.navigate(RouteScreen.CreateReport)
+                    },
+                    navigateToReportView = {
+                        navController.navigate(RouteScreen.ReportView(it))
                     }
                 )
             }

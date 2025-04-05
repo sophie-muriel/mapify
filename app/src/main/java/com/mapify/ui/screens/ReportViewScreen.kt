@@ -23,6 +23,7 @@ import com.mapify.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportViewScreen(
+    reportId: String,
     navigateToCreateReport: () -> Unit
 ) {
 
@@ -52,7 +53,7 @@ fun ReportViewScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Report info here")
+            Text(text = reportId)
 
         }
     }
