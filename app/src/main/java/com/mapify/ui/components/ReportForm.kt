@@ -1,14 +1,19 @@
 package com.mapify.ui.components
 
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.ImageSearch
@@ -21,6 +26,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -55,9 +64,13 @@ fun ReportForm(
     photoError: Boolean,
     onClickCreate: () -> Unit
 ) {
+
+    val images = remember {  mutableStateListOf("")  }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = Spacing.Sides),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -114,18 +127,13 @@ fun ReportForm(
             supportingText = stringResource(id = R.string.description_supporting_text),
             isSingleLine = false,
             leadingIcon = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(top = 16.dp),
-                    contentAlignment = Alignment.TopStart
-                ) {
                     Icon(
+                        modifier = Modifier.align(Alignment.Start),
                         imageVector = Icons.Outlined.Description,
                         contentDescription = stringResource(id = R.string.description_icon_description),
                         tint = MaterialTheme.colorScheme.primary
                     )
-                }
+
             })
 
         GenericTextField(
@@ -149,22 +157,63 @@ fun ReportForm(
             readOnly = true
         )
 
-        GenericTextField(
-            value = photo,
-            supportingText = stringResource(id = R.string.photo_supporting_text),
-            label = stringResource(id = R.string.photo),
-            onValueChange = onValueChangePhoto,
-            isError = photoError,
-            leadingIcon = {
-                IconButton(
-                    onClick = { }) {
-                    Icon(
-                        imageVector = Icons.Outlined.ImageSearch,
-                        contentDescription = stringResource(id = R.string.photo_icon),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            GenericTextField(
+                modifier = Modifier.weight(1f),
+                value = photo,
+                supportingText = stringResource(id = R.string.photo_supporting_text),
+                label = stringResource(id = R.string.photo),
+                onValueChange = onValueChangePhoto,
+                isError = photoError,
+                leadingIcon = {
+                    IconButton(
+                        onClick = { }) {
+                        Icon(
+                            imageVector = Icons.Outlined.ImageSearch,
+                            contentDescription = stringResource(id = R.string.photo_icon),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                })
+            IconButton(
+                onClick = {
+                    images.add("")
                 }
-            })
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Add,
+                    contentDescription = null
+                )
+            }
+        }
+
+        images.forEachIndexed{ i, image ->
+            if(i==0){
+                return@forEachIndexed
+            }
+            GenericTextField(
+                value = images[i],
+                supportingText = stringResource(id = R.string.photo_supporting_text),
+                label = stringResource(id = R.string.photo),
+                onValueChange = {
+                    images[i] = it
+                },
+                isError = photoError,
+                leadingIcon = {
+                    IconButton(
+                        onClick = { }) {
+                        Icon(
+                            imageVector = Icons.Outlined.ImageSearch,
+                            contentDescription = stringResource(id = R.string.photo_icon),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                })
+        }
+
 
         Spacer(modifier = Modifier.padding(Spacing.Inline))
 
