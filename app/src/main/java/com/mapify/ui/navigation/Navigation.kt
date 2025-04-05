@@ -38,17 +38,14 @@ fun Navigation() {
                     })
             }
             composable<RouteScreen.Home> {
-                HomeScreen(
-                    navigateToProfile = {
-                        navController.navigate(RouteScreen.Profile)
-                    },
-                    navigateToCreateReport = {
-                        navController.navigate(RouteScreen.CreateReport)
-                    })
+                HomeScreen(navigateToProfile = {
+                    navController.navigate(RouteScreen.Profile)
+                }, navigateToCreateReport = {
+                    navController.navigate(RouteScreen.CreateReport)
+                })
             }
             composable<RouteScreen.CreateReport> {
-                CreateReportScreen(
-                    navigateToHome = {
+                CreateReportScreen(navigateToHome = {
                     navController.navigate(RouteScreen.Home)
                 }, navigateToReportLocation = {
                     navController.navigate(RouteScreen.ReportLocation)
@@ -65,8 +62,7 @@ fun Navigation() {
             composable<RouteScreen.ReportView> {
                 val args = it.toRoute<RouteScreen.ReportView>()
                 ReportViewScreen(
-                    reportId = args.reportId,
-                    navigateToCreateReport = {
+                    reportId = args.reportId, navigateToCreateReport = {
                         navController.navigate(RouteScreen.CreateReport)
                     })
             }
@@ -74,18 +70,14 @@ fun Navigation() {
                 ProfileScreen(
                     navigateToHome = {
                         navController.navigate(RouteScreen.Home)
-                    }
-                )
+                    })
             }
             composable<RouteScreen.Explore> {
-                ExploreScreen(
-                    navigateToCreateReport = {
-                        navController.navigate(RouteScreen.CreateReport)
-                    },
-                    navigateToReportView = {
-                        navController.navigate(RouteScreen.ReportView(it))
-                    }
-                )
+                ExploreScreen(navigateToCreateReport = {
+                    navController.navigate(RouteScreen.CreateReport)
+                }, navigateToReportView = {
+                    navController.navigate(RouteScreen.ReportView(it))
+                })
             }
         }
     }
