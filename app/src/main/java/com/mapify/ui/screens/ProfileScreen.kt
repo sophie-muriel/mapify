@@ -32,10 +32,10 @@ fun ProfileScreen(
 ) {
     // TODO: take variables and replace old variables with them maybe?
 
-    val oldName = stringResource(id = R.string.profile_name_value)
-    val oldEmail = stringResource(id = R.string.profile_email_value)
-    val oldPassword = stringResource(id = R.string.profile_password_value)
-    val location = stringResource(id = R.string.profile_location_value)
+    val oldName = "root"
+    val oldEmail = "root"
+    val oldPassword = "000000"
+    val location = "4°32;30.1;N 75°39;48.7;W"
 
     var name by rememberSaveable { mutableStateOf(oldName) }
     var nameTouched by rememberSaveable { mutableStateOf(false) }
@@ -134,7 +134,7 @@ fun ProfileInformation(
         )
 
         Text(
-            text = stringResource(id = R.string.profile_greeting),
+            text = stringResource(id = R.string.profile_greeting, name),
             style = MaterialTheme.typography.headlineSmall
         )
 
