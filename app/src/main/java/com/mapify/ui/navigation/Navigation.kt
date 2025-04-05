@@ -12,6 +12,7 @@ import com.mapify.ui.screens.RegistrationScreen
 import com.mapify.ui.screens.HomeScreen
 import com.mapify.ui.screens.ProfileScreen
 import com.mapify.ui.screens.ReportLocationScreen
+import com.mapify.ui.screens.ReportViewScreen
 
 @Composable
 fun Navigation() {
@@ -56,6 +57,12 @@ fun Navigation() {
             }
             composable<RouteScreen.ReportLocation> {
                 ReportLocationScreen(
+                    navigateToCreateReport = {
+                        navController.navigate(RouteScreen.CreateReport)
+                    })
+            }
+            composable<RouteScreen.ReportView> {
+                ReportViewScreen(
                     navigateToCreateReport = {
                         navController.navigate(RouteScreen.CreateReport)
                     })
