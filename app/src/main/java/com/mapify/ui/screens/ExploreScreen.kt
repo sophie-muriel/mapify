@@ -1,9 +1,12 @@
 package com.mapify.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,6 +37,18 @@ import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.CreateReportFloatingButton
 import java.time.LocalDateTime
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.automirrored.filled.StarHalf
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,7 +63,7 @@ fun ExploreScreen(
             id = "1",
             title = "Report 1",
             category = Category.SECURITY,
-            description = "This is an embedded test report",
+            description = "This is a report",
             images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s"),
             location = Location(
                 latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
@@ -61,14 +76,16 @@ fun ExploreScreen(
             id = "2",
             title = "Report 2",
             category = Category.PETS,
-            description = "This is an embedded test report",
+            description = "This is an embedded test report to test the pets category and the resolved flag and verified status",
             images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHtshKCjboh0e9X3dP5l-igYWWA4C8-nSaw&s"),
             location = Location(
                 latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
             ),
             status = ReportStatus.VERIFIED,
             userId = "1",
-            date = LocalDateTime.now()
+            date = LocalDateTime.now(),
+            isResolved = true,
+            priorityCounter = 25
         ),
         Report(
             id = "3",
@@ -117,8 +134,8 @@ fun ExploreScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(Spacing.Inline),
+                    .padding(horizontal = Spacing.Sides),
+                verticalArrangement = Arrangement.spacedBy(Spacing.Large),
             ) {
                 items(storedReports){ report ->
                     ReportCard(
@@ -137,15 +154,18 @@ fun ReportCard(
     report: Report,
     navigateToReportView: (String) -> Unit
 ){
-    OutlinedCard(
+    ElevatedCard(
         onClick = {
             navigateToReportView(report.id)
         },
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth().height(100.dp)
     ) {
-        Row {
-
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.Large),
+        ) {
             AsyncImage(
                 modifier = Modifier.width(100.dp).height(100.dp),
                 model = report.images[0],
@@ -153,13 +173,74 @@ fun ReportCard(
             )
 
             Column(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(Spacing.Small),
             ) {
                 Text(
-                    text = report.title
+                    text = report.title,
+                    style = MaterialTheme.typography.titleMedium
                 )
+
+                Spacer(modifier = Modifier.height(Spacing.Small))
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.Inline)
+                ) {
+                    if(report.isResolved){
+                        Text(
+                            text = "Resolved",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(3.dp)
+                                .height(3.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    shape = CircleShape
+                                )
+                                .align(alignment = Alignment.CenterVertically)
+                        )
+                    }
+                    Text(
+                        text = report.category.displayName,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+
+                    Spacer(
+                        modifier = Modifier
+                            .width(3.5.dp)
+                            .height(3.5.dp)
+                            .background(
+                                color = Color.Black,
+                                shape = CircleShape
+                            )
+                            .align(alignment = Alignment.CenterVertically)
+                    )
+
+                    Text(
+                        text = "1.2 KM away", //TODO: Replace with actual distance to user
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
                 Text(
-                    text = report.description
+                    text = if(report.description.length > 30) report.description.substring(0,30) + "..."
+                        else report.description.substring(0,report.description.length),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
+            Box(
+                modifier = Modifier.fillMaxHeight().padding(top = 12.dp, bottom = 12.dp),
+            ) {
+                Icon(
+                    imageVector = if(report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline,
+                    contentDescription = "Star Icon",
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 4.dp),
+                    tint = if(report.priorityCounter > 20) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
                 )
             }
         }

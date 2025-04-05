@@ -12,5 +12,10 @@ class Report(
     var status: ReportStatus,
     var userId: String,
     var date: LocalDateTime,
+    var isResolved: Boolean = false,
+    var priorityCounter: Int = 0
 ) {
+
+    val isHighPriority: Boolean
+        get() = priorityCounter > 20
 }
