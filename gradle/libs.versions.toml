@@ -8,7 +8,6 @@ espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2025.03.01"
-materialIconsExtended = "1.6.0"
 navigationCompose = "2.8.9"
 uiText = "1.7.8"
 kotlinxSerialization = "1.7.1"
@@ -17,7 +16,6 @@ coilCompose = "2.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-material-icons-extended-v160 = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-ui-text = { module = "androidx.compose.ui:ui-text", version.ref = "uiText" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
