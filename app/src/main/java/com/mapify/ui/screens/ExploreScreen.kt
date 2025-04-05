@@ -3,6 +3,7 @@ package com.mapify.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -140,14 +141,19 @@ fun ReportCard(
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        Text(
-            text = report.title,
-            modifier = Modifier.padding(10.dp)
-        )
-        Text(
-            text = report.description,
-            modifier = Modifier.padding(10.dp)
-        )
+        Row {
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Text(
+                    text = report.title
+                )
+                Text(
+                    text = report.description
+                )
+            }
+        }
     }
 
 }
