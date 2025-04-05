@@ -29,7 +29,8 @@ fun ReportLocationScreen(
         topBar = {
             TopAppBar(modifier = Modifier.padding(horizontal = Spacing.Small), title = {
                 Text(
-                    text = stringResource(id = R.string.report_location), style = MaterialTheme.typography.titleLarge
+                    text = stringResource(id = R.string.report_location),
+                    style = MaterialTheme.typography.titleLarge
                 )
             }, navigationIcon = {
                 IconButton(
