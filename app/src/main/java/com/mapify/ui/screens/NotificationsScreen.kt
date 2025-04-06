@@ -132,11 +132,10 @@ fun NotificationsScreen(
                     else stringResource(id = R.string.rejected),
                     supportingText = time,
                     statusColor = if (isVerified)
-                        MaterialTheme.colorScheme.primary
+                        MaterialTheme.colorScheme.tertiary
                     else
                         MaterialTheme.colorScheme.error
-                )
-            }
+                )}
         }
     }
 }
