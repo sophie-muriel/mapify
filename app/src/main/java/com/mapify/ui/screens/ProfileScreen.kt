@@ -49,42 +49,19 @@ fun ProfileScreen(
 
     Scaffold(
         topBar = {
-            if (!isKeyboardActive) {
-                TopAppBar(modifier = Modifier.padding(horizontal = Spacing.Small), title = {
-                    Text(
-                        text = stringResource(id = R.string.profile_title),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }, navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navigateToHome()
-                        }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.back_arrow_icon)
-                        )
+            ProfileTopBar(
+                editMode = editMode,
+                isKeyboardActive = isKeyboardActive,
+                navigateToHome = navigateToHome,
+                onToggleEditMode = {
+                    if (editMode) {
+                        name = oldName
+                        email = oldEmail
+                        password = oldPassword
                     }
-                }, actions = {
-                    //TODO: add popup to confirm discarding changes (if fields touched) AND saved changes (if fields touched)
-                    IconButton(
-                        onClick = {
-                            if (editMode) { // temporary (i think)
-                                name = oldName
-                                email = oldEmail
-                                password = oldPassword
-                            }
-                            editMode = !editMode
-                        }) {
-                        Icon(
-                            imageVector = if (editMode) Icons.Outlined.Close else Icons.Outlined.Edit,
-                            contentDescription = stringResource(
-                                id = if (editMode) R.string.close_icon_description else R.string.edit_icon_description
-                            )
-                        )
-                    }
-                })
-            }
+                    editMode = !editMode
+                }
+            )
         }) { padding ->
         Column(
             modifier = Modifier
@@ -315,5 +292,44 @@ fun ProfileEdit(
                 style = MaterialTheme.typography.bodyMedium
             )
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileTopBar(
+    editMode: Boolean,
+    isKeyboardActive: Boolean,
+    navigateToHome: () -> Unit,
+    onToggleEditMode: () -> Unit
+) {
+    if (!isKeyboardActive) {
+        TopAppBar(
+            modifier = Modifier.padding(horizontal = Spacing.Small),
+            title = {
+                Text(
+                    text = stringResource(id = R.string.profile_title),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = navigateToHome) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(id = R.string.back_arrow_icon)
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = onToggleEditMode) {
+                    Icon(
+                        imageVector = if (editMode) Icons.Outlined.Close else Icons.Outlined.Edit,
+                        contentDescription = stringResource(
+                            id = if (editMode) R.string.close_icon_description else R.string.edit_icon_description
+                        )
+                    )
+                }
+            }
+        )
     }
 }
