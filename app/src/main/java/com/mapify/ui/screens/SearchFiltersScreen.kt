@@ -4,8 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,13 +17,19 @@ import com.mapify.ui.components.SimpleTopBar
 @Composable
 fun SearchFiltersScreen(
     navigateToExplore: () -> Unit
-){
+) {
 
     //TODO: Navigation back to ExploreScreen with variables 
     Scaffold(
         topBar = {
             SimpleTopBar(
-                onClickArrowBack = navigateToExplore)
+                Alignment.CenterStart,
+                stringResource(id = R.string.report_view),
+                Icons.AutoMirrored.Filled.ArrowBack,
+                stringResource(id = R.string.back_arrow_icon),
+                onClickNavIcon = { navigateToExplore() },
+                false
+            )
         }) { padding ->
         Column(
             modifier = Modifier
@@ -34,5 +41,4 @@ fun SearchFiltersScreen(
 
         }
     }
-
 }

@@ -18,13 +18,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -49,6 +46,7 @@ import com.mapify.model.Category
 import com.mapify.model.Location
 import com.mapify.model.Role
 import com.mapify.model.User
+import com.mapify.ui.components.SimpleTopBar
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,22 +99,16 @@ fun CreateReportScreen(
     Scaffold(
         topBar = {
             if (!isKeyboardActive) {
-                TopAppBar(modifier = Modifier.padding(horizontal = Spacing.Small), title = {
-                    Text(
-                        text = stringResource(id = R.string.create_report),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }, navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            exitDialogVisible = true
-                        }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.back_arrow_icon)
-                        )
-                    }
-                })
+                SimpleTopBar(
+                    Alignment.CenterStart,
+                    stringResource(id = R.string.create_report),
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    stringResource(id = R.string.back_arrow_icon),
+                    onClickNavIcon = {
+                        exitDialogVisible = true
+                    },
+                    false
+                )
             }
         }) { padding ->
 
