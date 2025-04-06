@@ -23,7 +23,12 @@ import com.mapify.ui.components.CreateReportFloatingButton
 
 @Composable
 fun HomeScreen(
-    navigateToProfile: () -> Unit, navigateToCreateReport: () -> Unit
+    navigateToProfile: () -> Unit,
+    navigateToCreateReport: () -> Unit,
+    navigateToExplore: () -> Unit,
+    navigateToNotifications: () -> Unit,
+    navigateToMessages: () -> Unit
+
 ) {
     //TODO: add logout icon (convenient for tests, anyway)
 
@@ -32,7 +37,11 @@ fun HomeScreen(
             onClickTop = {
                 navigateToProfile()
             })
-    }, bottomBar = { BottomNavigationBar(homeSelected = true) }, floatingActionButton = {
+    }, bottomBar = { BottomNavigationBar(homeSelected = true,
+        navigateToExplore = navigateToExplore,
+        navigateToNotifications = navigateToNotifications,
+        navigateToMessages = navigateToMessages) },
+        floatingActionButton = {
         CreateReportFloatingButton(navigateToCreateReport = navigateToCreateReport)
     }) { padding ->
         Box(
