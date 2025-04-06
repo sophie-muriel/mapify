@@ -11,6 +11,7 @@ import com.mapify.ui.screens.ExploreScreen
 import com.mapify.ui.screens.LoginScreen
 import com.mapify.ui.screens.RegistrationScreen
 import com.mapify.ui.screens.HomeScreen
+import com.mapify.ui.screens.NotificationsScreen
 import com.mapify.ui.screens.ProfileScreen
 import com.mapify.ui.screens.ReportLocationScreen
 import com.mapify.ui.screens.ReportViewScreen
@@ -22,7 +23,7 @@ fun Navigation() {
 
     Surface {
         NavHost(
-            navController = navController, startDestination = RouteScreen.Explore
+            navController = navController, startDestination = RouteScreen.Notifications
         ) {
             composable<RouteScreen.Login> {
                 LoginScreen(navigateToRegistration = {
@@ -38,11 +39,23 @@ fun Navigation() {
                     })
             }
             composable<RouteScreen.Home> {
-                HomeScreen(navigateToProfile = {
-                    navController.navigate(RouteScreen.Profile)
-                }, navigateToCreateReport = {
-                    navController.navigate(RouteScreen.CreateReport)
-                })
+                HomeScreen(
+                    navigateToProfile = {
+                        navController.navigate(RouteScreen.Profile)
+                    },
+                    navigateToCreateReport = {
+                        navController.navigate(RouteScreen.CreateReport)
+                    },
+                    navigateToExplore = {
+                        navController.navigate(RouteScreen.Explore)
+                    },
+                    navigateToNotifications = {
+                        navController.navigate(RouteScreen.Notifications)
+                    },
+                    navigateToMessages = {
+                        // Pendiente para crear La ventana de mensajes
+                    }
+                )
             }
             composable<RouteScreen.CreateReport> {
                 CreateReportScreen(navigateToHome = {
@@ -78,6 +91,15 @@ fun Navigation() {
                 }, navigateToReportView = {
                     navController.navigate(RouteScreen.ReportView(it))
                 })
+            }
+            composable<RouteScreen.Notifications> {
+                NotificationsScreen(
+                    navigateToHome = { navController.navigate(RouteScreen.Home) },
+                    navigateToExplore = { navController.navigate(RouteScreen.Explore) },
+                    navigateToMessages = { /* Por implementar */ },
+                    navigateToProfile = { navController.navigate(RouteScreen.Profile)
+                    }
+                )
             }
         }
     }

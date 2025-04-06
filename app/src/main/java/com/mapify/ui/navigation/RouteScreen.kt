@@ -28,4 +28,7 @@ sealed class RouteScreen {
     @Serializable
     data object Explore : RouteScreen()
 
+    @Serializable
+    data object Notifications : RouteScreen()
+
 }
