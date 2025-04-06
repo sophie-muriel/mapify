@@ -13,9 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mapify.R
+import com.mapify.model.Category
+import com.mapify.model.Location
+import com.mapify.model.Report
+import com.mapify.model.ReportStatus
 import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.NotificationItem
 import com.mapify.ui.theme.Spacing
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,12 +30,48 @@ fun NotificationsScreen(
     navigateToMessages: () -> Unit,
     navigateToProfile: () -> Unit
 ) {
-    val notifications = listOf(
-        Triple("Report Rejected", false, "2 min ago"),
-        Triple("Report Verified", true, "10 min ago"),
-        Triple("Report Rejected", false, "1 hour ago"),
-        Triple("Report Verified", true, "2 days ago"),
-        Triple("Report Rejected", false, "Just now")
+    val storedReports = listOf(
+        Report(
+            id = "1",
+            title = "Report 1",
+            category = Category.SECURITY,
+            description = "This is a report",
+            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s"),
+            location = Location(
+                latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
+            ),
+            status = ReportStatus.NOT_VERIFIED,
+            userId = "1",
+            date = LocalDateTime.now()
+        ),
+        Report(
+            id = "2",
+            title = "Report 2",
+            category = Category.PETS,
+            description = "This is an embedded test report to test the pets category and the resolved flag and verified status",
+            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHtshKCjboh0e9X3dP5l-igYWWA4C8-nSaw&s"),
+            location = Location(
+                latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
+            ),
+            status = ReportStatus.VERIFIED,
+            userId = "1",
+            date = LocalDateTime.now(),
+            isResolved = true,
+            priorityCounter = 25
+        ),
+        Report(
+            id = "3",
+            title = "Report 3",
+            category = Category.INFRASTRUCTURE,
+            description = "This is an embedded test report",
+            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
+            location = Location(
+                latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
+            ),
+            status = ReportStatus.VERIFIED,
+            userId = "2",
+            date = LocalDateTime.now()
+        ),
     )
 
     Scaffold(
