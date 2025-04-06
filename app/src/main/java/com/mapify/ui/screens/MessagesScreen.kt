@@ -90,7 +90,7 @@ fun MessagesScreen(
         ) {
             items(dummyMessages) { message ->
                 MessageItem(
-                    sender = "List item",  // <-- aquí estaba el error
+                    sender = "List item",
                     message = message
                 )
             }
