@@ -1,8 +1,6 @@
 package com.mapify.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -10,20 +8,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.mapify.R
 import com.mapify.ui.theme.Spacing
 
 @Composable
 fun NotificationItem(
     title: String,
     status: String,
-    supportingText: String, // "2 min ago"
+    supportingText: String,
     statusColor: Color,
     imageUrl: String,
-    reportDate: String // "06/04/2025 05:00 p. m." — se mostrará debajo del estado
+    reportDate: String
 ) {
     ElevatedCard(
         modifier = Modifier
