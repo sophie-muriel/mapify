@@ -11,6 +11,7 @@ import com.mapify.ui.screens.ExploreScreen
 import com.mapify.ui.screens.LoginScreen
 import com.mapify.ui.screens.RegistrationScreen
 import com.mapify.ui.screens.HomeScreen
+import com.mapify.ui.screens.MessagesScreen
 import com.mapify.ui.screens.NotificationsScreen
 import com.mapify.ui.screens.ProfileScreen
 import com.mapify.ui.screens.ReportLocationScreen
@@ -53,7 +54,7 @@ fun Navigation() {
                         navController.navigate(RouteScreen.Notifications)
                     },
                     navigateToMessages = {
-                        // Pendiente para crear La ventana de mensajes
+                        navController.navigate(RouteScreen.Messages)
                     }
                 )
             }
@@ -96,9 +97,17 @@ fun Navigation() {
                 NotificationsScreen(
                     navigateToHome = { navController.navigate(RouteScreen.Home) },
                     navigateToExplore = { navController.navigate(RouteScreen.Explore) },
-                    navigateToMessages = { /* Por implementar */ },
+                    navigateToMessages = { navController.navigate(RouteScreen.Messages) },
                     navigateToProfile = { navController.navigate(RouteScreen.Profile)
                     }
+                )
+            }
+            composable<RouteScreen.Messages> {
+                MessagesScreen(
+                    navigateToHome = { navController.navigate(RouteScreen.Home) },
+                    navigateToExplore = { navController.navigate(RouteScreen.Explore) },
+                    navigateToNotifications = { navController.navigate(RouteScreen.Notifications) },
+                    navigateToProfile = { navController.navigate(RouteScreen.Profile) }
                 )
             }
         }
