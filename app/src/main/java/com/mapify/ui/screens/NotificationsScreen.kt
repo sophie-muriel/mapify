@@ -53,11 +53,9 @@ fun NotificationsScreen(
             id = "2",
             title = "Report 2",
             category = Category.PETS,
-            description = "This is an embedded test report to test the pets category and the resolved flag and verified status",
+            description = "This is a test report...",
             images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHtshKCjboh0e9X3dP5l-igYWWA4C8-nSaw&s"),
-            location = Location(
-                latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
-            ),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
             status = ReportStatus.VERIFIED,
             userId = "1",
             date = LocalDateTime.now(),
