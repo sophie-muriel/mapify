@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,13 +17,18 @@ import com.mapify.R
 @Composable
 fun SettingsScreen(
     navigateToHome: () -> Unit
-){
+) {
 
     Scaffold(
         topBar = {
             SimpleTopBar(
-                text = stringResource(id = R.string.settings_screen),
-                onClickArrowBack = navigateToHome)
+                Alignment.CenterStart,
+                stringResource(id = R.string.report_view),
+                Icons.AutoMirrored.Filled.ArrowBack,
+                stringResource(id = R.string.back_arrow_icon),
+                onClickNavIcon = { navigateToHome() },
+                false
+            )
         }) { padding ->
         Column(
             modifier = Modifier
