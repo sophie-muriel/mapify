@@ -34,7 +34,8 @@ fun NotificationsScreen(
     navigateToHome: () -> Unit,
     navigateToExplore: () -> Unit,
     navigateToMessages: () -> Unit,
-    navigateToProfile: () -> Unit
+    navigateToProfile: () -> Unit,
+    navigateToReportView: (String) -> Unit
 ) {
     val storedReports = listOf(
         Report(
