@@ -104,7 +104,6 @@ fun ExploreScreen(
             onClickSearch = navigateToCreateReport, //TODO: Replace with actual back arrow
             onClickSettings = navigateToCreateReport, //TODO: Replace with actual back arrow
         )
-
     }, bottomBar = {
         BottomNavigationBar(searchSelected = true)
     }, floatingActionButton = {
@@ -129,7 +128,6 @@ fun ExploreScreen(
                         report = report, navigateToReportView = navigateToReportView
                     )
                 }
-
             }
         }
     }
@@ -146,7 +144,7 @@ fun TopNavigationBar2(
         modifier = Modifier.padding(horizontal = Spacing.Small),
         title = {
         Text(
-            text = "Explore Screen"
+            text = stringResource(id = R.string.explore_screen)
         )
     }, navigationIcon = {
         IconButton(onClick = onClickBackArrow) {
