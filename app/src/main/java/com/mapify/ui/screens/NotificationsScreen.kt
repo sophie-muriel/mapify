@@ -132,7 +132,7 @@ fun NotificationsScreen(
                     else stringResource(id = R.string.rejected),
                     supportingText = time,
                     statusColor = if (isVerified)
-                        MaterialTheme.colorScheme.error
+                        MaterialTheme.colorScheme.primary
                     else
                         MaterialTheme.colorScheme.error
                 )
