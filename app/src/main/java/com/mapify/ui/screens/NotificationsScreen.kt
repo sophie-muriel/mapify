@@ -66,50 +66,57 @@ fun NotificationsScreen(
             id = "3",
             title = "Report 3",
             category = Category.INFRASTRUCTURE,
-            description = "This is an embedded test report",
+            description = "Another report example",
             images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
-            location = Location(
-                latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
-            ),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
             status = ReportStatus.VERIFIED,
             userId = "2",
             date = LocalDateTime.now()
         ),
+        Report(
+            id = "4",
+            title = "Report 4",
+            category = Category.COMMUNITY,
+            description = "Report about illegal dumping near the river.",
+            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
+            status = ReportStatus.VERIFIED,
+            userId = "3",
+            date = LocalDateTime.now().minusHours(3),
+            isResolved = false,
+            priorityCounter = 10
+        ),
+        Report(
+            id = "5",
+            title = "Report 5",
+            category = Category.SECURITY,
+            description = "Potholes causing problems in traffic.",
+            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
+            status = ReportStatus.PENDING_VERIFICATION,
+            userId = "4",
+            date = LocalDateTime.now().minusDays(1),
+            isResolved = false,
+            priorityCounter = 3
+        ),
+        Report(
+            id = "6",
+            title = "Report 6",
+            category = Category.PETS,
+            description = "Lost dog seen in the neighborhood.",
+            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
+            status = ReportStatus.VERIFIED,
+            userId = "5",
+            date = LocalDateTime.now().minusMinutes(45),
+            isResolved = true,
+            priorityCounter = 15
+        )
     )
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.notifications),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        navigateToProfile()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.AccountCircle,
-                            contentDescription = stringResource(id = R.string.name_icon_description),
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* Acción futura de configuración */ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Settings,
-                            contentDescription = stringResource(id = R.string.settings_icon)
-                        )
-                    }
-                }
-            )
+            NotificationsTopBar(navigateToProfile = navigateToProfile)
         },
         bottomBar = {
             BottomNavigationBar(
