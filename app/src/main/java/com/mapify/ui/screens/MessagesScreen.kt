@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.MessageItem
@@ -70,7 +69,7 @@ fun MessagesScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* Acción de nuevo mensaje */ },
+                onClick = { /* new message action */ },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             ) {

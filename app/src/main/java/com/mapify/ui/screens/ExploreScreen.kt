@@ -39,6 +39,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
@@ -49,7 +50,10 @@ import coil.compose.AsyncImage
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExploreScreen(
-    navigateToCreateReport: () -> Unit, navigateToReportView: (String) -> Unit
+    navigateToCreateReport: () -> Unit,
+    navigateToReportView: (String) -> Unit,
+    navigateToSearchFilters: () -> Unit,
+    navigateToSettings: () -> Unit
 ) {
 
     val storedReports = listOf(
@@ -97,29 +101,11 @@ fun ExploreScreen(
     )
 
     Scaffold(topBar = {
-        TopAppBar(modifier = Modifier.padding(horizontal = Spacing.Small), title = {
-            Text(
-                text = "Explore Screen"
-            )
-        }, navigationIcon = {
-            IconButton(
-                onClick = {
-                    //navigateToCreateReport()
-                }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(id = R.string.back_arrow_icon)
-                )
-            }
-        }, actions = {
-            IconButton(
-                onClick = {}) {
-                Icon(
-                    imageVector = Icons.Outlined.Settings,
-                    contentDescription = stringResource(id = R.string.settings_icon)
-                )
-            }
-        })
+        TopNavigationBar2(
+            onClickBackArrow = navigateToCreateReport,//TODO: Replace with actual back arrow
+            onClickSearch = navigateToSearchFilters,
+            onClickSettings = navigateToSettings,
+        )
     }, bottomBar = {
         BottomNavigationBar(searchSelected = true)
     }, floatingActionButton = {
@@ -144,10 +130,46 @@ fun ExploreScreen(
                         report = report, navigateToReportView = navigateToReportView
                     )
                 }
-
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopNavigationBar2(
+    onClickBackArrow: () -> Unit,
+    onClickSearch: () -> Unit,
+    onClickSettings: () -> Unit
+) {
+    TopAppBar(
+        modifier = Modifier.padding(horizontal = Spacing.Small),
+        title = {
+        Text(
+            text = stringResource(id = R.string.explore_screen)
+        )
+    }, navigationIcon = {
+        IconButton(onClick = onClickBackArrow) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(id = R.string.back_arrow_icon)
+            )
+        }
+    }, actions = {
+        IconButton(onClick = onClickSearch) {
+            Icon(
+                imageVector = Icons.Outlined.Search,
+                contentDescription = stringResource(id = R.string.settings_icon)
+            )
+        }
+
+        IconButton(onClick = onClickSettings) {
+            Icon(
+                imageVector = Icons.Outlined.Settings,
+                contentDescription = stringResource(id = R.string.settings_icon)
+            )
+        }
+    })
 }
 
 @Composable
