@@ -44,9 +44,7 @@ fun NotificationsScreen(
             category = Category.SECURITY,
             description = "This is a report",
             images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s"),
-            location = Location(
-                latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
-            ),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
             status = ReportStatus.NOT_VERIFIED,
             userId = "1",
             date = LocalDateTime.now()
