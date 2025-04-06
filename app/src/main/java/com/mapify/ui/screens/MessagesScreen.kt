@@ -17,8 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.ui.components.BottomNavigationBar
+import com.mapify.ui.components.MessageItem
 import com.mapify.ui.theme.Spacing
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,28 +85,14 @@ fun MessagesScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = Spacing.Sides)
+                .padding(horizontal = Spacing.Sides),
+            verticalArrangement = Arrangement.spacedBy(Spacing.Small)
         ) {
             items(dummyMessages) { message ->
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            imageVector = Icons.Filled.AccountCircle,
-                            contentDescription = stringResource(id = R.string.name_icon_description),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    headlineContent = { Text("List item") },
-                    supportingContent = { Text(message) },
-                    trailingContent = {
-                        Icon(
-                            imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = stringResource(id = R.string.more_options_icon),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
+                MessageItem(
+                    sender = "List item",  // <-- aquí estaba el error
+                    message = message
                 )
-                HorizontalDivider()
             }
         }
     }
