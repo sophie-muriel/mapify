@@ -16,6 +16,8 @@ import com.mapify.ui.screens.NotificationsScreen
 import com.mapify.ui.screens.ProfileScreen
 import com.mapify.ui.screens.ReportLocationScreen
 import com.mapify.ui.screens.ReportViewScreen
+import com.mapify.ui.screens.SettingsScreen
+import com.mapify.ui.screens.SearchFiltersScreen
 
 @Composable
 fun Navigation() {
@@ -24,7 +26,7 @@ fun Navigation() {
 
     Surface {
         NavHost(
-            navController = navController, startDestination = RouteScreen.Notifications
+            navController = navController, startDestination = RouteScreen.Explore
         ) {
             composable<RouteScreen.Login> {
                 LoginScreen(navigateToRegistration = {
@@ -87,11 +89,17 @@ fun Navigation() {
                     })
             }
             composable<RouteScreen.Explore> {
-                ExploreScreen(navigateToCreateReport = {
+                ExploreScreen(
+                    navigateToCreateReport = {
                     navController.navigate(RouteScreen.CreateReport)
                 }, navigateToReportView = {
                     navController.navigate(RouteScreen.ReportView(it))
-                })
+                }, navigateToSearchFilters = {
+                    navController.navigate(RouteScreen.SearchFilters)
+                }, navigateToSettings = {
+                        navController.navigate(RouteScreen.Settings)
+                    }
+                )
             }
             composable<RouteScreen.Notifications> {
                 NotificationsScreen(
@@ -110,6 +118,16 @@ fun Navigation() {
                     navigateToExplore = { navController.navigate(RouteScreen.Explore) },
                     navigateToNotifications = { navController.navigate(RouteScreen.Notifications) },
                     navigateToProfile = { navController.navigate(RouteScreen.Profile) }
+                )
+            }
+            composable<RouteScreen.Settings> {
+                SettingsScreen(
+                    navigateToHome = { navController.navigate(RouteScreen.Home) },
+                )
+            }
+            composable<RouteScreen.SearchFilters> {
+                SearchFiltersScreen(
+                    navigateToExplore = { navController.navigate(RouteScreen.Explore) },
                 )
             }
         }
