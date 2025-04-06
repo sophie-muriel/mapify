@@ -102,9 +102,9 @@ fun ExploreScreen(
 
     Scaffold(topBar = {
         TopNavigationBar2(
-            onClickBackArrow = navigateToCreateReport, //TODO: Replace with actual back arrow
-            onClickSearch = navigateToSearchFilters, //TODO: Replace with actual back arrow
-            onClickSettings = navigateToSettings, //TODO: Replace with actual back arrow
+            onClickBackArrow = navigateToCreateReport,//TODO: Replace with actual back arrow
+            onClickSearch = navigateToSearchFilters,
+            onClickSettings = navigateToSettings,
         )
     }, bottomBar = {
         BottomNavigationBar(searchSelected = true)

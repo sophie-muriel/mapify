@@ -18,6 +18,7 @@ fun SearchFiltersScreen(
     navigateToExplore: () -> Unit
 ){
 
+    //TODO: Navigation back to ExploreScreen with variables 
     Scaffold(
         topBar = {
             SimpleTopBar(
