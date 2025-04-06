@@ -31,4 +31,7 @@ sealed class RouteScreen {
     @Serializable
     data object Notifications : RouteScreen()
 
+    @Serializable
+    object Messages : RouteScreen()
+
 }
