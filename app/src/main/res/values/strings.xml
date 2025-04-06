@@ -89,4 +89,7 @@
     <string name="notifications">Notifications</string>
     <string name="verified">Report Verified</string>
     <string name="rejected">Report Rejected</string>
+
+    <string name="messages_label">Messages</string>
+    <string name="more_options_icon">More Options Icon</string>
 </resources>
