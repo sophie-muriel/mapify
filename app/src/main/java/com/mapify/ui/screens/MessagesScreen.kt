@@ -89,12 +89,20 @@ fun MessagesScreen(
         ) {
             items(dummyMessages) { message ->
                 ListItem(
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Filled.AccountCircle,
+                            contentDescription = stringResource(id = R.string.name_icon_description),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    },
                     headlineContent = { Text("List item") },
                     supportingContent = { Text(message) },
                     trailingContent = {
                         Icon(
                             imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = stringResource(id = R.string.more_options_icon)
+                            contentDescription = stringResource(id = R.string.more_options_icon),
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 )
