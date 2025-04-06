@@ -133,19 +133,90 @@ fun NotificationsScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(horizontal = Spacing.Sides),
-            verticalArrangement = Arrangement.spacedBy(0.dp)
+            verticalArrangement = Arrangement.spacedBy(Spacing.Inline)
         ) {
-            items(notifications) { (message, isVerified, time) ->
-                NotificationItem(
-                    title = message,
-                    status = if (isVerified) stringResource(id = R.string.verified)
-                    else stringResource(id = R.string.rejected),
-                    supportingText = time,
-                    statusColor = if (isVerified)
-                        MaterialTheme.colorScheme.tertiary
-                    else
-                        MaterialTheme.colorScheme.error
-                )}
+            items(storedReports) { report ->
+                ElevatedCard(
+                    onClick = { navigateToReportView(report.id) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp)
+                ) {
+                    NotificationItem(
+                        title = report.title,
+                        status = if (report.status == ReportStatus.VERIFIED)
+                            stringResource(id = R.string.verified)
+                        else
+                            stringResource(id = R.string.rejected),
+                        supportingText = getRelativeTime(report.date),
+                        statusColor = if (report.status == ReportStatus.VERIFIED)
+                            MaterialTheme.colorScheme.tertiary
+                        else
+                            MaterialTheme.colorScheme.error,
+                        imageUrl = report.images.first(),
+                        reportDate = formatReportDate(report.date) // parte inferior del estado
+                    )
+                }
+            }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NotificationsTopBar(navigateToProfile: () -> Unit) {
+    TopAppBar(
+        title = {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(id = R.string.notifications),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = navigateToProfile) {
+                Icon(
+                    imageVector = Icons.Filled.AccountCircle,
+                    contentDescription = stringResource(id = R.string.name_icon_description)
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = { /* Acción futura */ }) {
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = stringResource(id = R.string.settings_icon)
+                )
+            }
+        }
+    )
+}
+
+fun formatReportDate(date: LocalDateTime): String {
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a", Locale("es", "CO"))
+    val colombiaZone = ZoneId.of("America/Bogota")
+    val zonedDate = date.atZone(ZoneOffset.UTC).withZoneSameInstant(colombiaZone)
+    return zonedDate.format(formatter)
+}
+
+fun getRelativeTime(date: LocalDateTime): String {
+    val colombiaZone = ZoneId.of("America/Bogota")
+    val now = LocalDateTime.now(colombiaZone)
+    val reportDate = date.atZone(ZoneOffset.UTC).withZoneSameInstant(colombiaZone).toLocalDateTime()
+
+    val minutes = ChronoUnit.MINUTES.between(reportDate, now)
+    val hours = ChronoUnit.HOURS.between(reportDate, now)
+    val days = ChronoUnit.DAYS.between(reportDate, now)
+
+    return when {
+        minutes < 1 -> "just now"
+        minutes < 60 -> "$minutes min ago"
+        hours < 24 -> "$hours hours ago"
+        days == 1L -> "yesterday"
+        else -> "$days days ago"
     }
 }
