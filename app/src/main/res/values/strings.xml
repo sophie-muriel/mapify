@@ -85,4 +85,8 @@
     <string name="settings_icon">Settings Icon</string>
     <string name="resolved">Resolved</string>
     <string name="star_icon">Star Icon</string>
+
+    <string name="notifications">Notifications</string>
+    <string name="verified">Report Verified</string>
+    <string name="rejected">Report Rejected</string>
 </resources>
