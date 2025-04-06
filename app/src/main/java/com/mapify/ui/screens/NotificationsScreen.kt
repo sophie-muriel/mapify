@@ -125,17 +125,17 @@ fun NotificationsScreen(
                 .padding(horizontal = Spacing.Sides),
             verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            items(notifications) { (message, isVerified, time) ->
-                NotificationItem(
-                    title = message,
-                    status = if (isVerified) stringResource(id = R.string.verified)
-                    else stringResource(id = R.string.rejected),
-                    supportingText = time,
-                    statusColor = if (isVerified)
-                        MaterialTheme.colorScheme.tertiary
-                    else
-                        MaterialTheme.colorScheme.error
-                )}
+//            items(notifications) { (message, isVerified, time) ->
+//                NotificationItem(
+//                    title = message,
+//                    status = if (isVerified) stringResource(id = R.string.verified)
+//                    else stringResource(id = R.string.rejected),
+//                    supportingText = time,
+//                    statusColor = if (isVerified)
+//                        MaterialTheme.colorScheme.tertiary
+//                    else
+//                        MaterialTheme.colorScheme.error
+//                )}
         }
     }
 }
