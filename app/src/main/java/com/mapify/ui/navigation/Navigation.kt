@@ -98,7 +98,9 @@ fun Navigation() {
                     navigateToHome = { navController.navigate(RouteScreen.Home) },
                     navigateToExplore = { navController.navigate(RouteScreen.Explore) },
                     navigateToMessages = { navController.navigate(RouteScreen.Messages) },
-                    navigateToProfile = { navController.navigate(RouteScreen.Profile)
+                    navigateToProfile = { navController.navigate(RouteScreen.Profile) },
+                    navigateToReportView = { reportId ->
+                        navController.navigate(RouteScreen.ReportView(reportId))
                     }
                 )
             }
