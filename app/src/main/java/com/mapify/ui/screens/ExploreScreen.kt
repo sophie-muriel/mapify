@@ -51,7 +51,9 @@ import coil.compose.AsyncImage
 @Composable
 fun ExploreScreen(
     navigateToCreateReport: () -> Unit,
-    navigateToReportView: (String) -> Unit
+    navigateToReportView: (String) -> Unit,
+    navigateToSearchFilters: () -> Unit,
+    navigateToSettings: () -> Unit
 ) {
 
     val storedReports = listOf(
@@ -101,8 +103,8 @@ fun ExploreScreen(
     Scaffold(topBar = {
         TopNavigationBar2(
             onClickBackArrow = navigateToCreateReport, //TODO: Replace with actual back arrow
-            onClickSearch = navigateToCreateReport, //TODO: Replace with actual back arrow
-            onClickSettings = navigateToCreateReport, //TODO: Replace with actual back arrow
+            onClickSearch = navigateToSearchFilters, //TODO: Replace with actual back arrow
+            onClickSettings = navigateToSettings, //TODO: Replace with actual back arrow
         )
     }, bottomBar = {
         BottomNavigationBar(searchSelected = true)

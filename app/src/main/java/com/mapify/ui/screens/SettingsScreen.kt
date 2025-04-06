@@ -4,15 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,17 +12,16 @@ import androidx.compose.ui.res.stringResource
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.R
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportViewScreen(
-    reportId: String, navigateToCreateReport: () -> Unit
-) {
+fun SettingsScreen(
+    navigateToHome: () -> Unit
+){
 
     Scaffold(
         topBar = {
             SimpleTopBar(
-                text = stringResource(id = R.string.report_view),
-                onClickArrowBack = navigateToCreateReport)
+                text = stringResource(id = R.string.settings_screen),
+                onClickArrowBack = navigateToHome)
         }) { padding ->
         Column(
             modifier = Modifier
@@ -39,10 +30,7 @@ fun ReportViewScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = reportId)
 
         }
     }
 }
-
-
