@@ -94,6 +94,6 @@
     <string name="messages_label">Messages</string>
     <string name="more_options_icon">More Options Icon</string>
 
-    <string name="explore_screen">Explore</string>
+    <string name="explore_screen">Nearby Reports</string>
     <string name="settings_screen">Settings</string>
 </resources>
