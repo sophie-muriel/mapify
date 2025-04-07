@@ -1,4 +1,4 @@
-package com.mapify.ui.screens
+package com.mapify.ui.users
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -6,13 +6,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.mapify.R
+import com.mapify.ui.users.navigation.UserNavigation
 import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.CreateReportFloatingButton
 import com.mapify.ui.components.SimpleTopBar
@@ -21,12 +21,11 @@ import com.mapify.ui.components.SimpleTopBar
 fun HomeScreen(
     navigateToProfile: () -> Unit,
     navigateToCreateReport: () -> Unit,
-    navigateToExplore: () -> Unit,
-    navigateToNotifications: () -> Unit,
-    navigateToMessages: () -> Unit
-
+    navigateToDetail: (String) -> Unit
 ) {
     //TODO: add logout icon (convenient for tests, anyway)
+
+    val navController = rememberNavController()
 
     Scaffold(
         topBar = {
@@ -40,21 +39,23 @@ fun HomeScreen(
             ) //TODO: add action for settings screen
         }, bottomBar = {
             BottomNavigationBar(
-                homeSelected = true,
-                navigateToExplore = navigateToExplore,
-                navigateToNotifications = navigateToNotifications,
-                navigateToMessages = navigateToMessages
+                navController = navController,
             )
         },
         floatingActionButton = {
             CreateReportFloatingButton(navigateToCreateReport = navigateToCreateReport)
         }) { padding ->
+        UserNavigation(
+            padding,
+            navController = navController,
+            navigateToDetail = navigateToDetail
+        )
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            Text(text = "Content", modifier = Modifier.padding(16.dp))
+
         }
     }
 }
