@@ -51,6 +51,10 @@ fun SimpleTopBar(
                         contentDescription = actionIconDescription,
                     )
                 }
+            } else {
+                IconButton(onClick = {}, enabled = false) {
+                    Box(modifier = Modifier) {}
+                }
             }
         }
     )
