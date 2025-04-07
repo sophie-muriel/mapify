@@ -19,7 +19,11 @@ import com.mapify.model.Message
 import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.MessageItem
 import com.mapify.ui.theme.Spacing
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +33,7 @@ fun MessagesScreen(
     navigateToNotifications: () -> Unit,
     navigateToProfile: () -> Unit
 ) {
-    val messages = listOf(
+    val messagesList = listOf(
         Message(
             id = "1",
             sender = "Laura Mejía",
@@ -50,7 +54,7 @@ fun MessagesScreen(
             id = "3",
             sender = "Andrea Torres",
             content = "¿Podrías revisar el archivo que te envié?",
-            timestamp = LocalDateTime.now().minusDays(1),
+            timestamp = LocalDateTime.now().minusDays(5),
             isRead = false,
             profileImageUrl = null
         )
@@ -114,9 +118,32 @@ fun MessagesScreen(
                 .padding(horizontal = Spacing.Sides),
             verticalArrangement = Arrangement.spacedBy(Spacing.Small)
         ) {
-            items(messages) { message ->
-                MessageItem(message = message)
+            items(messagesList) { message ->
+                MessageItem(
+                    sender = message.sender,
+                    message = message.content,
+                    time = formatMessageDate(message.timestamp),
+                    isRead = message.isRead
+                )
             }
+        }
+    }
+}
+
+fun formatMessageDate(date: LocalDateTime): String {
+    val now = LocalDate.now()
+    val messageDate = date.toLocalDate()
+    return when {
+        messageDate.isEqual(now) -> {
+            val timeFormatter = DateTimeFormatter.ofPattern("hh:mm a", Locale("es", "CO"))
+            date.format(timeFormatter)
+        }
+        messageDate.isEqual(now.minusDays(1)) -> {
+            "ayer"
+        }
+        else -> {
+            val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("es", "CO"))
+            date.format(dateFormatter)
         }
     }
 }

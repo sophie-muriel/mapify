@@ -13,7 +13,10 @@ import com.mapify.model.Message
 
 @Composable
 fun MessageItem(
-    message: Message,
+    sender: String,
+    message: String,
+    time: String,
+    isRead: Boolean,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
@@ -22,13 +25,14 @@ fun MessageItem(
             .wrapContentHeight()
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Outlined.AccountCircle,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = if (isRead) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(40.dp)
             )
 
@@ -36,22 +40,33 @@ fun MessageItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = message.sender,
+                    text = sender,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = message.content,
+                    text = message,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline
                 )
             }
 
-            IconButton(onClick = { /* Opciones futuras */ }) {
-                Icon(
-                    imageVector = Icons.Outlined.MoreVert,
-                    contentDescription = null
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = time,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
                 )
+
+                if (!isRead) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Nuevo",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }
 }
+
