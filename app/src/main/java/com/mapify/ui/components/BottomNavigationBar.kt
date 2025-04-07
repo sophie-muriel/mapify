@@ -77,7 +77,7 @@ fun BottomNavigationBar(
                 },
                 icon = {
                     Icon(
-                        imageVector = if (isSelected) it.icon else it.iconSelected,
+                        imageVector = if (isSelected) it.iconSelected else it.icon,
                         contentDescription = it.iconDescription,
                         tint = MaterialTheme.colorScheme.primary
                     )
