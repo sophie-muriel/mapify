@@ -35,22 +35,44 @@ fun HomeScreen(
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
     val currentRoute = navBackStackEntry?.destination?.route
 
+    //Common top bar parameters for UserNavigationTabs
+    val alignment = Alignment.Center
+    val navIconVector = Icons.Filled.AccountCircle
+    val navIconDescription = stringResource(id = R.string.name_icon_description)
+    val onClickNavIcon = { navigateToProfile() }
+    val actions = true
+    val settingsIconVector = Icons.Filled.Settings
+    val settingsIconDescription = stringResource(id = R.string.settings_icon)
+
     Scaffold(
         topBar = {
-            SimpleTopBar(
-                Alignment.Center,
-                stringResource(id = R.string.app_name),
-                Icons.Filled.AccountCircle,
-                stringResource(id = R.string.name_icon_description),
-                { navigateToProfile() },
-                true,
-                Icons.Filled.Settings,
-                stringResource(id = R.string.settings_icon),
-                { },
-//                true,
-//                Icons.Filled.Search,
-//                stringResource(id = R.string.messages_icon)
-            ) //TODO: add action for settings screen
+            when (currentRoute) {
+                UserRouteTab.Home::class.qualifiedName -> {
+                    SimpleTopBar(alignment, stringResource(id = R.string.app_name),
+                        navIconVector, navIconDescription, onClickNavIcon, actions,
+                        settingsIconVector, settingsIconDescription
+                    )
+                }
+                UserRouteTab.Explore::class.qualifiedName -> {
+                    SimpleTopBar(alignment, stringResource(id = R.string.explore_screen),
+                        navIconVector, navIconDescription, onClickNavIcon, actions,
+                        Icons.Filled.Search, stringResource(id = R.string.search_icon),
+                        { }, true,settingsIconVector, settingsIconDescription,{ }
+                    )
+                }
+                UserRouteTab.Notifications::class.qualifiedName -> {
+                    SimpleTopBar(alignment, stringResource(id = R.string.notifications),
+                        navIconVector, navIconDescription, onClickNavIcon, actions,
+                        settingsIconVector, settingsIconDescription
+                    )
+                }
+                UserRouteTab.Messages::class.qualifiedName -> {
+                    SimpleTopBar(alignment, stringResource(id = R.string.messages_label),
+                        navIconVector, navIconDescription, onClickNavIcon, actions,
+                        settingsIconVector, settingsIconDescription
+                    )
+                }
+            } //TODO: add action for settings screen
         },
         bottomBar = {
             BottomNavigationBar(
