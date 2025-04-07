@@ -139,7 +139,7 @@ fun formatMessageDate(date: LocalDateTime): String {
             date.format(timeFormatter)
         }
         messageDate.isEqual(now.minusDays(1)) -> {
-            "ayer"
+            "Yesterday"
         }
         else -> {
             val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("es", "CO"))
