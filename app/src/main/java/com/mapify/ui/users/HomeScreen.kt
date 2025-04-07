@@ -55,7 +55,7 @@ fun HomeScreen(
         },
         floatingActionButton = {
             when (currentRoute) {
-                UserRouteTab.Home::class.qualifiedName -> {
+                UserRouteTab.Home::class.qualifiedName, UserRouteTab.Explore::class.qualifiedName -> {
                     CreateFAB(
                         { navigateToCreateReport() },
                         Icons.Filled.Add,
