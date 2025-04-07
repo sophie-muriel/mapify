@@ -15,9 +15,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.mapify.R
+import com.mapify.model.Message
 import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.MessageItem
 import com.mapify.ui.theme.Spacing
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,7 +29,32 @@ fun MessagesScreen(
     navigateToNotifications: () -> Unit,
     navigateToProfile: () -> Unit
 ) {
-    val dummyMessages = List(5) { "Lorem ipsum dolor sit amet, consectetur." }
+    val messages = listOf(
+        Message(
+            id = "1",
+            sender = "Laura Mejía",
+            content = "Hola, quería saber si hay novedades sobre el reporte.",
+            timestamp = LocalDateTime.now().minusMinutes(5),
+            isRead = false,
+            profileImageUrl = null
+        ),
+        Message(
+            id = "2",
+            sender = "Carlos Ruiz",
+            content = "Gracias por tu respuesta.",
+            timestamp = LocalDateTime.now().minusHours(2),
+            isRead = true,
+            profileImageUrl = null
+        ),
+        Message(
+            id = "3",
+            sender = "Andrea Torres",
+            content = "¿Podrías revisar el archivo que te envié?",
+            timestamp = LocalDateTime.now().minusDays(1),
+            isRead = false,
+            profileImageUrl = null
+        )
+    )
 
     Scaffold(
         topBar = {
@@ -69,7 +96,7 @@ fun MessagesScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* new message action */ },
+                onClick = { /* Acción de nuevo mensaje */ },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             ) {
@@ -87,10 +114,10 @@ fun MessagesScreen(
                 .padding(horizontal = Spacing.Sides),
             verticalArrangement = Arrangement.spacedBy(Spacing.Small)
         ) {
-            items(dummyMessages) { message ->
+            items(messages) { message ->
                 MessageItem(
-                    sender = "List item",
-                    message = message
+                    sender = message.sender,
+                    message = message.content
                 )
             }
         }
