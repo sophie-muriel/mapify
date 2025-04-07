@@ -7,17 +7,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.mapify.ui.screens.CreateReportScreen
-import com.mapify.ui.screens.ExploreScreen
 import com.mapify.ui.screens.LoginScreen
 import com.mapify.ui.screens.RegistrationScreen
-import com.mapify.ui.screens.HomeScreen
-import com.mapify.ui.screens.MessagesScreen
 import com.mapify.ui.screens.NotificationsScreen
 import com.mapify.ui.screens.ProfileScreen
 import com.mapify.ui.screens.ReportLocationScreen
 import com.mapify.ui.screens.ReportViewScreen
 import com.mapify.ui.screens.SettingsScreen
 import com.mapify.ui.screens.SearchFiltersScreen
+import com.mapify.ui.users.HomeScreen
 
 @Composable
 fun Navigation() {
@@ -26,7 +24,7 @@ fun Navigation() {
 
     Surface {
         NavHost(
-            navController = navController, startDestination = RouteScreen.Messages
+            navController = navController, startDestination = RouteScreen.Home
         ) {
             composable<RouteScreen.Login> {
                 LoginScreen(navigateToRegistration = {
@@ -49,14 +47,8 @@ fun Navigation() {
                     navigateToCreateReport = {
                         navController.navigate(RouteScreen.CreateReport)
                     },
-                    navigateToExplore = {
-                        navController.navigate(RouteScreen.Explore)
-                    },
-                    navigateToNotifications = {
-                        navController.navigate(RouteScreen.Notifications)
-                    },
-                    navigateToMessages = {
-                        navController.navigate(RouteScreen.Messages)
+                    navigateToDetail = {
+                        navController.navigate(RouteScreen.ReportView(it))
                     }
                 )
             }
@@ -88,19 +80,6 @@ fun Navigation() {
                         navController.navigate(RouteScreen.Home)
                     })
             }
-            composable<RouteScreen.Explore> {
-                ExploreScreen(
-                    navigateToCreateReport = {
-                    navController.navigate(RouteScreen.CreateReport)
-                }, navigateToReportView = {
-                    navController.navigate(RouteScreen.ReportView(it))
-                }, navigateToSearchFilters = {
-                    navController.navigate(RouteScreen.SearchFilters)
-                }, navigateToSettings = {
-                        navController.navigate(RouteScreen.Settings)
-                    }
-                )
-            }
             composable<RouteScreen.Notifications> {
                 NotificationsScreen(
                     navigateToHome = { navController.navigate(RouteScreen.Home) },
@@ -110,14 +89,6 @@ fun Navigation() {
                     navigateToReportView = { reportId ->
                         navController.navigate(RouteScreen.ReportView(reportId))
                     }
-                )
-            }
-            composable<RouteScreen.Messages> {
-                MessagesScreen(
-                    navigateToHome = { navController.navigate(RouteScreen.Home) },
-                    navigateToExplore = { navController.navigate(RouteScreen.Explore) },
-                    navigateToNotifications = { navController.navigate(RouteScreen.Notifications) },
-                    navigateToProfile = { navController.navigate(RouteScreen.Profile) }
                 )
             }
             composable<RouteScreen.Settings> {

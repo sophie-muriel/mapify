@@ -62,6 +62,7 @@
     <string name="report_view">Report View</string>
     <string name="report_location">Report Location</string>
     <string name="close_icon_description">Close Icon</string>
+    <string name="add_icon_description">Add</string>
 
     <string name="profile_title">Profile</string>
     <string name="profile_greeting">Hi, %1$s!</string>
@@ -93,6 +94,6 @@
     <string name="messages_label">Messages</string>
     <string name="more_options_icon">More Options Icon</string>
 
-    <string name="explore_screen">Explore</string>
+    <string name="explore_screen">Nearby Reports</string>
     <string name="settings_screen">Settings</string>
 </resources>

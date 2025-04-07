@@ -17,7 +17,6 @@ import com.mapify.model.Category
 import com.mapify.model.Location
 import com.mapify.model.Report
 import com.mapify.model.ReportStatus
-import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.NotificationItem
 import com.mapify.ui.theme.Spacing
 import java.time.LocalDateTime
@@ -26,7 +25,6 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
-import kotlin.time.Duration
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,13 +117,13 @@ fun NotificationsScreen(
             NotificationsTopBar(navigateToProfile = navigateToProfile)
         },
         bottomBar = {
-            BottomNavigationBar(
-                notificationsSelected = true,
-                navigateToHome = navigateToHome,
-                navigateToExplore = navigateToExplore,
-                navigateToMessages = navigateToMessages,
-                navigateToNotifications = {}
-            )
+//            BottomNavigationBar(
+//                notificationsSelected = true,
+//                navigateToHome = navigateToHome,
+//                navigateToExplore = navigateToExplore,
+//                navigateToMessages = navigateToMessages,
+//                navigateToNotifications = {}
+//            )
         }
     ) { padding ->
         LazyColumn(

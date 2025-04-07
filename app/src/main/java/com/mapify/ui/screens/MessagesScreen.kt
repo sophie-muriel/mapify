@@ -31,41 +31,7 @@ fun MessagesScreen(
     navigateToNotifications: () -> Unit,
     navigateToProfile: () -> Unit
 ) {
-    var messagesList by remember {
-        mutableStateOf(
-            listOf(
-                Message(
-                    id = "1",
-                    sender = "Laura Mejía",
-                    content = "Hola, quería saber si hay novedades sobre el reporte.",
-                    timestamp = LocalDateTime.now().minusMinutes(5),
-                    isRead = false
-                ),
-                Message(
-                    id = "2",
-                    sender = "Carlos Ruiz",
-                    content = "Gracias por tu respuesta.",
-                    timestamp = LocalDateTime.now().minusHours(2),
-                    isRead = true
-                ),
-                Message(
-                    id = "3",
-                    sender = "Andrea Torres",
-                    content = "¿Podrías revisar el archivo que te envié?",
-                    timestamp = LocalDateTime.now().minusDays(5),
-                    isRead = false
-                )
-            )
-        )
-    }
-
-    var selectedMessage by remember { mutableStateOf<Message?>(null) }
-
-    val markMessageAsRead: (Message) -> Unit = { message ->
-        messagesList = messagesList.map {
-            if (it.id == message.id) it.copy(isRead = true) else it
-        }
-    }
+    val dummyMessages = List(5) { "Lorem ipsum dolor sit amet, consectetur." }
 
     Scaffold(
         topBar = {
@@ -87,7 +53,7 @@ fun MessagesScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Future settings */ }) {
+                    IconButton(onClick = { /* Configuración futura */ }) {
                         Icon(
                             imageVector = Icons.Outlined.Settings,
                             contentDescription = stringResource(id = R.string.settings_icon)
@@ -107,7 +73,7 @@ fun MessagesScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* New message */ },
+                onClick = { /* new message action */ },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             ) {
@@ -118,33 +84,18 @@ fun MessagesScreen(
             }
         }
     ) { padding ->
-        if (selectedMessage != null) {
-            MessageDetailScreen(
-                message = selectedMessage!!,
-                onBackClick = {
-                    selectedMessage = null
-                },
-                onMarkAsRead = { message ->
-                    markMessageAsRead(message)
-                }
-            )
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = Spacing.Sides),
-                verticalArrangement = Arrangement.spacedBy(Spacing.Small)
-            ) {
-                items(messagesList) { message ->
-                    MessageItem(
-                        sender = message.sender,
-                        message = message.content,
-                        time = formatMessageDate(message.timestamp),
-                        isRead = message.isRead,
-                        onClick = { selectedMessage = message }
-                    )
-                }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = Spacing.Sides),
+            verticalArrangement = Arrangement.spacedBy(Spacing.Small)
+        ) {
+            items(dummyMessages) { message ->
+                MessageItem(
+                    sender = "List item",
+                    message = message
+                )
             }
         }
     }

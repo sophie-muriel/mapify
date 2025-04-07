@@ -1,4 +1,4 @@
-package com.mapify.ui.screens
+package com.mapify.ui.users.tabs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -6,56 +6,46 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.mapify.R
 import com.mapify.model.Category
 import com.mapify.model.Location
 import com.mapify.model.Report
 import com.mapify.model.ReportStatus
 import com.mapify.ui.theme.Spacing
-import com.mapify.ui.components.BottomNavigationBar
-import com.mapify.ui.components.CreateReportFloatingButton
 import java.time.LocalDateTime
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarOutline
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import coil.compose.AsyncImage
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExploreScreen(
-    navigateToCreateReport: () -> Unit,
-    navigateToReportView: (String) -> Unit,
-    navigateToSearchFilters: () -> Unit,
-    navigateToSettings: () -> Unit
+fun ExploreTab(
+    navigateToDetail: (String) -> Unit
 ) {
-
     val storedReports = listOf(
         Report(
             id = "1",
@@ -100,85 +90,29 @@ fun ExploreScreen(
         ),
     )
 
-    Scaffold(topBar = {
-        TopNavigationBar2(
-            onClickBackArrow = navigateToCreateReport,//TODO: Replace with actual back arrow
-            onClickSearch = navigateToSearchFilters,
-            onClickSettings = navigateToSettings,
-        )
-    }, bottomBar = {
-        BottomNavigationBar(searchSelected = true)
-    }, floatingActionButton = {
-        CreateReportFloatingButton(
-            navigateToCreateReport = {
-                navigateToCreateReport()
-            })
-    }) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = Spacing.Sides),
-                verticalArrangement = Arrangement.spacedBy(Spacing.Large),
-            ) {
-                items(storedReports) { report ->
-                    ReportCard(
-                        report = report, navigateToReportView = navigateToReportView
-                    )
-                }
-            }
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = Spacing.Sides),
+        verticalArrangement = Arrangement.spacedBy(Spacing.Large),
+    ) {
+        items(storedReports) {
+            ReportCard(
+                report = it,
+                navigateToDetail = navigateToDetail
+            )
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopNavigationBar2(
-    onClickBackArrow: () -> Unit,
-    onClickSearch: () -> Unit,
-    onClickSettings: () -> Unit
-) {
-    TopAppBar(
-        modifier = Modifier.padding(horizontal = Spacing.Small),
-        title = {
-        Text(
-            text = stringResource(id = R.string.explore_screen)
-        )
-    }, navigationIcon = {
-        IconButton(onClick = onClickBackArrow) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(id = R.string.back_arrow_icon)
-            )
-        }
-    }, actions = {
-        IconButton(onClick = onClickSearch) {
-            Icon(
-                imageVector = Icons.Outlined.Search,
-                contentDescription = stringResource(id = R.string.settings_icon)
-            )
-        }
-
-        IconButton(onClick = onClickSettings) {
-            Icon(
-                imageVector = Icons.Outlined.Settings,
-                contentDescription = stringResource(id = R.string.settings_icon)
-            )
-        }
-    })
-}
-
 @Composable
 fun ReportCard(
-    report: Report, navigateToReportView: (String) -> Unit
+    report: Report,
+    navigateToDetail: (String) -> Unit
 ) {
     ElevatedCard(
         onClick = {
-            navigateToReportView(report.id)
+            navigateToDetail(report.id)
         }, modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
@@ -188,13 +122,18 @@ fun ReportCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Spacing.Large),
         ) {
-            AsyncImage(
-                modifier = Modifier
+            Box(
+                modifier = Modifier.background(MaterialTheme.colorScheme.secondaryContainer)
                     .width(100.dp)
-                    .height(100.dp),
-                model = report.images[0],
-                contentDescription = stringResource(id = R.string.report_image)
-            )
+                    .height(100.dp)
+            ){
+                AsyncImage(
+                    modifier = Modifier.fillMaxSize(),
+                    model = report.images[0],
+                    contentDescription = stringResource(id = R.string.report_image),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
 
             Column(
                 modifier = Modifier.weight(1f),
@@ -272,5 +211,4 @@ fun ReportCard(
             }
         }
     }
-
 }
