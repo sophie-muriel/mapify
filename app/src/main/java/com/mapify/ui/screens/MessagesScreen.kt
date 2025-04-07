@@ -5,10 +5,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,9 +20,8 @@ import com.mapify.ui.components.MessageItem
 import com.mapify.ui.theme.Spacing
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,32 +31,41 @@ fun MessagesScreen(
     navigateToNotifications: () -> Unit,
     navigateToProfile: () -> Unit
 ) {
-    val messagesList = listOf(
-        Message(
-            id = "1",
-            sender = "Laura Mejía",
-            content = "Hola, quería saber si hay novedades sobre el reporte.",
-            timestamp = LocalDateTime.now().minusMinutes(5),
-            isRead = false,
-            profileImageUrl = null
-        ),
-        Message(
-            id = "2",
-            sender = "Carlos Ruiz",
-            content = "Gracias por tu respuesta.",
-            timestamp = LocalDateTime.now().minusHours(2),
-            isRead = true,
-            profileImageUrl = null
-        ),
-        Message(
-            id = "3",
-            sender = "Andrea Torres",
-            content = "¿Podrías revisar el archivo que te envié?",
-            timestamp = LocalDateTime.now().minusDays(5),
-            isRead = false,
-            profileImageUrl = null
+    var messagesList by remember {
+        mutableStateOf(
+            listOf(
+                Message(
+                    id = "1",
+                    sender = "Laura Mejía",
+                    content = "Hola, quería saber si hay novedades sobre el reporte.",
+                    timestamp = LocalDateTime.now().minusMinutes(5),
+                    isRead = false
+                ),
+                Message(
+                    id = "2",
+                    sender = "Carlos Ruiz",
+                    content = "Gracias por tu respuesta.",
+                    timestamp = LocalDateTime.now().minusHours(2),
+                    isRead = true
+                ),
+                Message(
+                    id = "3",
+                    sender = "Andrea Torres",
+                    content = "¿Podrías revisar el archivo que te envié?",
+                    timestamp = LocalDateTime.now().minusDays(5),
+                    isRead = false
+                )
+            )
         )
-    )
+    }
+
+    var selectedMessage by remember { mutableStateOf<Message?>(null) }
+
+    val markMessageAsRead: (Message) -> Unit = { message ->
+        messagesList = messagesList.map {
+            if (it.id == message.id) it.copy(isRead = true) else it
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -80,7 +87,7 @@ fun MessagesScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Configuración futura */ }) {
+                    IconButton(onClick = { /* Future settings */ }) {
                         Icon(
                             imageVector = Icons.Outlined.Settings,
                             contentDescription = stringResource(id = R.string.settings_icon)
@@ -100,7 +107,7 @@ fun MessagesScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* Acción de nuevo mensaje */ },
+                onClick = { /* New message */ },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             ) {
@@ -111,39 +118,34 @@ fun MessagesScreen(
             }
         }
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = Spacing.Sides),
-            verticalArrangement = Arrangement.spacedBy(Spacing.Small)
-        ) {
-            items(messagesList) { message ->
-                MessageItem(
-                    sender = message.sender,
-                    message = message.content,
-                    time = formatMessageDate(message.timestamp),
-                    isRead = message.isRead
-                )
+        if (selectedMessage != null) {
+            MessageDetailScreen(
+                message = selectedMessage!!,
+                onBackClick = {
+                    selectedMessage = null
+                },
+                onMarkAsRead = { message ->
+                    markMessageAsRead(message)
+                }
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = Spacing.Sides),
+                verticalArrangement = Arrangement.spacedBy(Spacing.Small)
+            ) {
+                items(messagesList) { message ->
+                    MessageItem(
+                        sender = message.sender,
+                        message = message.content,
+                        time = formatMessageDate(message.timestamp),
+                        isRead = message.isRead,
+                        onClick = { selectedMessage = message }
+                    )
+                }
             }
-        }
-    }
-}
-
-fun formatMessageDate(date: LocalDateTime): String {
-    val now = LocalDate.now()
-    val messageDate = date.toLocalDate()
-    return when {
-        messageDate.isEqual(now) -> {
-            val timeFormatter = DateTimeFormatter.ofPattern("hh:mm a", Locale("es", "CO"))
-            date.format(timeFormatter)
-        }
-        messageDate.isEqual(now.minusDays(1)) -> {
-            "Yesterday"
-        }
-        else -> {
-            val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("es", "CO"))
-            date.format(dateFormatter)
         }
     }
 }
