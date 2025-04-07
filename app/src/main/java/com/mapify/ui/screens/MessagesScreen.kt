@@ -115,10 +115,7 @@ fun MessagesScreen(
             verticalArrangement = Arrangement.spacedBy(Spacing.Small)
         ) {
             items(messages) { message ->
-                MessageItem(
-                    sender = message.sender,
-                    message = message.content
-                )
+                MessageItem(message = message)
             }
         }
     }
