@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -45,7 +46,10 @@ fun HomeScreen(
                 true,
                 Icons.Filled.Settings,
                 stringResource(id = R.string.settings_icon),
-                { }
+                { },
+//                true,
+//                Icons.Filled.Search,
+//                stringResource(id = R.string.messages_icon)
             ) //TODO: add action for settings screen
         },
         bottomBar = {

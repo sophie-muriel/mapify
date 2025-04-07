@@ -22,9 +22,14 @@ fun SimpleTopBar(
     navIconDescription: String,
     onClickNavIcon: () -> Unit,
     actions: Boolean,
-    actionIconVector: ImageVector? = null,
-    actionIconDescription: String = "",
-    onClickAction: () -> Unit = {},
+    firstActionIconVector: ImageVector? = null,
+    firstActionIconDescription: String = "",
+    firstOnClickAction: () -> Unit = {},
+    secondAction: Boolean = false,
+    secondActionIconVector: ImageVector? = null,
+    secondActionIconDescription: String = "",
+    secondOnClickAction: () -> Unit = {},
+
 ) {
     TopAppBar(
         title = {
@@ -44,12 +49,20 @@ fun SimpleTopBar(
             }
         },
         actions = {
-            if (actions && actionIconVector != null) {
-                IconButton(onClick = onClickAction) {
+            if (actions && firstActionIconVector != null) {
+                IconButton(onClick = firstOnClickAction) {
                     Icon(
-                        imageVector = actionIconVector,
-                        contentDescription = actionIconDescription,
+                        imageVector = firstActionIconVector,
+                        contentDescription = firstActionIconDescription,
                     )
+                }
+                if (secondAction && secondActionIconVector != null) {
+                    IconButton(onClick = secondOnClickAction) {
+                        Icon(
+                            imageVector = secondActionIconVector,
+                            contentDescription = secondActionIconDescription,
+                        )
+                    }
                 }
             } else {
                 IconButton(onClick = {}, enabled = false) {
