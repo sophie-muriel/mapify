@@ -96,4 +96,7 @@
 
     <string name="explore_screen">Nearby Reports</string>
     <string name="settings_screen">Settings</string>
+
+    <string name="search_filters">Search Filters</string>
+    <string name="priority_filter">Priority reports only</string>
 </resources>
