@@ -82,7 +82,7 @@ fun Navigation() {
             composable<RouteScreen.ReportLocation> {
                 ReportLocationScreen(
                     navigateToCreateReport = {
-                        navController.navigate(RouteScreen.CreateReport)
+                        navController.navigate(RouteScreen.CreateReport) // TODO: change to back
                     }
                 )
             }
@@ -103,7 +103,7 @@ fun Navigation() {
                     isAdmin = isAdmin.value
                 )
             }
-            composable<RouteScreen.Notifications> {
+            composable<RouteScreen.Notifications> { //TODO: move this entire thing to tabs and add back
                 NotificationsScreen(
                     navigateToHome = { navController.navigate(RouteScreen.Home) },
                     navigateToExplore = { navController.navigate(RouteScreen.Explore) },
@@ -116,7 +116,7 @@ fun Navigation() {
             }
             composable<RouteScreen.Settings> {
                 SettingsScreen(
-                    navigateToHome = { navController.navigate(RouteScreen.Home) },
+                    navigateToHome = { navController.navigate(RouteScreen.Home) }, //TODO: add back
                 )
             }
             composable<RouteScreen.SearchFilters> {
