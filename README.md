@@ -9,13 +9,13 @@ Android app for users to upload, rate, and interact with reports nearby.
   - [x] Registration location
   - [x] Registration location enabled
 - [x] Home
-  - [ ] Create report *
+  - [x] Create report
     - [-] Report location
   - [x] Profile
     - [x] Edit profile
-  - [ ] Settings
+  - [ ] Settings *
 - [x] Explore
-  - [ ] Search filters
+  - [ ] Search filters *
   - [ ] Report view *
     - [ ] Report view location
   - [ ] Edit report
@@ -42,7 +42,7 @@ Android app for users to upload, rate, and interact with reports nearby.
 - [ ] Input report rejection message
 
 #### Functionalities
-- [ ] Manage multiple images in report creation *
+- [x] Manage multiple images in report creation
 - [ ] Create navigation 'stack' and general navigation functionality *
 - [ ] Validate name fields and report titles
 - [ ] Search filters (date, distance, verified, priority)
