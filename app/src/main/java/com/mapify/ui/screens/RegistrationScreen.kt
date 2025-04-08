@@ -238,9 +238,7 @@ fun RegistrationForm(
 
         GenericTextField(
             value = email,
-            supportingText = if (emailError) stringResource(id = R.string.email_supporting_text) else stringResource(
-                id = R.string.email_supporting_text
-            ),
+            supportingText = stringResource(id = R.string.email_supporting_text),
             label = stringResource(id = R.string.email_label),
             onValueChange = onValueChangeEmail,
             isError = emailError,
