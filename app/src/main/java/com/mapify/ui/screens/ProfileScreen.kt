@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.util.Patterns
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
@@ -43,8 +44,12 @@ fun ProfileScreen(
     var password by rememberSaveable { mutableStateOf(oldPassword) }
     var passwordTouched by rememberSaveable { mutableStateOf(false) }
 
-    var editMode by rememberSaveable { mutableStateOf(false) }
+    val nameError = nameTouched && name.isBlank()
+    val emailError =
+        emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
+    val passwordError = passwordTouched && password.length < 6
 
+    var editMode by rememberSaveable { mutableStateOf(false) }
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     if (nameTouched || emailTouched || passwordTouched) {
@@ -113,7 +118,10 @@ fun ProfileScreen(
                     oldPassword = password
                     passwordTouched = false
                     editMode = !editMode
-                }
+                },
+                nameError,
+                emailError,
+                passwordError
             )
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen / 2))
@@ -154,7 +162,10 @@ fun ProfileContent(
     onValueChangeName: (String) -> Unit,
     onValueChangeEmail: (String) -> Unit,
     onValueChangePassword: (String) -> Unit,
-    onClickEdit: () -> Unit
+    onClickEdit: () -> Unit,
+    nameError: Boolean,
+    emailError: Boolean,
+    passwordError: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -195,6 +206,7 @@ fun ProfileContent(
 
         GenericTextField(
             value = oldName,
+            supportingText = stringResource(id = R.string.name_supporting_text),
             label = stringResource(id = R.string.name_label),
             onValueChange = onValueChangeName,
             leadingIcon = {
@@ -204,13 +216,14 @@ fun ProfileContent(
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
-            isError = false,
+            isError = nameError,
             readOnly = !isEditMode,
             isSingleLine = true
         )
 
         GenericTextField(
             value = oldEmail,
+            supportingText = stringResource(id = R.string.email_supporting_text),
             label = stringResource(id = R.string.email_label),
             onValueChange = onValueChangeEmail,
             leadingIcon = {
@@ -220,13 +233,14 @@ fun ProfileContent(
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
-            isError = false,
+            isError = emailError,
             readOnly = !isEditMode,
             isSingleLine = true
         )
 
         GenericTextField(
             value = oldPassword,
+            supportingText = stringResource(id = R.string.password_supporting_text),
             label = stringResource(id = R.string.password_label),
             onValueChange = onValueChangePassword,
             leadingIcon = {
@@ -236,7 +250,7 @@ fun ProfileContent(
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
-            isError = false,
+            isError = passwordError,
             isPassword = true,
             readOnly = !isEditMode,
             isSingleLine = true
@@ -266,7 +280,7 @@ fun ProfileContent(
                     .fillMaxWidth()
                     .padding(horizontal = Spacing.Sides)
                     .height(40.dp),
-                enabled = true,
+                enabled = oldName.isNotEmpty() && oldEmail.isNotEmpty() && oldPassword.isNotEmpty() && !emailError && !passwordError,
                 onClick = { onClickEdit() },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
