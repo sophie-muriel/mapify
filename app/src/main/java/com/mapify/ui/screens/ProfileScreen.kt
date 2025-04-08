@@ -28,7 +28,7 @@ import com.mapify.ui.theme.Spacing
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    navigateToHome: () -> Unit
+    navigateBack: () -> Unit
 ) {
     // TODO: take variables and replace old variables with them maybe?
 
@@ -52,7 +52,7 @@ fun ProfileScreen(
             ProfileTopBar(
                 editMode = editMode,
                 isKeyboardActive = isKeyboardActive,
-                navigateToHome = navigateToHome,
+                navigateBack = navigateBack,
                 onToggleEditMode = {
                     if (editMode) {
                         name = oldName
@@ -300,7 +300,7 @@ fun ProfileEdit(
 fun ProfileTopBar(
     editMode: Boolean,
     isKeyboardActive: Boolean,
-    navigateToHome: () -> Unit,
+    navigateBack: () -> Unit,
     onToggleEditMode: () -> Unit
 ) {
     if (!isKeyboardActive) {
@@ -313,7 +313,7 @@ fun ProfileTopBar(
                 )
             },
             navigationIcon = {
-                IconButton(onClick = navigateToHome) {
+                IconButton(onClick = navigateBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(id = R.string.back_arrow_icon)
