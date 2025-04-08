@@ -100,4 +100,8 @@
     <string name="search_filters">Search Filters</string>
     <string name="priority_filter">Priority reports only</string>
     <string name="resolved_filter">Resolved reports only</string>
+    <string name="my_posts">My posts only</string>
+    <string name="person_icon">Person Icon</string>
+    <string name="verified_filter">Verified reports only</string>
+    <string name="check_box_icon">Check Box Icon</string>
 </resources>
