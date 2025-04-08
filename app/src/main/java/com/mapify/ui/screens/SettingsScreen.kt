@@ -55,6 +55,7 @@ fun SettingsScreen(
 
     var logoutDialogVisible by rememberSaveable { mutableStateOf(false) }
     var deleteAccountDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var accountDeletedDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -135,10 +136,21 @@ fun SettingsScreen(
             },
             onExit = {
                 deleteAccountDialogVisible = false
-                navigateToLogin()
+                accountDeletedDialogVisible = true
             },
             onCloseText = stringResource(id = R.string.cancel),
             onExitText = stringResource(id = R.string.delete_account)
+        )
+    }
+    if (accountDeletedDialogVisible) {
+        GenericDialog(
+            title = stringResource(id = R.string.account_deleted),
+            message = stringResource(id = R.string.account_deleted_message),
+            onExit = {
+                accountDeletedDialogVisible = false
+                navigateToLogin()
+            },
+            onExitText = stringResource(id = R.string.ok)
         )
     }
 }
