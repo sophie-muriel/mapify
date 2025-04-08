@@ -67,6 +67,8 @@ fun ReportForm(
     val photoErrors = remember { mutableStateListOf(false) }
     val photosTouched = remember { mutableStateListOf(false) }
 
+    // max 5 images
+
     Column(
         modifier = Modifier
             .fillMaxWidth()

@@ -1,5 +1,7 @@
 package com.mapify.ui.screens
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +33,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -93,6 +96,14 @@ fun CreateReportScreen(
 
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
     var publishReportVisible by rememberSaveable { mutableStateOf(false) }
+
+    var context = LocalContext.current
+
+    //validar el boton de ir atras (de Android) y mostrar una alerta de confirmacion
+    BackHandler(enabled = true, onBack = {
+        Toast.makeText(context, "Ir atras", Toast.LENGTH_SHORT).show()
+
+    })
 
     Scaffold(
         topBar = {

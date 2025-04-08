@@ -21,16 +21,22 @@ import com.mapify.ui.users.HomeScreen
 fun Navigation() {
 
     val navController = rememberNavController()
+    //Crear una variable de estado isAdmin (inicialmente falsa) y cambia cuando en el Login se verifica que es admin
 
     Surface {
         NavHost(
-            navController = navController, startDestination = RouteScreen.Home
+            navController = navController, startDestination = RouteScreen.Login
         ) {
             composable<RouteScreen.Login> {
                 LoginScreen(navigateToRegistration = {
                     navController.navigate(RouteScreen.Registration)
                 }, navigateToHome = {
-                    navController.navigate(RouteScreen.Home)
+                    navController.navigate(RouteScreen.Home){
+                        popUpTo(0){
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 })
             }
             composable<RouteScreen.Registration> {
@@ -70,8 +76,8 @@ fun Navigation() {
             composable<RouteScreen.ReportView> {
                 val args = it.toRoute<RouteScreen.ReportView>()
                 ReportViewScreen(
-                    reportId = args.reportId, navigateToCreateReport = {
-                        navController.navigate(RouteScreen.CreateReport)
+                    reportId = args.reportId, navigateToBack = {
+                        navController.popBackStack()
                     })
             }
             composable<RouteScreen.Profile> {
