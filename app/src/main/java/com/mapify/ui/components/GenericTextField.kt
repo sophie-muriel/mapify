@@ -38,6 +38,7 @@ fun GenericTextField(
     isPassword: Boolean = false,
     readOnly: Boolean = false,
     showTrailingIcon: Boolean = true,
+    trailingIcon: @Composable (() -> Unit)? = null
 ) {
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -49,13 +50,19 @@ fun GenericTextField(
         ),
         leadingIcon = leadingIcon,
         trailingIcon = {
-            if (isPassword && showTrailingIcon) {
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(
-                        imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = stringResource(id = R.string.password_visibility_description)
-                    )
+            when {
+                isPassword && showTrailingIcon -> {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                            contentDescription = stringResource(id = R.string.password_visibility_description)
+                        )
+                    }
                 }
+                trailingIcon != null && showTrailingIcon -> {
+                    trailingIcon()
+                }
+                else -> Unit
             }
         },
         singleLine = isSingleLine,
