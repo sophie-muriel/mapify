@@ -16,14 +16,15 @@ import com.mapify.ui.users.tabs.NotificationsTab
 fun UserNavigation(
     padding: PaddingValues,
     navController: NavHostController,
-    navigateToDetail: (String) -> Unit
+    navigateToDetail: (String) -> Unit,
+    isAdmin: Boolean,
 ) {
     NavHost(
         modifier = Modifier.padding(padding),
         navController = navController,
         startDestination = UserRouteTab.Home
     ) {
-        composable<UserRouteTab.Home> { HomeTab() }
+        composable<UserRouteTab.Home> { HomeTab(isAdmin = isAdmin) }
         composable<UserRouteTab.Explore> { ExploreTab(navigateToDetail = navigateToDetail) }
         composable<UserRouteTab.Notifications> { NotificationsTab() }
         composable<UserRouteTab.Messages> { MessagesTab() }
