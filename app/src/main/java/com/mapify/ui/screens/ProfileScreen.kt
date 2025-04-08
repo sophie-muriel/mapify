@@ -1,11 +1,11 @@
 package com.mapify.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.LocationOn
@@ -17,25 +17,24 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mapify.R
+import com.mapify.ui.components.DiscardChangesDialog
 import com.mapify.ui.components.GenericTextField
+import com.mapify.ui.components.SimpleTopBar
 import com.mapify.ui.theme.Spacing
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    isAdmin: Boolean
 ) {
-    // TODO: take variables and replace old variables with them maybe?
-
-    val oldName = "root"
-    val oldEmail = "root"
-    val oldPassword = "000000"
-    val location = "4°32;30.1;N 75°39;48.7;W"
+    var oldName by rememberSaveable { mutableStateOf(if (isAdmin) "Administrator" else "Average User") }
+    var oldEmail by rememberSaveable { mutableStateOf(if (isAdmin) "admin" else "root") }
+    var oldPassword by rememberSaveable { mutableStateOf(if (isAdmin) "admin" else "root") }
+    val location = "4°32;30.1;N 75°39;48.7;W" // how to update location? beats me!
 
     var name by rememberSaveable { mutableStateOf(oldName) }
     var nameTouched by rememberSaveable { mutableStateOf(false) }
@@ -44,22 +43,39 @@ fun ProfileScreen(
     var password by rememberSaveable { mutableStateOf(oldPassword) }
     var passwordTouched by rememberSaveable { mutableStateOf(false) }
 
-    val isKeyboardActive = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     var editMode by rememberSaveable { mutableStateOf(false) }
+
+    var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
+
+    if (nameTouched || emailTouched || passwordTouched) {
+        BackHandler(enabled = true) {
+            exitDialogVisible = true
+        }
+    }
 
     Scaffold(
         topBar = {
-            ProfileTopBar(
-                editMode = editMode,
-                isKeyboardActive = isKeyboardActive,
-                navigateBack = navigateBack,
-                onToggleEditMode = {
-                    if (editMode) {
-                        name = oldName
-                        email = oldEmail
-                        password = oldPassword
+            SimpleTopBar(
+                contentAlignment = Alignment.CenterStart,
+                text = stringResource(id = R.string.edit_profile_label),
+                navIconVector = Icons.AutoMirrored.Filled.ArrowBack,
+                navIconDescription = stringResource(id = R.string.back_arrow_icon),
+                onClickNavIcon = {
+                    if (editMode && (nameTouched || emailTouched || passwordTouched)) {
+                        exitDialogVisible = true
+                    } else {
+                        navigateBack()
                     }
-                    editMode = !editMode
+                },
+                actions = !editMode,
+                firstActionIconVector = Icons.Outlined.Edit,
+                firstActionIconDescription = stringResource(id = R.string.edit_icon_description),
+                firstOnClickAction = {
+                    if (editMode && (nameTouched || emailTouched || passwordTouched)) {
+                        exitDialogVisible = true
+                    } else {
+                        editMode = !editMode
+                    }
                 }
             )
         }) { padding ->
@@ -71,129 +87,74 @@ fun ProfileScreen(
         ) {
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen / 2))
 
-            if (!editMode) {
-                ProfileInformation(oldName, oldEmail, oldPassword, location)
-            } else {
-                ProfileEdit(name, email, password, location, onValueChangeName = {
+            ProfileContent(
+                oldName = name,
+                oldEmail = email,
+                oldPassword = password,
+                location = location,
+                isEditMode = editMode,
+                onValueChangeName = {
                     name = it
                     nameTouched = true
-                }, onValueChangeEmail = {
+                },
+                onValueChangeEmail = {
                     email = it
                     emailTouched = true
-                }, onValueChangePassword = {
+                },
+                onValueChangePassword = {
                     password = it
                     passwordTouched = true
-                }, onClickEdit = { editMode = !editMode })
-            }
+                },
+                onClickEdit = {
+                    oldName = name
+                    nameTouched = false
+                    oldEmail = email
+                    emailTouched = false
+                    oldPassword = password
+                    passwordTouched = false
+                    editMode = !editMode
+                }
+            )
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen / 2))
         }
     }
-}
 
-@Composable
-fun ProfileInformation(
-    name: String, email: String, password: String, location: String // ?
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = Spacing.Sides),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = Icons.Outlined.AccountCircle,
-            contentDescription = stringResource(id = R.string.name_icon_description),
-            modifier = Modifier
-                .size(100.dp)
-                .padding(bottom = Spacing.Inline),
-            tint = MaterialTheme.colorScheme.primary
-        )
-
-        Text(
-            text = stringResource(id = R.string.profile_greeting, name),
-            style = MaterialTheme.typography.headlineSmall
-        )
-
-        Spacer(modifier = Modifier.height(Spacing.Inline * 2))
-
-        GenericTextField(
-            value = name,
-            label = stringResource(id = R.string.name_label),
-            onValueChange = {},
-            isError = false,
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.AccountCircle,
-                    contentDescription = stringResource(id = R.string.name_icon_description),
-                    tint = MaterialTheme.colorScheme.primary
-                )
+    if (exitDialogVisible) {
+        DiscardChangesDialog(
+            title = stringResource(id = R.string.exit_profile_edit),
+            message = stringResource(id = R.string.exit_profile_edit_description),
+            onClose = {
+                exitDialogVisible = false
             },
-            isSingleLine = true,
-            readOnly = true
-        )
+            onExit = {
+                if (!editMode) {
+                    exitDialogVisible = false
+                    navigateBack()
+                } else {
+                    exitDialogVisible = false
+                    editMode = false
 
-        GenericTextField(
-            value = email,
-            label = stringResource(id = R.string.email_label),
-            onValueChange = {},
-            isError = false,
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Email,
-                    contentDescription = stringResource(id = R.string.email_icon_description),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            isSingleLine = true,
-            readOnly = true
-        )
-
-        GenericTextField(
-            value = password,
-            label = stringResource(id = R.string.password_label),
-            onValueChange = {},
-            isError = false,
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Lock,
-                    contentDescription = stringResource(id = R.string.password_icon_description),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            isSingleLine = true,
-            isPassword = true,
-            readOnly = true
-        )
-
-        GenericTextField(
-            value = location,
-            label = stringResource(id = R.string.location),
-            onValueChange = {},
-            isError = false,
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.LocationOn,
-                    contentDescription = stringResource(id = R.string.location_icon_description),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            isSingleLine = true,
-            readOnly = true
+                    name = oldName
+                    email = oldEmail
+                    password = oldPassword
+                }
+            }
         )
     }
 }
 
 @Composable
-fun ProfileEdit(
-    name: String,
-    email: String,
-    password: String,
-    location: String, // ?
+fun ProfileContent(
+    oldName: String,
+    oldEmail: String,
+    oldPassword: String,
+    location: String,
+    isEditMode: Boolean,
     onValueChangeName: (String) -> Unit,
     onValueChangeEmail: (String) -> Unit,
     onValueChangePassword: (String) -> Unit,
-    onClickEdit: () -> Unit // show popup to confirm changes or something idk
+    onClickEdit: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -201,21 +162,39 @@ fun ProfileEdit(
             .padding(horizontal = Spacing.Sides),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(Modifier.height(100.dp))
+        if (!isEditMode) {
+            Icon(
+                imageVector = Icons.Outlined.AccountCircle,
+                contentDescription = stringResource(id = R.string.name_icon_description),
+                modifier = Modifier
+                    .size(100.dp)
+                    .padding(bottom = Spacing.Inline),
+                tint = MaterialTheme.colorScheme.primary
+            )
 
-        Text(
-            text = stringResource(id = R.string.edit_profile_label),
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Spacing.Sides),
-            textAlign = TextAlign.Start
-        )
+            Text(
+                text = stringResource(id = R.string.profile_greeting, oldName),
+                style = MaterialTheme.typography.headlineSmall
+            )
 
-        Spacer(Modifier.padding(Spacing.Inline))
+            Spacer(modifier = Modifier.height(Spacing.Inline * 2))
+        } else {
+            Spacer(Modifier.height(100.dp))
+
+            Text(
+                text = stringResource(id = R.string.edit_profile_label),
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacing.Sides),
+                textAlign = TextAlign.Start
+            )
+
+            Spacer(Modifier.padding(Spacing.Inline))
+        }
 
         GenericTextField(
-            value = name,
+            value = oldName,
             label = stringResource(id = R.string.name_label),
             onValueChange = onValueChangeName,
             leadingIcon = {
@@ -225,11 +204,13 @@ fun ProfileEdit(
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
-            isError = false
+            isError = false,
+            readOnly = !isEditMode,
+            isSingleLine = true
         )
 
         GenericTextField(
-            value = email,
+            value = oldEmail,
             label = stringResource(id = R.string.email_label),
             onValueChange = onValueChangeEmail,
             leadingIcon = {
@@ -239,11 +220,13 @@ fun ProfileEdit(
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
-            isError = false
+            isError = false,
+            readOnly = !isEditMode,
+            isSingleLine = true
         )
 
         GenericTextField(
-            value = password,
+            value = oldPassword,
             label = stringResource(id = R.string.password_label),
             onValueChange = onValueChangePassword,
             leadingIcon = {
@@ -254,7 +237,9 @@ fun ProfileEdit(
                 )
             },
             isError = false,
-            isPassword = true
+            isPassword = true,
+            readOnly = !isEditMode,
+            isSingleLine = true
         )
 
         GenericTextField(
@@ -269,67 +254,30 @@ fun ProfileEdit(
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
-            isSingleLine = true,
-            readOnly = true
+            readOnly = true,
+            isSingleLine = true
         )
 
-        Spacer(modifier = Modifier.height(Spacing.Inline * 2))
+        if (isEditMode) {
+            Spacer(modifier = Modifier.height(Spacing.Inline * 2))
 
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Spacing.Sides)
-                .height(40.dp),
-            enabled = true, // TODO: check for field errors ahahahahahaha
-            onClick = { onClickEdit() },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-        ) {
-            Text(
-                text = stringResource(id = R.string.save_changes_label),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ProfileTopBar(
-    editMode: Boolean,
-    isKeyboardActive: Boolean,
-    navigateBack: () -> Unit,
-    onToggleEditMode: () -> Unit
-) {
-    if (!isKeyboardActive) {
-        TopAppBar(
-            modifier = Modifier.padding(horizontal = Spacing.Small),
-            title = {
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacing.Sides)
+                    .height(40.dp),
+                enabled = true,
+                onClick = { onClickEdit() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+            ) {
                 Text(
-                    text = stringResource(id = R.string.profile_title),
-                    style = MaterialTheme.typography.titleLarge
+                    text = stringResource(id = R.string.save_changes_label),
+                    style = MaterialTheme.typography.bodyMedium
                 )
-            },
-            navigationIcon = {
-                IconButton(onClick = navigateBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(id = R.string.back_arrow_icon)
-                    )
-                }
-            },
-            actions = {
-                IconButton(onClick = onToggleEditMode) {
-                    Icon(
-                        imageVector = if (editMode) Icons.Outlined.Close else Icons.Outlined.Edit,
-                        contentDescription = stringResource(
-                            id = if (editMode) R.string.close_icon_description else R.string.edit_icon_description
-                        )
-                    )
-                }
             }
-        )
+        }
     }
 }
