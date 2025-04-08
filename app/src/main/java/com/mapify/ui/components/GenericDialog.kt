@@ -16,19 +16,20 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.mapify.R
 import com.mapify.ui.theme.Spacing
 
 @Composable
-fun DiscardChangesDialog(
+fun GenericDialog(
     title: String,
     message: String,
     onClose: () -> Unit,
-    onExit: () -> Unit
+    onExit: () -> Unit,
+    onCloseText: String,
+    onExitText: String,
+    textField: (@Composable () -> Unit)? = null
 ) {
     Dialog(
         onDismissRequest = { onClose() }) {
@@ -59,6 +60,10 @@ fun DiscardChangesDialog(
 
             Spacer(modifier = Modifier.height(Spacing.Small))
 
+            if (textField != null) {
+                textField()
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -71,7 +76,7 @@ fun DiscardChangesDialog(
                         onClose()
                     }) {
                     Text(
-                        text = stringResource(id = R.string.cancel),
+                        text = onCloseText,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -89,7 +94,7 @@ fun DiscardChangesDialog(
                     ),
                 ) {
                     Text(
-                        text = stringResource(id = R.string.exit),
+                        text = onExitText,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
