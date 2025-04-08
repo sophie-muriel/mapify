@@ -63,6 +63,9 @@ fun Navigation() {
                     },
                     navigateToDetail = {
                         navController.navigate(RouteScreen.ReportView(it))
+                    },
+                    navigateToSettings = {
+                        navController.navigate(RouteScreen.Settings)
                     }
                 )
             }
