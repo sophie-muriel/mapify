@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mapify.R
-import com.mapify.ui.components.DiscardChangesDialog
+import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.ui.theme.Spacing
@@ -32,6 +32,7 @@ fun ProfileScreen(
     navigateBack: () -> Unit,
     isAdmin: Boolean
 ) {
+    //TODO: add back handler to exit if editmode is false
     var oldName by rememberSaveable { mutableStateOf(if (isAdmin) "Administrator" else "Average User") }
     var oldEmail by rememberSaveable { mutableStateOf(if (isAdmin) "admin" else "root") }
     var oldPassword by rememberSaveable { mutableStateOf(if (isAdmin) "admin" else "root") }
@@ -129,7 +130,7 @@ fun ProfileScreen(
     }
 
     if (exitDialogVisible) {
-        DiscardChangesDialog(
+        GenericDialog(
             title = stringResource(id = R.string.exit_profile_edit),
             message = stringResource(id = R.string.exit_profile_edit_description),
             onClose = {
@@ -147,7 +148,9 @@ fun ProfileScreen(
                     email = oldEmail
                     password = oldPassword
                 }
-            }
+            },
+            onCloseText = stringResource(id = R.string.cancel),
+            onExitText = stringResource(id = R.string.exit)
         )
     }
 }
