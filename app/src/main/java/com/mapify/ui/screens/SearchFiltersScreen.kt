@@ -26,6 +26,7 @@ import androidx.compose.material3.CalendarLocale
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerFormatter
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -111,56 +112,25 @@ fun SearchFiltersScreen(
 
         val date = stringResource(id = R.string.selected_date) + " "
         if(datePressed){
-            DatePickerDialog(
+            DatePickerForFilter(
                 onDismissRequest = { datePressed = false },
-                confirmButton = {
-                    Button(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .height(40.dp),
-                        enabled = datePikerState.selectedDateMillis != null,
-                        onClick = {
-                            formattedDate = datePikerState.selectedDateMillis?.let {
-                                Instant.ofEpochMilli(it)
-                                    .atZone(ZoneId.of("UTC"))
-                                    .toLocalDate()
-                                    .format(DateTimeFormatter.ofPattern("MM/dd/yyyy", Locale.getDefault()))
-                            } ?: ""
-                            datePressed = false
-                            Toast.makeText(
-                                context,
-                                date + formattedDate,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        ),
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.ok_button),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(Spacing.Sides))
+                datePickerState = datePikerState,
+                onClickOk = {
+                    formattedDate = datePikerState.selectedDateMillis?.let {
+                        Instant.ofEpochMilli(it)
+                            .atZone(ZoneId.of("UTC"))
+                            .toLocalDate()
+                            .format(DateTimeFormatter.ofPattern("MM/dd/yyyy", Locale.getDefault()))
+                    } ?: ""
+                    datePressed = false
+                    Toast.makeText(
+                        context,
+                        date + formattedDate,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 },
-                dismissButton = {
-                    TextButton(
-                        onClick = { datePressed = false }
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.cancel),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            ){
-                DatePicker(
-                    state = datePikerState,
-                    dateFormatter = CustomDateFormatter(),
-                )
-            }
+                onClickCancel = { datePressed = false }
+            )
         }
     }
 }
@@ -191,6 +161,55 @@ class CustomDateFormatter : DatePickerFormatter {
                 .toLocalDate()
             monthYearFormatter.format(date)
         } ?: ""
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerForFilter(
+    onDismissRequest: () -> Unit,
+    datePickerState: DatePickerState,
+    onClickOk: () -> Unit,
+    onClickCancel: () -> Unit
+){
+    DatePickerDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            Button(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .height(40.dp),
+                enabled = datePickerState.selectedDateMillis != null,
+                onClick = {
+                    onClickOk()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.ok_button),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Spacer(modifier = Modifier.height(Spacing.Sides))
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onClickCancel
+            ) {
+                Text(
+                    text = stringResource(id = R.string.cancel),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    ){
+        DatePicker(
+            state = datePickerState,
+            dateFormatter = CustomDateFormatter(),
+        )
     }
 }
 
