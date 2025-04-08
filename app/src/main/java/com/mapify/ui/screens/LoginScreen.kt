@@ -2,23 +2,18 @@ package com.mapify.ui.screens
 
 import android.util.Patterns
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,10 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.mapify.R
+import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.LogoTitle
 import com.mapify.ui.theme.Spacing
@@ -232,104 +226,37 @@ fun LoginForm(
     }
 
     if (dialogVisible) {
-        RecoveryPasswordDialog(
-            recoveryEmail, onValueChangeRecoveryEmail, onClickRecovery, onClose = {
+        GenericDialog(
+            title = stringResource(id = R.string.forgot_password),
+            message = stringResource(id = R.string.forgot_password_description),
+            onClose = {
                 resetRecoveryFields()
                 dialogVisible = false
-            }, recoveryEmailError
-        )
-    }
-}
-
-@Composable
-fun RecoveryPasswordDialog(
-    recoveryEmail: String,
-    onValueChangeRecoveryEmail: (String) -> Unit,
-    onClickRecovery: () -> Unit,
-    onClose: () -> Unit,
-    recoveryEmailError: Boolean
-) {
-    Dialog(
-        onDismissRequest = { onClose() }) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentSize(),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Spacer(modifier = Modifier.height(Spacing.Sides))
-
-            Text(
-                text = stringResource(id = R.string.forgot_password),
-                textAlign = TextAlign.Left,
-                modifier = Modifier.padding(
-                    horizontal = Spacing.Sides, vertical = Spacing.Small
-                ),
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Text(
-                text = stringResource(id = R.string.forgot_password_description),
-                textAlign = TextAlign.Left,
-                modifier = Modifier.padding(
-                    horizontal = Spacing.Sides, vertical = Spacing.Small
-                ),
-                style = MaterialTheme.typography.bodySmall
-            )
-            GenericTextField(
-                value = recoveryEmail,
-                supportingText = stringResource(id = R.string.email_supporting_text),
-                label = stringResource(id = R.string.email_label),
-                onValueChange = onValueChangeRecoveryEmail,
-                isError = recoveryEmailError,
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Rounded.Email,
-                        contentDescription = stringResource(id = R.string.email_icon_description),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = Spacing.Sides
-                    ), horizontalArrangement = Arrangement.End
-            ) {
-                TextButton(
-                    onClick = onClose
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.back),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-
-                Button(
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .height(40.dp),
-                    enabled = recoveryEmail.isNotEmpty() && !recoveryEmailError,
-                    onClick = {
-                        onClickRecovery()
-                        onClose()
+            },
+            onExit = {
+                onClickRecovery()
+                resetRecoveryFields()
+                dialogVisible = false
+            },
+            onCloseText = stringResource(id = R.string.back),
+            onExitText = stringResource(id = R.string.send_email_recovery_link),
+            textField = {
+                GenericTextField(
+                    value = recoveryEmail,
+                    supportingText = stringResource(id = R.string.email_supporting_text),
+                    label = stringResource(id = R.string.email_label),
+                    onValueChange = onValueChangeRecoveryEmail,
+                    isError = recoveryEmailError,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Rounded.Email,
+                            contentDescription = stringResource(id = R.string.email_icon_description),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.send_email_recovery_link),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                )
             }
-
-            Spacer(modifier = Modifier.height(Spacing.Sides))
-        }
-
+        )
     }
 }
