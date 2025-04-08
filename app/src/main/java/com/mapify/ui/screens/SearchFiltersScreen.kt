@@ -3,7 +3,6 @@ package com.mapify.ui.screens
 import android.content.res.Resources.Theme
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -23,7 +21,6 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CalendarLocale
@@ -57,18 +54,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.theme.Spacing
-import java.text.SimpleDateFormat
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,7 +74,9 @@ fun SearchFiltersScreen(
     var verifiedChecked by rememberSaveable { mutableStateOf(false) }
     var myPostsChecked by rememberSaveable { mutableStateOf(false) }
     var datePressed by rememberSaveable { mutableStateOf(false) }
+    var dateSelected by rememberSaveable { mutableStateOf(false) }
     var distancePressed by rememberSaveable { mutableStateOf(false) }
+    var distanceSelected by rememberSaveable { mutableStateOf(false) }
     val datePikerState = rememberDatePickerState()
     var formattedDate by rememberSaveable { mutableStateOf("") }
     var sliderPosition by rememberSaveable { mutableFloatStateOf(0f) }
@@ -117,13 +111,16 @@ fun SearchFiltersScreen(
                verifiedChecked = verifiedChecked,
                onChangeVerifiedChecked = { verifiedChecked = it },
                datePressed = datePressed,
-               onChangeDatePressed = { datePressed = true },
+               onChangeDatePressed = { datePressed = it },
+               dateSelected = dateSelected,
                distancePressed = distancePressed,
-               onChangeDistancePressed = { distancePressed = it }
+               onChangeDistancePressed = { distancePressed = it },
+               distanceSelected = distanceSelected
            )
         }
 
         val date = stringResource(id = R.string.selected_date) + " "
+        val distance = stringResource(id = R.string.select_distance) + " "
         if(datePressed){
             DatePickerForFilter(
                 onDismissRequest = { datePressed = false },
@@ -141,6 +138,7 @@ fun SearchFiltersScreen(
                         date + formattedDate,
                         Toast.LENGTH_SHORT
                     ).show()
+                    dateSelected = true
                 },
                 onClickCancel = { datePressed = false }
             )
@@ -151,16 +149,22 @@ fun SearchFiltersScreen(
                     if(sliderPosition != 0f){
                         Toast.makeText(
                             context,
-                            sliderPosition.toString().dropLast(2) + " KM",
+                            distance + sliderPosition.toString().dropLast(2) + " KM",
                             Toast.LENGTH_SHORT
                         ).show()
+                        distanceSelected = true
+                    }else{
+                        distanceSelected = false
                     }
                 },
                 sliderPosition = sliderPosition,
                 onSliderPositionChange = { sliderPosition = it.toInt().toFloat() },
                 onCancel = {
+                    if(!distanceSelected){
+                        sliderPosition = 0f
+                    }
                     distancePressed = false
-                    sliderPosition = 0f
+
                 }
             )
         }
@@ -207,15 +211,16 @@ fun SearchFilters(
     verifiedChecked: Boolean,
     onChangeVerifiedChecked: (Boolean) -> Unit,
     datePressed: Boolean,
+    dateSelected: Boolean,
     onChangeDatePressed: (Boolean) -> Unit,
     distancePressed: Boolean,
+    distanceSelected: Boolean,
     onChangeDistancePressed: (Boolean) -> Unit
 ){
     FilterRow(
         icon = Icons.Filled.Star,
         description = stringResource(id = R.string.star_icon),
-        tint = MaterialTheme.colorScheme.primary,
-        stringResource(id = R.string.priority_filter),
+        text = stringResource(id = R.string.priority_filter),
         status = priorityChecked,
         onStatusChange = onChangePriorityCheck,
         isSwitch = true
@@ -224,7 +229,6 @@ fun SearchFilters(
     FilterRow(
         icon = Icons.Filled.Check,
         description = stringResource(id = R.string.check_icon),
-        tint = MaterialTheme.colorScheme.secondary,
         text = stringResource(id = R.string.resolved_filter),
         status = resolvedChecked,
         onStatusChange = onChangeReSolvedCheck,
@@ -234,7 +238,6 @@ fun SearchFilters(
     FilterRow(
         icon = Icons.Filled.CheckBox,
         description = stringResource(id = R.string.check_icon),
-        tint = MaterialTheme.colorScheme.primary,
         text = stringResource(id = R.string.verified_filter),
         status = verifiedChecked,
         onStatusChange = onChangeVerifiedChecked,
@@ -244,7 +247,6 @@ fun SearchFilters(
     FilterRow(
         icon = Icons.Filled.Person,
         description = stringResource(id = R.string.person_icon),
-        tint = MaterialTheme.colorScheme.secondary,
         text = stringResource(id = R.string.my_posts),
         status = myPostsChecked,
         onStatusChange = onChangeMyPostsCheck,
@@ -254,9 +256,9 @@ fun SearchFilters(
     FilterRow(
         icon = Icons.Filled.Today,
         description = stringResource(id = R.string.date_icon),
-        tint = MaterialTheme.colorScheme.secondary,
         text = stringResource(id = R.string.date),
         status = datePressed,
+        statusTwo = dateSelected,
         onStatusChange = onChangeDatePressed,
         isSwitch = false
     )
@@ -264,9 +266,9 @@ fun SearchFilters(
     FilterRow(
         icon = Icons.Outlined.LocationOn,
         description = stringResource(id = R.string.location_icon),
-        tint = MaterialTheme.colorScheme.secondary,
         text = stringResource(id = R.string.distance),
         status = distancePressed,
+        statusTwo = distanceSelected,
         onStatusChange = onChangeDistancePressed,
         isSwitch = false
     )
@@ -276,12 +278,13 @@ fun SearchFilters(
 fun FilterRow(
     icon: ImageVector,
     description: String,
-    tint: Color,
     text: String,
     status: Boolean,
+    statusTwo: Boolean = false,
     onStatusChange: (Boolean) -> Unit,
     isSwitch: Boolean
 ){
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -295,7 +298,11 @@ fun FilterRow(
             Icon(
                 imageVector = icon,
                 contentDescription = description,
-                tint = tint
+                tint = when{
+                    isSwitch && status -> MaterialTheme.colorScheme.primary
+                    !isSwitch && statusTwo -> MaterialTheme.colorScheme.primary
+                    else -> MaterialTheme.colorScheme.secondary
+                }
             )
 
             Text(
