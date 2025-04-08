@@ -47,8 +47,8 @@ fun Navigation() {
             }
             composable<RouteScreen.Registration> {
                 RegistrationScreen(
-                    navigateToLogin = {
-                        navController.navigate(RouteScreen.Login)
+                    navigateBack = {
+                        navController.popBackStack()
                     }
                 )
             }
@@ -99,7 +99,8 @@ fun Navigation() {
                 ProfileScreen(
                     navigateBack = {
                         navController.popBackStack()
-                    }
+                    },
+                    isAdmin = isAdmin.value
                 )
             }
             composable<RouteScreen.Notifications> {
