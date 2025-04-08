@@ -104,4 +104,10 @@
     <string name="person_icon">Person Icon</string>
     <string name="verified_filter">Verified reports only</string>
     <string name="check_box_icon">Check Box Icon</string>
+    <string name="play_arrow_icon">Play Arrow Icon</string>
+    <string name="date_icon">Date Icon</string>
+    <string name="date">Date</string>
+    <string name="distance">Distance</string>
+    <string name="ok_button">Ok</string>
+    <string name="selected_date">Selected date</string>
 </resources>
