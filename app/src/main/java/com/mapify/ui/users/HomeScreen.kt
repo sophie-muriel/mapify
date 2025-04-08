@@ -101,7 +101,8 @@ fun HomeScreen(
         UserNavigation(
             padding,
             navController = navController,
-            navigateToDetail = navigateToDetail
+            navigateToDetail = navigateToDetail,
+            navigateToReportView = navigateToDetail
         )
         Box(
             modifier = Modifier
