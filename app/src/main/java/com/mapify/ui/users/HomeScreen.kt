@@ -25,6 +25,7 @@ import com.mapify.ui.users.navigation.UserRouteTab
 
 @Composable
 fun HomeScreen(
+    isAdmin: Boolean,
     navigateToProfile: () -> Unit,
     navigateToCreateReport: () -> Unit,
     navigateToDetail: (String) -> Unit
@@ -101,7 +102,8 @@ fun HomeScreen(
         UserNavigation(
             padding,
             navController = navController,
-            navigateToDetail = navigateToDetail
+            navigateToDetail = navigateToDetail,
+            isAdmin = isAdmin
         )
         Box(
             modifier = Modifier
