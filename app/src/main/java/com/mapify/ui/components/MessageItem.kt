@@ -12,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mapify.ui.theme.Spacing
+import com.mapify.ui.theme.Spacing
+
 
 @Composable
 fun MessageItem(
@@ -58,6 +60,11 @@ fun MessageItem(
                     )
                 }
 
+                Text(
+                    text = sender,
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Spacer(Modifier.height(Spacing.Small))
                 Text(
                     text = message,
                     style = if (!isRead)
