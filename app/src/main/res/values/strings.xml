@@ -44,8 +44,12 @@
     <string name="check_icon">Check Icon</string>
     <string name="exit_report_creation">Are you sure you want to exit report creation?</string>
     <string name="exit_profile_edit">Are you sure you want to exit profile editing?</string>
+    <string name="logout_confirmation">Are you sure you want to log out?</string>
+    <string name="delete_account_confirmation">Are you sure you want to delete your account?</string>
     <string name="exit_report_creation_description">If you exit now, all changes will be discarded, and the report will not be created.</string>
     <string name="exit_profile_edit_description">If you exit now, all changes will be discarded, and your profile information will not be changed.</string>
+    <string name="logout_confirmation_description">If you log out now, you will be signed out of your account and redirected to the login screen.</string>
+    <string name="delete_account_confirmation_description">If you delete your account, all your data will be permanently removed and cannot be recovered.</string>
     <string name="cancel">Cancel</string>
     <string name="exit">Exit</string>
     <string name="publish">Publish</string>
@@ -97,4 +101,7 @@
 
     <string name="explore_screen">Nearby Reports</string>
     <string name="settings_screen">Settings</string>
+
+    <string name="logout">Log out</string>
+    <string name="delete_account">Delete account</string>
 </resources>
