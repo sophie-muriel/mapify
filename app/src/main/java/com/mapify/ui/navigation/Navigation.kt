@@ -9,7 +9,6 @@ import androidx.navigation.toRoute
 import com.mapify.ui.screens.CreateReportScreen
 import com.mapify.ui.screens.LoginScreen
 import com.mapify.ui.screens.RegistrationScreen
-import com.mapify.ui.screens.NotificationsScreen
 import com.mapify.ui.screens.ProfileScreen
 import com.mapify.ui.screens.ReportLocationScreen
 import com.mapify.ui.screens.ReportViewScreen
@@ -79,17 +78,6 @@ fun Navigation() {
                     navigateToHome = {
                         navController.navigate(RouteScreen.Home)
                     })
-            }
-            composable<RouteScreen.Notifications> {
-                NotificationsScreen(
-                    navigateToHome = { navController.navigate(RouteScreen.Home) },
-                    navigateToExplore = { navController.navigate(RouteScreen.Explore) },
-                    navigateToMessages = { navController.navigate(RouteScreen.Messages) },
-                    navigateToProfile = { navController.navigate(RouteScreen.Profile) },
-                    navigateToReportView = { reportId ->
-                        navController.navigate(RouteScreen.ReportView(reportId))
-                    }
-                )
             }
             composable<RouteScreen.Settings> {
                 SettingsScreen(
