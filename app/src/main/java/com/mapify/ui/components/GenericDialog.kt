@@ -25,14 +25,20 @@ import com.mapify.ui.theme.Spacing
 fun GenericDialog(
     title: String,
     message: String,
-    onClose: () -> Unit,
+    onClose: (() -> Unit)? = null,
     onExit: () -> Unit,
-    onCloseText: String,
+    onCloseText: String = "",
     onExitText: String,
     textField: (@Composable () -> Unit)? = null
 ) {
     Dialog(
-        onDismissRequest = { onClose() }) {
+        onDismissRequest = {
+            if (onClose != null) {
+                onClose()
+            } else {
+                onExit()
+            }
+        }) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -71,14 +77,16 @@ fun GenericDialog(
                         horizontal = Spacing.Sides
                     ), horizontalArrangement = Arrangement.End
             ) {
-                TextButton(
-                    onClick = {
-                        onClose()
-                    }) {
-                    Text(
-                        text = onCloseText,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                if (onClose != null) {
+                    TextButton(
+                        onClick = {
+                            onClose()
+                        }) {
+                        Text(
+                            text = onCloseText,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
 
                 Button(
