@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +33,8 @@ fun SearchFiltersScreen(
     navigateToExplore: () -> Unit
 ) {
 
-    var checked by rememberSaveable { mutableStateOf(false) }
+    var priorityChecked by rememberSaveable { mutableStateOf(false) }
+    var solvedChecked by rememberSaveable { mutableStateOf(false) }
     //TODO: Navigation back to ExploreScreen with variables 
     Scaffold(
         topBar = {
@@ -52,34 +54,76 @@ fun SearchFiltersScreen(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Top
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = Spacing.Sides, end = 48.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    modifier = Modifier.weight(1f),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = stringResource(id = R.string.star_icon),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-
-                    Text(
-                        modifier = Modifier.padding(start = 12.dp),
-                        text = stringResource(id = R.string.priority_filter)
-                    )
-                }
-
-                Switch(
-                    checked = checked,
-                    onCheckedChange = { checked = it }
-                )
-            }
-
+           SearchFilters(
+               priorityChecked = priorityChecked,
+               onChangePriorityCheck = { priorityChecked = it },
+               solvedChecked = solvedChecked,
+               onChangeSolvedCheck = { solvedChecked = it}
+           )
         }
+    }
+}
+
+@Composable
+fun SearchFilters(
+    priorityChecked: Boolean,
+    onChangePriorityCheck: (Boolean) -> Unit,
+    solvedChecked: Boolean,
+    onChangeSolvedCheck: (Boolean) -> Unit
+){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = Spacing.Sides, end = 48.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = stringResource(id = R.string.star_icon),
+                tint = MaterialTheme.colorScheme.primary
+            )
+
+            Text(
+                modifier = Modifier.padding(start = 12.dp),
+                text = stringResource(id = R.string.priority_filter)
+            )
+        }
+
+        Switch(
+            checked = priorityChecked,
+            onCheckedChange = onChangePriorityCheck
+        )
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = Spacing.Sides, end = 48.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Check,
+                contentDescription = stringResource(id = R.string.check_icon),
+                tint = MaterialTheme.colorScheme.primary
+            )
+
+            Text(
+                modifier = Modifier.padding(start = 12.dp),
+                text = stringResource(id = R.string.resolved_filter)
+            )
+        }
+
+        Switch(
+            checked = solvedChecked,
+            onCheckedChange = onChangeSolvedCheck
+        )
     }
 }
