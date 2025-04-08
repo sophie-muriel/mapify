@@ -15,6 +15,7 @@ import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.ImageSearch
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -23,8 +24,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -60,7 +65,11 @@ fun ReportForm(
     onClickCreate: () -> Unit
 ) {
 
-    val images = remember { mutableStateListOf("") }
+    val regex = Regex("^(https?:\\/\\/)?([a-zA-Z0-9.-]+)\\.([a-zA-Z]{2,})(\\/\\S*)?$")
+
+    val photos = remember { mutableStateListOf(photo) }
+    val photoErrors = remember { mutableStateListOf(false) }
+    val photosTouched = remember { mutableStateListOf(false) }
 
     Column(
         modifier = Modifier
@@ -110,7 +119,8 @@ fun ReportForm(
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
-            })
+            }
+        )
 
         GenericTextField(
             modifier = Modifier.height(160.dp),
@@ -158,7 +168,7 @@ fun ReportForm(
                 modifier = Modifier.weight(1f),
                 value = photo,
                 supportingText = stringResource(id = R.string.photo_supporting_text),
-                label = stringResource(id = R.string.photo),
+                label = stringResource(id = R.string.photo) + " 1",
                 onValueChange = onValueChangePhoto,
                 isError = photoError,
                 leadingIcon = {
@@ -170,29 +180,37 @@ fun ReportForm(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                })
-            IconButton(
-                onClick = {
-                    images.add("")
-                }) {
-                Icon(
-                    imageVector = Icons.Outlined.Add, contentDescription = null
-                )
-            }
+                },
+                showTrailingIcon = true,
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            photos.add("")
+                            photosTouched.add(false)
+                            photoErrors.add(false)
+                        }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Add,
+                            contentDescription = stringResource(id = R.string.add_icon_description)
+                        )
+                    }
+                }
+            )
         }
 
-        images.forEachIndexed { i, image ->
+        photos.forEachIndexed { i, image ->
             if (i == 0) {
                 return@forEachIndexed
             }
             GenericTextField(
-                value = images[i],
+                value = photos[i],
                 supportingText = stringResource(id = R.string.photo_supporting_text),
-                label = stringResource(id = R.string.photo),
+                label = stringResource(id = R.string.photo) + " " + (i + 1),
                 onValueChange = {
-                    images[i] = it
+                    photos[i] = it
+                    photosTouched[i] = true
                 },
-                isError = photoError,
+                isError = photosTouched[i] && !photos[i].matches(regex),
                 leadingIcon = {
                     IconButton(
                         onClick = { }) {
@@ -202,9 +220,23 @@ fun ReportForm(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                })
+                },
+                showTrailingIcon = true,
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            photos.removeAt(i)
+                            photoErrors.removeAt(i)
+                            photosTouched.removeAt(i)
+                        }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Remove,
+                            contentDescription = stringResource(id = R.string.remove_icon_description)
+                        )
+                    }
+                }
+            )
         }
-
 
         Spacer(modifier = Modifier.padding(Spacing.Inline))
 
@@ -225,5 +257,7 @@ fun ReportForm(
                 style = MaterialTheme.typography.bodyMedium
             )
         }
+
+        Spacer(modifier = Modifier.padding(Spacing.Large))
     }
 }
