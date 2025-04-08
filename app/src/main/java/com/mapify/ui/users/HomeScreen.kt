@@ -31,7 +31,6 @@ fun HomeScreen(
     navigateToDetail: (String) -> Unit,
     navigateToSettings: () -> Unit
 ) {
-    //TODO: add logout icon (convenient for tests, anyway)
 
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
@@ -74,7 +73,7 @@ fun HomeScreen(
                         settingsIconVector, settingsIconDescription, firstOnClickAction = { navigateToSettings() }
                     )
                 }
-            } //TODO: add action for settings screen
+            }
         },
         bottomBar = {
             BottomNavigationBar(
