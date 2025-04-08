@@ -99,4 +99,5 @@
 
     <string name="search_filters">Search Filters</string>
     <string name="priority_filter">Priority reports only</string>
+    <string name="resolved_filter">Resolved reports only</string>
 </resources>
