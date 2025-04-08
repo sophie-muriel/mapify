@@ -1,6 +1,5 @@
 package com.mapify.ui.screens
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,7 +32,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -48,6 +46,7 @@ import com.mapify.model.Category
 import com.mapify.model.Location
 import com.mapify.model.Role
 import com.mapify.model.User
+import com.mapify.ui.components.DiscardChangesDialog
 import com.mapify.ui.components.SimpleTopBar
 import java.time.LocalDateTime
 
@@ -96,8 +95,6 @@ fun CreateReportScreen(
 
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
     var publishReportVisible by rememberSaveable { mutableStateOf(false) }
-
-    var context = LocalContext.current
 
     BackHandler(enabled = true) {
         exitDialogVisible = true
@@ -178,12 +175,17 @@ fun CreateReportScreen(
 
     }
     if (exitDialogVisible) {
-        ExitReportCreationDialog(onClose = {
-            exitDialogVisible = false
-        }, onExit = {
-            exitDialogVisible = false
-            navigateBack()
-        })
+        DiscardChangesDialog(
+            title = stringResource(id = R.string.exit_report_creation),
+            message = stringResource(id = R.string.exit_report_creation_description),
+            onClose = {
+                exitDialogVisible = false
+            },
+            onExit = {
+                exitDialogVisible = false
+                navigateBack()
+            }
+        )
     }
 
     if (publishReportVisible) {
@@ -206,79 +208,6 @@ fun CreateReportScreen(
             reportsList.add(newReport)
             navigateToReportView(newReport.id)
         })
-    }
-}
-
-@Composable
-fun ExitReportCreationDialog(
-    onClose: () -> Unit, onExit: () -> Unit
-) {
-    Dialog(
-        onDismissRequest = { onClose() }) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentSize(),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Spacer(modifier = Modifier.height(Spacing.Sides))
-
-            Text(
-                text = stringResource(id = R.string.exit_report_creation),
-                textAlign = TextAlign.Left,
-                modifier = Modifier.padding(
-                    horizontal = Spacing.Sides, vertical = Spacing.Small
-                ),
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Text(
-                text = stringResource(id = R.string.exit_report_creation_description),
-                textAlign = TextAlign.Left,
-                modifier = Modifier.padding(
-                    horizontal = Spacing.Sides, vertical = Spacing.Small
-                ),
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Spacer(modifier = Modifier.height(Spacing.Small))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = Spacing.Sides
-                    ), horizontalArrangement = Arrangement.End
-            ) {
-                TextButton(
-                    onClick = {
-                        onClose()
-                    }) {
-                    Text(
-                        text = stringResource(id = R.string.cancel),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-
-                Button(
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .height(40.dp),
-                    onClick = {
-                        onExit()
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.exit),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(Spacing.Sides))
-        }
     }
 }
 
