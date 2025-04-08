@@ -63,6 +63,7 @@
     <string name="report_location">Report Location</string>
     <string name="close_icon_description">Close Icon</string>
     <string name="add_icon_description">Add</string>
+    <string name="remove_icon_description">Remove</string>
 
     <string name="profile_title">Profile</string>
     <string name="profile_greeting">Hi, %1$s!</string>
