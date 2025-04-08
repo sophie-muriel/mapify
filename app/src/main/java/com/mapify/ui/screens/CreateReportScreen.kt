@@ -39,8 +39,6 @@ fun CreateReportScreen(
     navigateToReportLocation: () -> Unit,
     navigateToReportView: (String) -> Unit
 ) {
-    // TODO: disable button until validate all images
-
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
     val titleError = titleTouched && title.isBlank()

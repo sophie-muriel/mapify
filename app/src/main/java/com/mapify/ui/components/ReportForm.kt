@@ -63,7 +63,7 @@ fun ReportForm(
 
     val regex = Regex("^(https?:\\/\\/)?([a-zA-Z0-9.-]+)\\.([a-zA-Z]{2,})(\\/\\S*)?$")
 
-    val photos = remember { mutableStateListOf(photo) }
+    val photos = remember { mutableStateListOf<String>() }
     val photoErrors = remember { mutableStateListOf(false) }
     val photosTouched = remember { mutableStateListOf(false) }
 
@@ -186,7 +186,9 @@ fun ReportForm(
                             photos.add("")
                             photosTouched.add(false)
                             photoErrors.add(false)
-                        }) {
+                        },
+                        enabled = photos.size < 4
+                    ) {
                         Icon(
                             imageVector = Icons.Outlined.Add,
                             contentDescription = stringResource(id = R.string.add_icon_description)
@@ -197,16 +199,14 @@ fun ReportForm(
         }
 
         photos.forEachIndexed { i, image ->
-            if (i == 0) {
-                return@forEachIndexed
-            }
             GenericTextField(
                 value = photos[i],
                 supportingText = stringResource(id = R.string.photo_supporting_text),
-                label = stringResource(id = R.string.photo) + " " + (i + 1),
+                label = stringResource(id = R.string.photo) + " " + (i + 2),
                 onValueChange = {
                     photos[i] = it
                     photosTouched[i] = true
+                    photoErrors[i] = !photos[i].matches(regex)
                 },
                 isError = photosTouched[i] && !photos[i].matches(regex),
                 leadingIcon = {
@@ -238,12 +238,17 @@ fun ReportForm(
 
         Spacer(modifier = Modifier.padding(Spacing.Inline))
 
+        val vogosBinted = photos.isEmpty() || photoErrors.all { !it } // vorp?
+        val noBlanks = if (photos.isEmpty()) true else photos.none { it.isBlank() }
+
         Button(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = Spacing.Sides)
                 .height(40.dp),
-            enabled = !titleError && !dropDownError && !descriptionError && !photoError, //TODO: Location has to be added here later
+            enabled = !titleError && title.isNotBlank() && !dropDownError && !descriptionError
+                    && description.isNotBlank() && !photoError && photo.isNotBlank()
+                    && vogosBinted && noBlanks, //TODO: Location has to be added here later
             onClick = onClickCreate,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
