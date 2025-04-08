@@ -17,7 +17,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -49,7 +48,6 @@ import com.mapify.model.User
 import com.mapify.ui.components.SimpleTopBar
 import java.time.LocalDateTime
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateReportScreen(
     navigateToHome: () -> Unit,
@@ -165,7 +163,8 @@ fun CreateReportScreen(
                 },
                 onClickCreate = {
                     publishReportVisible = true
-                })
+                }
+            )
         }
 
     }
@@ -346,5 +345,3 @@ fun PublishReportDialog(
         }
     }
 }
-
-
