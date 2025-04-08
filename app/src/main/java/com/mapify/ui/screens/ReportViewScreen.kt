@@ -17,7 +17,7 @@ import com.mapify.R
 
 @Composable
 fun ReportViewScreen(
-    reportId: String, navigateToBack: () -> Unit
+    reportId: String, navigateBack: () -> Unit
 ) {
 
     Scaffold(
@@ -27,7 +27,7 @@ fun ReportViewScreen(
                 stringResource(id = R.string.report_view),
                 Icons.AutoMirrored.Filled.ArrowBack,
                 stringResource(id = R.string.back_arrow_icon),
-                onClickNavIcon = { navigateToBack() },
+                onClickNavIcon = { navigateBack() },
                 false
             )
         }) { padding ->
