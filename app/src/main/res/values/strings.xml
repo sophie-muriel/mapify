@@ -43,7 +43,9 @@
     <string name="back_arrow_icon">Back Arrow Icon</string>
     <string name="check_icon">Check Icon</string>
     <string name="exit_report_creation">Are you sure you want to exit report creation?</string>
+    <string name="exit_profile_edit">Are you sure you want to exit profile editing?</string>
     <string name="exit_report_creation_description">If you exit now, all changes will be discarded, and the report will not be created.</string>
+    <string name="exit_profile_edit_description">If you exit now, all changes will be discarded, and your profile information will not be changed.</string>
     <string name="cancel">Cancel</string>
     <string name="exit">Exit</string>
     <string name="publish">Publish</string>
