@@ -104,4 +104,7 @@
 
     <string name="logout">Log out</string>
     <string name="delete_account">Delete account</string>
+    <string name="account_deleted">Account deleted</string>
+    <string name="account_deleted_message">Your account has been deleted successfully. You will be taken to the login page.</string>
+    <string name="ok">OK</string> <!--ok-->
 </resources>
