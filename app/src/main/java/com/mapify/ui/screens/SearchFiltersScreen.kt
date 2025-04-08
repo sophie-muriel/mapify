@@ -3,6 +3,7 @@ package com.mapify.ui.screens
 import android.content.res.Resources.Theme
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -20,9 +23,11 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CalendarLocale
+import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerFormatter
@@ -32,6 +37,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -44,12 +51,17 @@ import androidx.compose.ui.res.stringResource
 import com.mapify.R
 import com.mapify.ui.components.SimpleTopBar
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.theme.Spacing
 import java.text.SimpleDateFormat
 import java.time.Instant
@@ -73,6 +85,7 @@ fun SearchFiltersScreen(
     var distancePressed by rememberSaveable { mutableStateOf(false) }
     val datePikerState = rememberDatePickerState()
     var formattedDate by rememberSaveable { mutableStateOf("") }
+    var sliderPosition by rememberSaveable { mutableFloatStateOf(0f) }
     val context = LocalContext.current
 
     //TODO: Navigation back to ExploreScreen with variables 
@@ -131,6 +144,25 @@ fun SearchFiltersScreen(
                 },
                 onClickCancel = { datePressed = false }
             )
+        }else if(distancePressed){
+            DistanceSelectionDialog(
+                onClose = {
+                    distancePressed = false
+                    if(sliderPosition != 0f){
+                        Toast.makeText(
+                            context,
+                            sliderPosition.toString().dropLast(2) + " KM",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                },
+                sliderPosition = sliderPosition,
+                onSliderPositionChange = { sliderPosition = it.toInt().toFloat() },
+                onCancel = {
+                    distancePressed = false
+                    sliderPosition = 0f
+                }
+            )
         }
     }
 }
@@ -161,55 +193,6 @@ class CustomDateFormatter : DatePickerFormatter {
                 .toLocalDate()
             monthYearFormatter.format(date)
         } ?: ""
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerForFilter(
-    onDismissRequest: () -> Unit,
-    datePickerState: DatePickerState,
-    onClickOk: () -> Unit,
-    onClickCancel: () -> Unit
-){
-    DatePickerDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            Button(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .height(40.dp),
-                enabled = datePickerState.selectedDateMillis != null,
-                onClick = {
-                    onClickOk()
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-            ) {
-                Text(
-                    text = stringResource(id = R.string.ok_button),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            Spacer(modifier = Modifier.height(Spacing.Sides))
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onClickCancel
-            ) {
-                Text(
-                    text = stringResource(id = R.string.cancel),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-    ){
-        DatePicker(
-            state = datePickerState,
-            dateFormatter = CustomDateFormatter(),
-        )
     }
 }
 
@@ -338,5 +321,160 @@ fun FilterRow(
         }
     }
     Spacer(modifier = Modifier.height(Spacing.Inline))
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerForFilter(
+    onDismissRequest: () -> Unit,
+    datePickerState: DatePickerState,
+    onClickOk: () -> Unit,
+    onClickCancel: () -> Unit
+){
+    DatePickerDialog(
+        //modifier = Modifier.padding(Spacing.Sides),
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            Button(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .height(40.dp),
+                enabled = datePickerState.selectedDateMillis != null,
+                onClick = {
+                    onClickOk()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.ok_button),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Spacer(modifier = Modifier.height(Spacing.Sides))
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onClickCancel
+            ) {
+                Text(
+                    text = stringResource(id = R.string.cancel),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+
+    ){
+        DatePicker(
+            state = datePickerState,
+            dateFormatter = CustomDateFormatter(),
+        )
+    }
+}
+
+@Composable
+fun DistanceSelectionDialog(
+    onClose: () -> Unit,
+    sliderPosition: Float,
+    onSliderPositionChange: (Float) -> Unit,
+    onCancel: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = { onClose() }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentSize(),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Spacer(modifier = Modifier.height(Spacing.Sides))
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ){
+                Text(
+                    text = stringResource(id = R.string.select_distance),
+                    textAlign = TextAlign.Left,
+                    modifier = Modifier.padding(
+                        horizontal = Spacing.Sides, vertical = Spacing.Small
+                    ),
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = stringResource(id = R.string.distance_km),
+                    textAlign = TextAlign.Left,
+                    modifier = Modifier.padding(
+                        horizontal = Spacing.Sides, vertical = Spacing.Small
+                    ),
+                    style = MaterialTheme.typography.headlineMedium
+                )
+
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = Spacing.Sides),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.Inline)
+                ){
+                    Slider(
+                        value = sliderPosition,
+                        onValueChange = onSliderPositionChange,
+                        colors = SliderDefaults.colors(
+                            thumbColor = MaterialTheme.colorScheme.primary,
+                            activeTrackColor = MaterialTheme.colorScheme.primary,
+                            inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
+                        ),
+                        steps = 9,
+                        valueRange = 0f..10f
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = Spacing.Sides
+                        ), horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier.weight(1f)
+                    ){
+                        Text(text = sliderPosition.toString().dropLast(2) + " KM")
+                    }
+
+                    TextButton(
+                        onClick = onCancel
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.cancel),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+
+                    Button(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .height(40.dp),
+                        enabled = true,
+                        onClick = onClose,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.ok_button),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+
+            }
+
+            Spacer(modifier = Modifier.height(Spacing.Sides))
+        }
+
+    }
 }
 
