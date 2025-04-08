@@ -45,7 +45,8 @@ import com.mapify.ui.theme.Spacing
 
 @Composable
 fun LoginScreen(
-    navigateToRegistration: () -> Unit, navigateToHome: () -> Unit
+    navigateToRegistration: () -> Unit,
+    navigateToHome: (Boolean) -> Unit
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var recoveryEmail by rememberSaveable { mutableStateOf("") }
@@ -53,9 +54,6 @@ fun LoginScreen(
     var password by rememberSaveable { mutableStateOf("") }
 
     val context = LocalContext.current
-
-    val rootLogin = stringResource(id = R.string.root_login)
-    val rootPassword = stringResource(id = R.string.root_password)
 
     val recoveryEmailError =
         recoveryEmailTouched && !Patterns.EMAIL_ADDRESS.matcher(recoveryEmail).matches()
@@ -91,8 +89,13 @@ fun LoginScreen(
                 onValueChangeEmail = { email = it },
                 onValueChangePassword = { password = it },
                 onClickLogin = {
-                    if (email == rootLogin && password == rootPassword) {
-                        navigateToHome()
+                    if (email == "root" && password == "root") {
+                        navigateToHome(false)
+                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                            resetFields()
+                        }, 200)
+                    } else if (email == "admin" && password == "admin") {
+                        navigateToHome(true)
                         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                             resetFields()
                         }, 200)
