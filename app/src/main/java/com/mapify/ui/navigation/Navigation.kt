@@ -2,6 +2,8 @@ package com.mapify.ui.navigation
 
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -21,32 +23,38 @@ import com.mapify.ui.users.HomeScreen
 fun Navigation() {
 
     val navController = rememberNavController()
-    //Crear una variable de estado isAdmin (inicialmente falsa) y cambia cuando en el Login se verifica que es admin
+    val isAdmin = rememberSaveable { mutableStateOf(false) }
 
     Surface {
         NavHost(
             navController = navController, startDestination = RouteScreen.Login
         ) {
             composable<RouteScreen.Login> {
-                LoginScreen(navigateToRegistration = {
-                    navController.navigate(RouteScreen.Registration)
-                }, navigateToHome = {
-                    navController.navigate(RouteScreen.Home){
-                        popUpTo(0){
-                            inclusive = true
+                LoginScreen(
+                    navigateToRegistration = {
+                        navController.navigate(RouteScreen.Registration)
+                    },
+                    navigateToHome = { adminValue ->
+                        isAdmin.value = adminValue
+                        navController.navigate(RouteScreen.Home) {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
                         }
-                        launchSingleTop = true
                     }
-                })
+                )
             }
             composable<RouteScreen.Registration> {
                 RegistrationScreen(
                     navigateToLogin = {
                         navController.navigate(RouteScreen.Login)
-                    })
+                    }
+                )
             }
             composable<RouteScreen.Home> {
                 HomeScreen(
+                    isAdmin = isAdmin.value,
                     navigateToProfile = {
                         navController.navigate(RouteScreen.Profile)
                     },
@@ -59,32 +67,40 @@ fun Navigation() {
                 )
             }
             composable<RouteScreen.CreateReport> {
-                CreateReportScreen(navigateToHome = {
-                    navController.navigate(RouteScreen.Home)
-                }, navigateToReportLocation = {
-                    navController.navigate(RouteScreen.ReportLocation)
-                }, navigateToReportView = {
-                    navController.navigate(RouteScreen.ReportView(it))
-                })
+                CreateReportScreen(
+                    navigateBack = {
+                        navController.popBackStack()
+                    },
+                    navigateToReportLocation = {
+                        navController.navigate(RouteScreen.ReportLocation)
+                    },
+                    navigateToReportView = {
+                        navController.navigate(RouteScreen.ReportView(it))
+                    }
+                )
             }
             composable<RouteScreen.ReportLocation> {
                 ReportLocationScreen(
                     navigateToCreateReport = {
                         navController.navigate(RouteScreen.CreateReport)
-                    })
+                    }
+                )
             }
             composable<RouteScreen.ReportView> {
                 val args = it.toRoute<RouteScreen.ReportView>()
                 ReportViewScreen(
-                    reportId = args.reportId, navigateToBack = {
+                    reportId = args.reportId,
+                    navigateBack = {
                         navController.popBackStack()
-                    })
+                    }
+                )
             }
             composable<RouteScreen.Profile> {
                 ProfileScreen(
-                    navigateToHome = {
-                        navController.navigate(RouteScreen.Home)
-                    })
+                    navigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
             composable<RouteScreen.Notifications> {
                 NotificationsScreen(
