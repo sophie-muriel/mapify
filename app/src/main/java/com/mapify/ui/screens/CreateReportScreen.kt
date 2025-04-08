@@ -1,27 +1,14 @@
 package com.mapify.ui.screens
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -34,19 +21,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.mapify.R
 import com.mapify.ui.components.ReportForm
-import com.mapify.ui.theme.Spacing
 import com.mapify.model.Report
 import com.mapify.model.ReportStatus
 import com.mapify.model.Category
 import com.mapify.model.Location
 import com.mapify.model.Role
 import com.mapify.model.User
-import com.mapify.ui.components.DiscardChangesDialog
+import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.SimpleTopBar
 import java.time.LocalDateTime
 
@@ -56,6 +39,8 @@ fun CreateReportScreen(
     navigateToReportLocation: () -> Unit,
     navigateToReportView: (String) -> Unit
 ) {
+    // TODO: disable button until validate all images
+
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
     val titleError = titleTouched && title.isBlank()
@@ -175,7 +160,7 @@ fun CreateReportScreen(
 
     }
     if (exitDialogVisible) {
-        DiscardChangesDialog(
+        GenericDialog(
             title = stringResource(id = R.string.exit_report_creation),
             message = stringResource(id = R.string.exit_report_creation_description),
             onClose = {
@@ -184,102 +169,38 @@ fun CreateReportScreen(
             onExit = {
                 exitDialogVisible = false
                 navigateBack()
-            }
+            },
+            onCloseText = stringResource(id = R.string.cancel),
+            onExitText = stringResource(id = R.string.exit)
         )
     }
 
     if (publishReportVisible) {
-        PublishReportDialog(onClose = {
-            publishReportVisible = false
-        }, onPublish = {
-            publishReportVisible = false
-            val newReport = Report(
-                title = title,
-                category = Category.entries.find { it.displayName == dropDownValue }!!,
-                description = description,
-                location = null, //TODO: This must be changed here and in Report model erase the "?"
-                images = listOf(photo),
-                id = reportsIdCounter.toString(),
-                status = ReportStatus.NOT_VERIFIED,
-                userId = embeddedUser.id,
-                date = LocalDateTime.now()
-            )
-            reportsIdCounter++
-            reportsList.add(newReport)
-            navigateToReportView(newReport.id)
-        })
-    }
-}
-
-@Composable
-fun PublishReportDialog(
-    onClose: () -> Unit, onPublish: () -> Unit
-) {
-    Dialog(
-        onDismissRequest = { onClose() }) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentSize(),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Spacer(modifier = Modifier.height(Spacing.Sides))
-
-            Text(
-                text = stringResource(id = R.string.publish_report),
-                textAlign = TextAlign.Left,
-                modifier = Modifier.padding(
-                    horizontal = Spacing.Sides, vertical = Spacing.Small
-                ),
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Text(
-                text = stringResource(id = R.string.publish_report_description),
-                textAlign = TextAlign.Left,
-                modifier = Modifier.padding(
-                    horizontal = Spacing.Sides, vertical = Spacing.Small
-                ),
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Spacer(modifier = Modifier.height(Spacing.Small))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = Spacing.Sides
-                    ), horizontalArrangement = Arrangement.End
-            ) {
-                TextButton(
-                    onClick = {
-                        onClose()
-                    }) {
-                    Text(
-                        text = stringResource(id = R.string.cancel),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-
-                Button(
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .height(40.dp),
-                    onClick = {
-                        onPublish()
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.publish),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(Spacing.Sides))
-        }
+        GenericDialog(
+            title = stringResource(id = R.string.publish_report),
+            message = stringResource(id = R.string.publish_report_description),
+            onClose = {
+                publishReportVisible = false
+            },
+            onExit = {
+                publishReportVisible = false
+                val newReport = Report(
+                    title = title,
+                    category = Category.entries.find { it.displayName == dropDownValue }!!,
+                    description = description,
+                    location = null, //TODO: This must be changed here and in Report model erase the "?"
+                    images = listOf(photo),
+                    id = reportsIdCounter.toString(),
+                    status = ReportStatus.NOT_VERIFIED,
+                    userId = embeddedUser.id,
+                    date = LocalDateTime.now()
+                )
+                reportsIdCounter++
+                reportsList.add(newReport)
+                navigateToReportView(newReport.id)
+            },
+            onCloseText = stringResource(id = R.string.cancel),
+            onExitText = stringResource(id = R.string.publish)
+        )
     }
 }
