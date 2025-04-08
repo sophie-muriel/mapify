@@ -53,7 +53,7 @@ import java.time.LocalDateTime
 
 @Composable
 fun CreateReportScreen(
-    navigateToHome: () -> Unit,
+    navigateBack: () -> Unit,
     navigateToReportLocation: () -> Unit,
     navigateToReportView: (String) -> Unit
 ) {
@@ -99,11 +99,9 @@ fun CreateReportScreen(
 
     var context = LocalContext.current
 
-    //validar el boton de ir atras (de Android) y mostrar una alerta de confirmacion
-    BackHandler(enabled = true, onBack = {
-        Toast.makeText(context, "Ir atras", Toast.LENGTH_SHORT).show()
-
-    })
+    BackHandler(enabled = true) {
+        exitDialogVisible = true
+    }
 
     Scaffold(
         topBar = {
@@ -184,7 +182,7 @@ fun CreateReportScreen(
             exitDialogVisible = false
         }, onExit = {
             exitDialogVisible = false
-            navigateToHome()
+            navigateBack()
         })
     }
 
