@@ -33,6 +33,8 @@ fun ProfileScreen(
     isAdmin: Boolean
 ) {
     //TODO: add back handler to exit if editmode is false
+    //TODO: use actual profile model
+
     var oldName by rememberSaveable { mutableStateOf(if (isAdmin) "Administrator" else "Average User") }
     var oldEmail by rememberSaveable { mutableStateOf(if (isAdmin) "admin" else "root") }
     var oldPassword by rememberSaveable { mutableStateOf(if (isAdmin) "admin" else "root") }

@@ -45,16 +45,20 @@
     <string name="exit_report_creation">Are you sure you want to exit report creation?</string>
     <string name="exit_profile_edit">Are you sure you want to exit profile editing?</string>
     <string name="logout_confirmation">Are you sure you want to log out?</string>
+    <string name="exit_report_editing">Are you sure you want to exit report editing?</string>
     <string name="delete_account_confirmation">Are you sure you want to delete your account?</string>
     <string name="exit_report_creation_description">If you exit now, all changes will be discarded, and the report will not be created.</string>
     <string name="exit_profile_edit_description">If you exit now, all changes will be discarded, and your profile information will not be changed.</string>
     <string name="logout_confirmation_description">If you log out now, you will be signed out of your account and redirected to the login screen.</string>
+    <string name="exit_report_editing_description">If you exit now, all changes will be discarded, and the report will not be edited.</string>
     <string name="delete_account_confirmation_description">If you delete your account, all your data will be permanently removed and cannot be recovered.</string>
     <string name="cancel">Cancel</string>
     <string name="exit">Exit</string>
     <string name="publish">Publish</string>
     <string name="publish_report">Do you want to publish your Report now?</string>
+    <string name="edit_report_title">Do you want to save your Report now?</string>
     <string name="publish_report_description">The report will be published with the information you have provided. However, you will be able to modify and update it later.</string>
+    <string name="edit_report_description">The report will be saved with the information you have provided. However, you will be able to modify it again and update it later.</string>
     <string name="enable_location_access">Enable location access</string>
     <string name="enable_location_access_message">
         Location access is required for this app to function properly. Please enable location services to continue.
@@ -130,4 +134,8 @@
     <string name="more_vertical_dots">More Vertical Dots</string>
     <string name="star_icon_prioritized">Star Icon Prioritized</string>
     <string name="star_icon_not_prioritized">Star Icon Not Prioritized</string>
+
+    <string name="edit_report">Edit Report</string>
+    <string name="edit">Edit</string>
+    <string name="is_report_solved">Is the report resolved?</string>
 </resources>
