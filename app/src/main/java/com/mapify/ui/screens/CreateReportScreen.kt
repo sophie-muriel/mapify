@@ -65,7 +65,7 @@ fun CreateReportScreen(
     }
 
     val onAddPhoto = {
-        photos = photos + "" // Adds a new empty field
+        photos = photos + ""
         photoTouchedList = photoTouchedList + false
     }
 
@@ -79,16 +79,10 @@ fun CreateReportScreen(
     }
 
     val onValueChangePhotos: (List<String>) -> Unit = { updatedList ->
-        // Find the first changed photo (if any)
         val changedIndex = updatedList.indexOfFirstIndexed { i, url -> url != photos.getOrNull(i) }
-
-        // Update photos
         photos = updatedList
-
-        // Update only touched index
         photoTouchedList = photoTouchedList.toMutableList().also {
             if (changedIndex in updatedList.indices) {
-                // Expand touched list if needed
                 while (it.size < updatedList.size) {
                     it.add(false)
                 }
