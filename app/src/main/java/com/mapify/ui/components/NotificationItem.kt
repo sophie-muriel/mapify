@@ -39,7 +39,8 @@ fun NotificationItem(
             .clickable { onClick() }
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Spacing.Large),
         ) {
@@ -67,48 +68,44 @@ fun NotificationItem(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(Spacing.Small),
                 ) {
-                    Spacer(modifier = Modifier.height(Spacing.Small))
+                    //Spacer(modifier = Modifier.height(Spacing.Small))
 
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(Spacing.Small)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = title,
-                                style = MaterialTheme.typography.titleSmall,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                text = supportingText,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
-
                         Text(
-                            text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = statusColor,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                ) {
-                                    append(status)
-                                }
-                                append(" \u2022 ")
-                                append(statusMessage)
-                            },
-                            style = MaterialTheme.typography.bodySmall,
-                            maxLines = 2,
+                            text = title,
+                            style = MaterialTheme.typography.titleSmall,
+                            maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
-
+                        Text(
+                            text = supportingText,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
+
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(
+                                style = SpanStyle(
+                                    color = statusColor,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            ) {
+                                append(status)
+                            }
+                            append(" \u2022 ")
+                            append(statusMessage)
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+
                 }
             }
         }
