@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mapify.ui.theme.Spacing
 
@@ -25,27 +26,31 @@ fun MessageItem(
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight()
+            .height(80.dp)
             .clickable { onClick() }
     ) {
         Row(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(Spacing.Inline),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.Inline)
         ) {
             Icon(
                 imageVector = Icons.Outlined.AccountCircle,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(50.dp)
             )
 
-            Spacer(modifier = Modifier.width(Spacing.Inline))
-
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(Spacing.Small)
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = sender,
@@ -58,10 +63,10 @@ fun MessageItem(
                     )
                 }
 
-                Spacer(Modifier.height(Spacing.Small))
-
                 Text(
                     text = message,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     style = if (!isRead)
                         MaterialTheme.typography.bodyMedium.copy(
                             color = MaterialTheme.colorScheme.onSurface
@@ -74,7 +79,6 @@ fun MessageItem(
             }
 
             if (!isRead) {
-                Spacer(modifier = Modifier.width(Spacing.Small))
                 Box(
                     modifier = Modifier
                         .size(8.dp)
