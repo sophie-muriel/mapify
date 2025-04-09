@@ -1,31 +1,49 @@
 package com.mapify.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.carousel.CarouselState
+import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
+import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.motionEventSpy
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.R
 import com.mapify.model.Category
 import com.mapify.model.Location
 import com.mapify.model.Report
 import com.mapify.model.ReportStatus
+import com.mapify.ui.theme.Spacing
 import java.time.LocalDateTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportViewScreen(
     reportId: String, navigateBack: () -> Unit
@@ -36,7 +54,9 @@ fun ReportViewScreen(
             title = "Report 1",
             category = Category.SECURITY,
             description = "This is a report",
-            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s"),
+            images = listOf(
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOvSWqWExnQHszC2ZfSLd-xZNC94pRxMO7ag&s"),
             location = Location(
                 latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
             ),
@@ -50,7 +70,10 @@ fun ReportViewScreen(
             title = "Report 2",
             category = Category.PETS,
             description = "This is an embedded test report to test the pets category and the resolved flag and verified status",
-            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHtshKCjboh0e9X3dP5l-igYWWA4C8-nSaw&s"),
+            images = listOf(
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHtshKCjboh0e9X3dP5l-igYWWA4C8-nSaw&s",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThXTf5MoQt2F4rJ9lnIRpA-fQ7zZNSRQwtkQ&s",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFSUC03tbmiZ9hVh3ShKNIJmVyPVk4XIf16A&s"),
             location = Location(
                 latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
             ),
@@ -121,6 +144,8 @@ fun ReportViewScreen(
         stringResource(id = R.string.star_icon_prioritized) else stringResource(id = R.string.star_icon_not_prioritized)
     val tint = if (report.isHighPriority) MaterialTheme.colorScheme.primary else LocalContentColor.current
 
+    val state = rememberCarouselState { report.images.count() }
+
     Scaffold(
         topBar = {
             SimpleTopBar(
@@ -145,11 +170,40 @@ fun ReportViewScreen(
                 .fillMaxSize()
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
-            Text(text = reportId)
-
+            Carousel(
+                state = state,
+                list = report.images
+            )
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Carousel(
+    state: CarouselState,
+    list: List<String>
+){
+    HorizontalUncontainedCarousel(
+        state = state,
+        modifier = Modifier
+            .width(412.dp)
+            .height(250.dp),
+        itemWidth = 248.dp,
+        itemSpacing = 8.dp,
+        contentPadding = PaddingValues(horizontal = Spacing.Large),
+    ) {
+        val item = list[it]
+        AsyncImage(
+            modifier = Modifier.height(248.dp)
+                .aspectRatio(1f)
+                .maskClip(MaterialTheme.shapes.extraLarge),
+            model = item,
+            contentDescription = stringResource(id = R.string.report_image),
+            contentScale = ContentScale.Crop
+        )
     }
 }
 
