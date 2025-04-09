@@ -58,29 +58,21 @@ fun ReportForm(
     location: String,
     onValueChangeLocation: (String) -> Unit,
     locationError: Boolean,
-    photo: String,
-    onValueChangePhoto: (String) -> Unit,
     navigateToReportLocation: () -> Unit,
-    photoError: Boolean,
     onClickCreate: () -> Unit,
     editMode: Boolean = false,
-    photosValues: List<String>? = null,
+    photos: List<String>,
+    photoErrors: List<Boolean>,
+    onValueChangePhotos: (List<String>) -> Unit,
     switchCheckedValue: Boolean = false,
-    switchCheckedOnClick: ((Boolean) -> Unit)? = null
+    switchCheckedOnClick: ((Boolean) -> Unit)? = null,
+    onAddPhoto: () -> Unit,
+    onRemovePhoto: (Int) -> Unit,
 ) {
 
     val regex = Regex("^(https?:\\/\\/)?([a-zA-Z0-9.-]+)\\.([a-zA-Z]{2,})(\\/\\S*)?$")
 
-    val photos = remember { mutableStateListOf<String>() }
-    val photoErrors = remember { mutableStateListOf(false) }
-    val photosTouched = remember { mutableStateListOf(false) }
-
     val switchChecked = remember { mutableStateOf(switchCheckedValue) }
-
-    photosValues?.let {
-        photos.clear()
-        photos.addAll(it)
-    }
 
     Column(
         modifier = Modifier
@@ -171,81 +163,54 @@ fun ReportForm(
             readOnly = true
         )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
-        ) {
-            GenericTextField(
-                modifier = Modifier.weight(1f),
-                value = photo,
-                supportingText = stringResource(id = R.string.photo_supporting_text),
-                label = stringResource(id = R.string.photo) + " 1",
-                onValueChange = onValueChangePhoto,
-                isError = photoError,
-                leadingIcon = {
-                    IconButton(
-                        onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Outlined.ImageSearch,
-                            contentDescription = stringResource(id = R.string.photo_icon),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                },
-                showTrailingIcon = true,
-                trailingIcon = {
-                    IconButton(
-                        onClick = {
-                            photos.add("")
-                            photosTouched.add(false)
-                            photoErrors.add(false)
-                        },
-                        enabled = photos.size < 4
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Add,
-                            contentDescription = stringResource(id = R.string.add_icon_description)
-                        )
-                    }
-                }
-            )
-        }
-
         photos.forEachIndexed { i, image ->
-            GenericTextField(
-                value = photos[i],
-                supportingText = stringResource(id = R.string.photo_supporting_text),
-                label = stringResource(id = R.string.photo) + " " + (i + 2),
-                onValueChange = {
-                    photos[i] = it
-                    photosTouched[i] = true
-                    photoErrors[i] = !photos[i].matches(regex)
-                },
-                isError = photosTouched[i] && !photos[i].matches(regex),
-                leadingIcon = {
-                    IconButton(
-                        onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Outlined.ImageSearch,
-                            contentDescription = stringResource(id = R.string.photo_icon),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                GenericTextField(
+                    modifier = Modifier.weight(1f),
+                    value = photos[i],
+                    supportingText = stringResource(id = R.string.photo_supporting_text),
+                    label = stringResource(id = R.string.photo) + " ${i + 1}",
+                    onValueChange = {
+                        val updatedPhotos = photos.toMutableList()
+                        updatedPhotos[i] = it
+                        onValueChangePhotos(updatedPhotos)
+                    },
+                    isError = photoErrors[i],
+                    leadingIcon = {
+                        IconButton(onClick = { }) {
+                            Icon(
+                                imageVector = Icons.Outlined.ImageSearch,
+                                contentDescription = stringResource(id = R.string.photo_icon),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    },
+                    showTrailingIcon = true,
+                    trailingIcon = {
+                        IconButton(
+                            onClick = {
+                                if (i == 0) {
+                                    onAddPhoto()
+                                } else {
+                                    onRemovePhoto(i)
+                                }
+                            },
+                            enabled = if (i == 0) photos.size < 5 else true
+                        ) {
+                            Icon(
+                                imageVector = if (i == 0) Icons.Outlined.Add else Icons.Outlined.Remove,
+                                contentDescription = if (i == 0)
+                                    stringResource(id = R.string.add_icon_description)
+                                else
+                                    stringResource(id = R.string.remove_icon_description)
+                            )
+                        }
                     }
-                },
-                showTrailingIcon = true,
-                trailingIcon = {
-                    IconButton(
-                        onClick = {
-                            photos.removeAt(i)
-                            photoErrors.removeAt(i)
-                            photosTouched.removeAt(i)
-                        }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Remove,
-                            contentDescription = stringResource(id = R.string.remove_icon_description)
-                        )
-                    }
-                }
-            )
+                )
+            }
         }
 
         if (editMode && switchCheckedOnClick != null) {
@@ -289,8 +254,7 @@ fun ReportForm(
                 .padding(horizontal = Spacing.Sides)
                 .height(40.dp),
             enabled = !titleError && title.isNotBlank() && !dropDownError && !descriptionError
-                    && description.isNotBlank() && !photoError && photo.isNotBlank()
-                    && vogosBinted && noBlanks, //TODO: Location has to be added here later
+                    && description.isNotBlank() && vogosBinted && noBlanks, //TODO: Location has to be added here later
             onClick = onClickCreate,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
