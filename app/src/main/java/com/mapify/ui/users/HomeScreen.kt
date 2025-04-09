@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mapify.R
+import com.mapify.model.Conversation
 import com.mapify.ui.users.navigation.UserNavigation
 import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.CreateFAB
@@ -29,7 +30,9 @@ fun HomeScreen(
     navigateToProfile: () -> Unit,
     navigateToCreateReport: () -> Unit,
     navigateToDetail: (String) -> Unit,
-    navigateToSettings: () -> Unit
+    navigateToSettings: () -> Unit,
+    navigateToConversation: (Conversation) -> Unit,
+    navigateToReportView: (String) -> Unit
 ) {
 
     val navController = rememberNavController()
@@ -100,10 +103,12 @@ fun HomeScreen(
         }
     ) { padding ->
         UserNavigation(
-            padding,
+            padding = padding,
             navController = navController,
             navigateToDetail = navigateToDetail,
-            isAdmin = isAdmin
+            isAdmin = isAdmin,
+            navigateToReportView = navigateToReportView,
+            navigateToConversation = navigateToConversation
         )
         Box(
             modifier = Modifier
