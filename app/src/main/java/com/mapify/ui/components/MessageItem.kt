@@ -12,8 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mapify.ui.theme.Spacing
-import com.mapify.ui.theme.Spacing
-
 
 @Composable
 fun MessageItem(
