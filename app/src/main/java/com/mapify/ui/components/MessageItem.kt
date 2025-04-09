@@ -3,15 +3,20 @@ package com.mapify.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import com.mapify.R
 import com.mapify.ui.theme.Spacing
 
 @Composable
@@ -26,67 +31,99 @@ fun MessageItem(
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(70.dp)
             .clickable { onClick() }
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(Spacing.Inline),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Spacing.Inline)
+            horizontalArrangement = Arrangement.spacedBy(Spacing.Large),
         ) {
-            Icon(
-                imageVector = Icons.Outlined.AccountCircle,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(50.dp)
-            )
-
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(Spacing.Small)
+            Box(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                    .width(70.dp)
+                    .height(70.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = sender,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = time,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                }
-
-                Text(
-                    text = message,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = if (!isRead)
-                        MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    else
-                        MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.outline
-                        )
+                AsyncImage(
+                    modifier = Modifier.fillMaxSize(),
+                    model = profileImageUrl,
+                    contentDescription = stringResource(id = R.string.report_image),
+                    contentScale = ContentScale.FillBounds
                 )
             }
-
-            if (!isRead) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = CircleShape
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = Spacing.Small * 3),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.Small),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = sender,
+                            style = MaterialTheme.typography.titleSmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
-                )
+                        Text(
+                            text = time,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+
+                    val styledMessage = buildAnnotatedString {
+                        if (!isRead) {
+                            withStyle(
+                                style = SpanStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            ) {
+                                append(message)
+                            }
+                        } else {
+                            withStyle(
+                                style = SpanStyle(
+                                    color = MaterialTheme.colorScheme.outline
+                                )
+                            ) {
+                                append(message)
+                            }
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = styledMessage,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        if (!isRead) {
+                            Text(
+                                text = "\u2B24",
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
     }
