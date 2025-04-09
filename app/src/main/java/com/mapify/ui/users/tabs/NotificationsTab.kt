@@ -20,6 +20,8 @@ import java.util.*
 fun NotificationsTab(
     navigateToReportView: (String) -> Unit
 ) {
+    //TODO: report deleted logic
+
     val storedReports = listOf(
         Report(
             id = "1",
@@ -101,7 +103,7 @@ fun NotificationsTab(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = Spacing.Sides),
-        verticalArrangement = Arrangement.spacedBy(Spacing.Small)
+        verticalArrangement = Arrangement.spacedBy(Spacing.Inline)
     ) {
         items(storedReports) { report ->
             NotificationItem(
@@ -111,13 +113,13 @@ fun NotificationsTab(
                 else
                     stringResource(id = R.string.rejected),
                 supportingText = getRelativeTime(report.date),
-                statusColor = if (report.status == ReportStatus.VERIFIED)
-                    MaterialTheme.colorScheme.tertiary
+                statusMessage = if (report.status == ReportStatus.VERIFIED)
+                    "Your report has been verified, congratulations!"
                 else
-                    MaterialTheme.colorScheme.error,
+                    "Your report has been rejected; modify it in 3 days or it will be deleted.",
                 imageUrl = report.images.first(),
-                reportDate = formatReportDate(report.date),
-                onClick = { navigateToReportView(report.id) }
+                onClick = { navigateToReportView(report.id) },
+                statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
             )
         }
     }
@@ -140,10 +142,10 @@ fun getRelativeTime(date: LocalDateTime): String {
     val days = ChronoUnit.DAYS.between(reportDate, now)
 
     return when {
-        minutes < 1 -> "justo ahora"
-        minutes < 60 -> "$minutes min"
-        hours < 24 -> "$hours h"
-        days == 1L -> "ayer"
+        minutes < 1 -> "Just now"
+        minutes < 60 -> "$minutes min ago"
+        hours < 24 -> "$hours h ago"
+        days == 1L -> "Yesterday"
         else -> "$days d"
     }
 }
