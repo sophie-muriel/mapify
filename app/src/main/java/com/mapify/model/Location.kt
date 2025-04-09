@@ -1,8 +1,12 @@
 package com.mapify.model
 
-class Location(
+data class Location(
     var latitude: Double,
     var longitude: Double,
     var country: String,
-    var city: String) {
+    var city: String
+) {
+    override fun toString(): String {
+        return "$city, $country - ($latitude, $longitude)"
+    }
 }
