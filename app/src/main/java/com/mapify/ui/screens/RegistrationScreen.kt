@@ -46,7 +46,6 @@ import com.mapify.ui.theme.Spacing
 fun RegistrationScreen(
     navigateBack: () -> Unit
 ) {
-    //TODO: validate name field
 
     var name by rememberSaveable { mutableStateOf("") }
     var nameTouched by rememberSaveable { mutableStateOf(false) }
