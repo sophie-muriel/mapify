@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.mapify.ui.screens.CreateReportScreen
+import com.mapify.ui.screens.EditReportScreen
 import com.mapify.ui.screens.LoginScreen
 import com.mapify.ui.screens.RegistrationScreen
 import com.mapify.ui.screens.ProfileScreen
@@ -125,6 +126,12 @@ fun Navigation() {
             composable<RouteScreen.SearchFilters> {
                 SearchFiltersScreen(
                     navigateToExplore = { navController.navigate(RouteScreen.Explore) },
+                )
+            }
+            composable<RouteScreen.EditReport> {
+                EditReportScreen(
+                    navigateBack = { navController.popBackStack() },
+                    navigateToReportLocation = { navController.navigate(RouteScreen.ReportLocation) }
                 )
             }
         }
