@@ -22,8 +22,6 @@
     <string name="email_taken">The email is already taken</string>
     <string name="registration_label">Register</string>
     <string name="login_account">Already have an account? Login</string>
-    <string name="root_login">root</string>
-    <string name="root_password">root</string>
     <string name="forgot_password_description">To recover your password please enter the email you used to register/sign in.</string>
     <string name="send_email_recovery_link">Send link</string>
     <string name="recovery_email_sent">Recovery email sent</string>
@@ -45,7 +43,13 @@
     <string name="back_arrow_icon">Back Arrow Icon</string>
     <string name="check_icon">Check Icon</string>
     <string name="exit_report_creation">Are you sure you want to exit report creation?</string>
+    <string name="exit_profile_edit">Are you sure you want to exit profile editing?</string>
+    <string name="logout_confirmation">Are you sure you want to log out?</string>
+    <string name="delete_account_confirmation">Are you sure you want to delete your account?</string>
     <string name="exit_report_creation_description">If you exit now, all changes will be discarded, and the report will not be created.</string>
+    <string name="exit_profile_edit_description">If you exit now, all changes will be discarded, and your profile information will not be changed.</string>
+    <string name="logout_confirmation_description">If you log out now, you will be signed out of your account and redirected to the login screen.</string>
+    <string name="delete_account_confirmation_description">If you delete your account, all your data will be permanently removed and cannot be recovered.</string>
     <string name="cancel">Cancel</string>
     <string name="exit">Exit</string>
     <string name="publish">Publish</string>
@@ -63,6 +67,7 @@
     <string name="report_location">Report Location</string>
     <string name="close_icon_description">Close Icon</string>
     <string name="add_icon_description">Add</string>
+    <string name="remove_icon_description">Remove</string>
 
     <string name="profile_title">Profile</string>
     <string name="profile_greeting">Hi, %1$s!</string>
@@ -115,4 +120,10 @@
     <string name="apply_filters">Apply Filters</string>
     <string name="clean_filters">Clean Filters</string>
     <string name="kilo_meter">KM</string>
+
+    <string name="logout">Log out</string>
+    <string name="delete_account">Delete account</string>
+    <string name="account_deleted">Account deleted</string>
+    <string name="account_deleted_message">Your account has been deleted successfully. You will be taken to the login page.</string>
+    <string name="ok">OK</string> <!--ok-->
 </resources>

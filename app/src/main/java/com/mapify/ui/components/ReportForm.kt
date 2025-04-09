@@ -15,6 +15,7 @@ import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.ImageSearch
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -60,7 +61,13 @@ fun ReportForm(
     onClickCreate: () -> Unit
 ) {
 
-    val images = remember { mutableStateListOf("") }
+    val regex = Regex("^(https?:\\/\\/)?([a-zA-Z0-9.-]+)\\.([a-zA-Z]{2,})(\\/\\S*)?$")
+
+    val photos = remember { mutableStateListOf<String>() }
+    val photoErrors = remember { mutableStateListOf(false) }
+    val photosTouched = remember { mutableStateListOf(false) }
+
+    // max 5 images
 
     Column(
         modifier = Modifier
@@ -110,7 +117,8 @@ fun ReportForm(
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
-            })
+            }
+        )
 
         GenericTextField(
             modifier = Modifier.height(160.dp),
@@ -158,7 +166,7 @@ fun ReportForm(
                 modifier = Modifier.weight(1f),
                 value = photo,
                 supportingText = stringResource(id = R.string.photo_supporting_text),
-                label = stringResource(id = R.string.photo),
+                label = stringResource(id = R.string.photo) + " 1",
                 onValueChange = onValueChangePhoto,
                 isError = photoError,
                 leadingIcon = {
@@ -170,29 +178,37 @@ fun ReportForm(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                })
-            IconButton(
-                onClick = {
-                    images.add("")
-                }) {
-                Icon(
-                    imageVector = Icons.Outlined.Add, contentDescription = null
-                )
-            }
+                },
+                showTrailingIcon = true,
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            photos.add("")
+                            photosTouched.add(false)
+                            photoErrors.add(false)
+                        },
+                        enabled = photos.size < 4
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Add,
+                            contentDescription = stringResource(id = R.string.add_icon_description)
+                        )
+                    }
+                }
+            )
         }
 
-        images.forEachIndexed { i, image ->
-            if (i == 0) {
-                return@forEachIndexed
-            }
+        photos.forEachIndexed { i, image ->
             GenericTextField(
-                value = images[i],
+                value = photos[i],
                 supportingText = stringResource(id = R.string.photo_supporting_text),
-                label = stringResource(id = R.string.photo),
+                label = stringResource(id = R.string.photo) + " " + (i + 2),
                 onValueChange = {
-                    images[i] = it
+                    photos[i] = it
+                    photosTouched[i] = true
+                    photoErrors[i] = !photos[i].matches(regex)
                 },
-                isError = photoError,
+                isError = photosTouched[i] && !photos[i].matches(regex),
                 leadingIcon = {
                     IconButton(
                         onClick = { }) {
@@ -202,18 +218,37 @@ fun ReportForm(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                })
+                },
+                showTrailingIcon = true,
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            photos.removeAt(i)
+                            photoErrors.removeAt(i)
+                            photosTouched.removeAt(i)
+                        }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Remove,
+                            contentDescription = stringResource(id = R.string.remove_icon_description)
+                        )
+                    }
+                }
+            )
         }
 
-
         Spacer(modifier = Modifier.padding(Spacing.Inline))
+
+        val vogosBinted = photos.isEmpty() || photoErrors.all { !it } // vorp?
+        val noBlanks = if (photos.isEmpty()) true else photos.none { it.isBlank() }
 
         Button(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = Spacing.Sides)
                 .height(40.dp),
-            enabled = !titleError && !dropDownError && !descriptionError && !photoError, //TODO: Location has to be added here later
+            enabled = !titleError && title.isNotBlank() && !dropDownError && !descriptionError
+                    && description.isNotBlank() && !photoError && photo.isNotBlank()
+                    && vogosBinted && noBlanks, //TODO: Location has to be added here later
             onClick = onClickCreate,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -225,5 +260,7 @@ fun ReportForm(
                 style = MaterialTheme.typography.bodyMedium
             )
         }
+
+        Spacer(modifier = Modifier.padding(Spacing.Large))
     }
 }

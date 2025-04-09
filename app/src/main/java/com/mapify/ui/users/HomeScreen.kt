@@ -25,11 +25,12 @@ import com.mapify.ui.users.navigation.UserRouteTab
 
 @Composable
 fun HomeScreen(
+    isAdmin: Boolean,
     navigateToProfile: () -> Unit,
     navigateToCreateReport: () -> Unit,
-    navigateToDetail: (String) -> Unit
+    navigateToDetail: (String) -> Unit,
+    navigateToSettings: () -> Unit
 ) {
-    //TODO: add logout icon (convenient for tests, anyway)
 
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
@@ -50,29 +51,29 @@ fun HomeScreen(
                 UserRouteTab.Home::class.qualifiedName -> {
                     SimpleTopBar(alignment, stringResource(id = R.string.app_name),
                         navIconVector, navIconDescription, onClickNavIcon, actions,
-                        settingsIconVector, settingsIconDescription
+                        settingsIconVector, settingsIconDescription, firstOnClickAction = { navigateToSettings() }
                     )
                 }
                 UserRouteTab.Explore::class.qualifiedName -> {
                     SimpleTopBar(alignment, stringResource(id = R.string.explore_screen),
                         navIconVector, navIconDescription, onClickNavIcon, actions,
                         Icons.Filled.Search, stringResource(id = R.string.search_icon),
-                        { }, true,settingsIconVector, settingsIconDescription,{ }
+                        { }, true,settingsIconVector, settingsIconDescription, secondOnClickAction = { navigateToSettings() }
                     )
                 }
                 UserRouteTab.Notifications::class.qualifiedName -> {
                     SimpleTopBar(alignment, stringResource(id = R.string.notifications),
                         navIconVector, navIconDescription, onClickNavIcon, actions,
-                        settingsIconVector, settingsIconDescription
+                        settingsIconVector, settingsIconDescription, firstOnClickAction = { navigateToSettings() }
                     )
                 }
                 UserRouteTab.Messages::class.qualifiedName -> {
                     SimpleTopBar(alignment, stringResource(id = R.string.messages_label),
                         navIconVector, navIconDescription, onClickNavIcon, actions,
-                        settingsIconVector, settingsIconDescription
+                        settingsIconVector, settingsIconDescription, firstOnClickAction = { navigateToSettings() }
                     )
                 }
-            } //TODO: add action for settings screen
+            }
         },
         bottomBar = {
             BottomNavigationBar(
@@ -101,7 +102,8 @@ fun HomeScreen(
         UserNavigation(
             padding,
             navController = navController,
-            navigateToDetail = navigateToDetail
+            navigateToDetail = navigateToDetail,
+            isAdmin = isAdmin
         )
         Box(
             modifier = Modifier

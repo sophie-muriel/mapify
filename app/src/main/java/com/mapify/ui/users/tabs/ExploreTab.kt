@@ -6,15 +6,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -28,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -123,10 +119,11 @@ fun ReportCard(
             horizontalArrangement = Arrangement.spacedBy(Spacing.Large),
         ) {
             Box(
-                modifier = Modifier.background(MaterialTheme.colorScheme.secondaryContainer)
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
                     .width(100.dp)
                     .height(100.dp)
-            ){
+            ) {
                 AsyncImage(
                     modifier = Modifier.fillMaxSize(),
                     model = report.images[0],
@@ -135,80 +132,85 @@ fun ReportCard(
                 )
             }
 
-            Column(
+            Row(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(Spacing.Small),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = report.title,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-
-                Spacer(modifier = Modifier.height(Spacing.Small))
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.Inline)
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.Small),
                 ) {
-                    if (report.isResolved) {
+                    Text(
+                        text = report.title,
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+
+                    Spacer(modifier = Modifier.height(Spacing.Small))
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.Inline)
+                    ) {
+                        if (report.isResolved) {
+                            Text(
+                                text = stringResource(id = R.string.resolved),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(
+                                modifier = Modifier
+                                    .width(3.dp)
+                                    .height(3.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.secondary, shape = CircleShape
+                                    )
+                                    .align(alignment = Alignment.CenterVertically)
+                            )
+                        }
                         Text(
-                            text = stringResource(id = R.string.resolved),
+                            text = report.category.displayName,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
                         )
+
                         Spacer(
                             modifier = Modifier
-                                .width(3.dp)
-                                .height(3.dp)
+                                .width(3.5.dp)
+                                .height(3.5.dp)
                                 .background(
-                                    color = MaterialTheme.colorScheme.secondary, shape = CircleShape
+                                    color = MaterialTheme.colorScheme.onBackground, shape = CircleShape
                                 )
                                 .align(alignment = Alignment.CenterVertically)
                         )
+
+                        Text(
+                            text = "1.2 KM away", //TODO: Replace with actual distance to user
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
-                    Text(
-                        text = report.category.displayName,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-
-                    Spacer(
-                        modifier = Modifier
-                            .width(3.5.dp)
-                            .height(3.5.dp)
-                            .background(
-                                color = Color.Black, shape = CircleShape
-                            )
-                            .align(alignment = Alignment.CenterVertically)
-                    )
 
                     Text(
-                        text = "1.2 KM away", //TODO: Replace with actual distance to user
+                        text = if (report.description.length > 25) report.description.substring(
+                            0, 25
+                        ) + "..."
+                        else report.description,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
-                Text(
-                    text = if (report.description.length > 30) report.description.substring(
-                        0, 30
-                    ) + "..."
-                    else report.description.substring(0, report.description.length),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(top = 12.dp, bottom = 12.dp),
-            ) {
                 Icon(
                     imageVector = if (report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline,
                     contentDescription = stringResource(id = R.string.star_icon),
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 4.dp),
-                    tint = if (report.priorityCounter > 20) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                        .padding(end = Spacing.Small * 3)
+                        .size(20.dp),
+                    tint = if (report.priorityCounter > 20)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.secondary
                 )
             }
+
         }
     }
 }

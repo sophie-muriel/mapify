@@ -44,7 +44,7 @@ import com.mapify.ui.theme.Spacing
 
 @Composable
 fun RegistrationScreen(
-    navigateToLogin: () -> Unit
+    navigateBack: () -> Unit
 ) {
     //TODO: validate name field
 
@@ -62,11 +62,10 @@ fun RegistrationScreen(
     val location = "Colombia" // fixed for now, change when location access is explained in class
 
     val context = LocalContext.current
-    val rootLogin = stringResource(id = R.string.root_login)
 
     val nameError = nameTouched && name.isBlank()
     val emailError =
-        emailTouched && !(email == rootLogin || Patterns.EMAIL_ADDRESS.matcher(email).matches())
+        emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
     val passwordError = passwordTouched && password.length < 6
     val passwordConfirmationError = passwordConfirmationTouched && passwordConfirmation != password
 
@@ -110,7 +109,7 @@ fun RegistrationScreen(
                     passwordConfirmation = it
                     passwordConfirmationTouched = true
                 }, passwordConfirmationError, onClickRegister = {
-                    if (email != rootLogin) {
+                    if (email != "root") {
                         locationForm = true
                     } else {
                         Toast.makeText(
@@ -118,7 +117,7 @@ fun RegistrationScreen(
                         ).show()
                     }
                 }, navigateToLogin = {
-                    navigateToLogin()
+                    navigateBack()
                     android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                         resetFields()
                     }, 100)
@@ -174,7 +173,7 @@ fun RegistrationScreen(
                                 context.getString(R.string.registration_successful),
                                 Toast.LENGTH_SHORT
                             ).show()
-                            navigateToLogin()
+                            navigateBack()
                             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                                 resetFields()
                             }, 100)
@@ -239,9 +238,7 @@ fun RegistrationForm(
 
         GenericTextField(
             value = email,
-            supportingText = if (emailError) stringResource(id = R.string.email_supporting_text) else stringResource(
-                id = R.string.email_supporting_text
-            ),
+            supportingText = stringResource(id = R.string.email_supporting_text),
             label = stringResource(id = R.string.email_label),
             onValueChange = onValueChangeEmail,
             isError = emailError,
