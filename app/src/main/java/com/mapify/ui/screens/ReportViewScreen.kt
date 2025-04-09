@@ -1,6 +1,7 @@
 package com.mapify.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +26,9 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material.icons.outlined.IndeterminateCheckBox
+import androidx.compose.material.icons.outlined.Sell
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -182,58 +185,74 @@ fun ReportViewScreen(
                 .fillMaxSize()
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.spacedBy(Spacing.Large)
         ) {
             Carousel(
                 state = state,
                 list = report.images
             )
 
-            Spacer(modifier = Modifier.height(Spacing.Inline))
-
             Column(
                 modifier = Modifier
                     .padding(horizontal = Spacing.Sides)
                     .align(Alignment.Start),
+                verticalArrangement = Arrangement.spacedBy(Spacing.Large)
             ){
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.Inline),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = report.title,
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    Icon(
-                        imageVector = when (reportStatus) {
-                            ReportStatus.VERIFIED -> Icons.Filled.CheckBox
-                            ReportStatus.NOT_VERIFIED -> Icons.Outlined.IndeterminateCheckBox
-                            else -> Icons.Filled.IndeterminateCheckBox
-                        },
-                        contentDescription = stringResource(id = R.string.star_icon),
-                        tint = when (reportStatus) {
-                            ReportStatus.VERIFIED -> MaterialTheme.colorScheme.primary
-                            ReportStatus.NOT_VERIFIED -> MaterialTheme.colorScheme.primary
-                            else -> MaterialTheme.colorScheme.tertiaryContainer
-                        }
+                TitleAndVerified(
+                    report = report,
+                    reportStatus = reportStatus
+                )
 
-                    )
-                }
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(Spacing.Inline),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     InfoChip(
-                        icon = Icons.Default.Event,
-                        text = report.category.displayName
+                        icon = Icons.Outlined.Sell,
+                        text = report.category.displayName,
+                        onClick = {  }
                     )
                     InfoChip(
                         icon = Icons.Default.Place,
-                        text = "1.2KM away"
+                        text = "1.2KM away",
+                        onClick = {
+                            //navigate to mapView }
+                        },
+                        isClickable = true
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+fun TitleAndVerified(
+    report: Report,
+    reportStatus: ReportStatus
+){
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(Spacing.Inline),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = report.title,
+            style = MaterialTheme.typography.headlineMedium
+        )
+        Icon(
+            imageVector = when (reportStatus) {
+                ReportStatus.VERIFIED -> Icons.Filled.CheckBox
+                ReportStatus.NOT_VERIFIED -> Icons.Outlined.IndeterminateCheckBox
+                else -> Icons.Filled.IndeterminateCheckBox
+            },
+            contentDescription = stringResource(id = R.string.star_icon),
+            tint = when (reportStatus) {
+                ReportStatus.VERIFIED -> MaterialTheme.colorScheme.primary
+                ReportStatus.NOT_VERIFIED -> MaterialTheme.colorScheme.primary
+                else -> MaterialTheme.colorScheme.tertiaryContainer
+            }
+
+        )
     }
 }
 
@@ -254,7 +273,8 @@ fun Carousel(
     ) {
         val item = list[it]
         AsyncImage(
-            modifier = Modifier.height(248.dp)
+            modifier = Modifier
+                .height(248.dp)
                 .aspectRatio(1f)
                 .maskClip(MaterialTheme.shapes.extraLarge),
             model = item,
@@ -267,26 +287,42 @@ fun Carousel(
 @Composable
 fun InfoChip(
     icon: ImageVector,
-    text: String
+    text: String,
+    isClickable: Boolean = false,
+    onClick: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.tertiaryContainer, shape = RoundedCornerShape(8.dp))
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+    ElevatedCard(
+        modifier = Modifier.then(
+            if (isClickable) {
+                Modifier.clickable(onClick = onClick)
+            } else {
+                Modifier
+            }
+        )
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(18.dp),
-            tint = MaterialTheme.colorScheme.onSurface
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-        )
+        Row(
+            modifier = Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.inverseOnSurface,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
     }
+
 }
 
 
