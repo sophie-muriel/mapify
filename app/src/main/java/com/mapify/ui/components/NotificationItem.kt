@@ -1,5 +1,6 @@
 package com.mapify.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
@@ -19,12 +20,14 @@ fun NotificationItem(
     supportingText: String,
     statusColor: Color,
     imageUrl: String,
-    reportDate: String
+    reportDate: String,
+    onClick: () -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(80.dp)
+            .clickable { onClick() }
     ) {
         Row(
             modifier = Modifier
@@ -76,5 +79,3 @@ fun NotificationItem(
         }
     }
 }
-
-
