@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,7 +40,9 @@ fun ReportViewScreen(
             ),
             status = ReportStatus.NOT_VERIFIED,
             userId = "1",
-            date = LocalDateTime.now()
+            date = LocalDateTime.now(),
+            isResolved = false,
+            priorityCounter = 10
         ),
         Report(
             id = "2",
@@ -67,7 +70,9 @@ fun ReportViewScreen(
             ),
             status = ReportStatus.VERIFIED,
             userId = "2",
-            date = LocalDateTime.now()
+            date = LocalDateTime.now(),
+            isResolved = false,
+            priorityCounter = 11
         ),
     )
 
@@ -82,7 +87,7 @@ fun ReportViewScreen(
                 stringResource(id = R.string.back_arrow_icon),
                 onClickNavIcon = { navigateBack() },
                 true,
-                firstActionIconVector = if (report.isHighPriority) Icons.Filled.Star else Icons.Outlined.Star,
+                firstActionIconVector = if (report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline,
                 stringResource(id = R.string.star_icon),
                 {},
                 true,
