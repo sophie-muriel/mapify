@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
@@ -32,6 +34,7 @@ fun SimpleTopBar(
     secondActionIconVector: ImageVector? = null,
     secondActionIconDescription: String = "",
     secondOnClickAction: () -> Unit = {},
+    tint: Color = LocalContentColor.current,
 
 ) {
     TopAppBar(
@@ -67,6 +70,7 @@ fun SimpleTopBar(
                     Icon(
                         imageVector = firstActionIconVector,
                         contentDescription = firstActionIconDescription,
+                        tint = tint
                     )
                 }
                 if (secondAction && secondActionIconVector != null) {

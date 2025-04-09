@@ -128,4 +128,6 @@
     <string name="ok">OK</string> <!--ok-->
 
     <string name="more_vertical_dots">More Vertical Dots</string>
+    <string name="star_icon_prioritized">Star Icon Prioritized</string>
+    <string name="star_icon_not_prioritized">Star Icon Not Prioritized</string>
 </resources>
