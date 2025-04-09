@@ -117,10 +117,67 @@ fun SearchFiltersScreen(
                onChangeDistancePressed = { distancePressed = it },
                distanceSelected = distanceSelected
            )
+            Spacer(modifier = Modifier.height(Spacing.Sides))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacing.Sides),
+                verticalArrangement = Arrangement.spacedBy(Spacing.Sides)
+
+            ){
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = Spacing.Sides)
+                        .height(40.dp),
+                    enabled = true,
+                    onClick = navigateToExplore,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.apply_filters),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = Spacing.Sides)
+                        .height(40.dp),
+                    enabled = true,
+                    onClick = {
+                        priorityChecked = false
+                        resolvedChecked = false
+                        verifiedChecked = false
+                        myPostsChecked = false
+                        datePikerState.selectedDateMillis = null
+                        dateSelected = false
+                        sliderPosition = 0f
+                        distanceSelected = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.clean_filters),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+
         }
 
         val date = stringResource(id = R.string.selected_date) + " "
         val distance = stringResource(id = R.string.select_distance) + " "
+
         if(datePressed){
             DatePickerForFilter(
                 onDismissRequest = { datePressed = false },
