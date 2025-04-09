@@ -136,6 +136,7 @@ fun SearchFiltersScreen(
 
         val date = stringResource(id = R.string.selected_date) + " "
         val distance = stringResource(id = R.string.select_distance) + " "
+        val distanceKm = " " + stringResource(id = R.string.kilo_meter)
 
         if(datePressed){
             DatePickerForFilter(
@@ -165,7 +166,7 @@ fun SearchFiltersScreen(
                     if(sliderPosition != 0f){
                         Toast.makeText(
                             context,
-                            distance + sliderPosition.toString().dropLast(2) + " KM",
+                            distance + sliderPosition.toString().dropLast(2) + distanceKm,
                             Toast.LENGTH_SHORT
                         ).show()
                         distanceSelected = true
