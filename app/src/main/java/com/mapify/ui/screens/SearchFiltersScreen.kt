@@ -119,60 +119,19 @@ fun SearchFiltersScreen(
            )
             Spacer(modifier = Modifier.height(Spacing.Sides))
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = Spacing.Sides),
-                verticalArrangement = Arrangement.spacedBy(Spacing.Sides)
-
-            ){
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = Spacing.Sides)
-                        .height(40.dp),
-                    enabled = true,
-                    onClick = navigateToExplore,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.apply_filters),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+            Buttons(
+                onClickApplyFilters = navigateToExplore,
+                onClickCleanFilters = {
+                    priorityChecked = false
+                    resolvedChecked = false
+                    verifiedChecked = false
+                    myPostsChecked = false
+                    datePikerState.selectedDateMillis = null
+                    dateSelected = false
+                    sliderPosition = 0f
+                    distanceSelected = false
                 }
-
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = Spacing.Sides)
-                        .height(40.dp),
-                    enabled = true,
-                    onClick = {
-                        priorityChecked = false
-                        resolvedChecked = false
-                        verifiedChecked = false
-                        myPostsChecked = false
-                        datePikerState.selectedDateMillis = null
-                        dateSelected = false
-                        sliderPosition = 0f
-                        distanceSelected = false
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
-                    ),
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.clean_filters),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-
-
+            )
         }
 
         val date = stringResource(id = R.string.selected_date) + " "
@@ -396,7 +355,6 @@ fun DatePickerForFilter(
     onClickCancel: () -> Unit
 ){
     DatePickerDialog(
-        //modifier = Modifier.padding(Spacing.Sides),
         onDismissRequest = onDismissRequest,
         confirmButton = {
             Button(
@@ -540,5 +498,56 @@ fun DistanceSelectionDialog(
         }
 
     }
+}
+
+@Composable
+fun Buttons(
+    onClickApplyFilters: () -> Unit,
+    onClickCleanFilters: () -> Unit
+){
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Spacing.Sides),
+        verticalArrangement = Arrangement.spacedBy(Spacing.Sides)
+
+    ){
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.Sides)
+                .height(40.dp),
+            enabled = true,
+            onClick = onClickApplyFilters,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+        ) {
+            Text(
+                text = stringResource(id = R.string.apply_filters),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.Sides)
+                .height(40.dp),
+            enabled = true,
+            onClick = onClickCleanFilters,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
+            ),
+        ) {
+            Text(
+                text = stringResource(id = R.string.clean_filters),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+
 }
 
