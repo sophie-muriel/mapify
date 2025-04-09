@@ -10,23 +10,23 @@ Android app for users to upload, rate, and interact with reports nearby.
   - [x] Registration location enabled
 - [x] Home
   - [x] Create report
-    - [ ] Report location
+    - [x] Report location
   - [x] Profile
     - [x] Edit profile
   - [x] Settings
 - [x] Explore
   - [x] Search filters
   - [ ] Report view *
-    - [ ] Report view location
-  - [ ] Edit report
+    - [x] Report view location
+  - [ ] Edit report *
 - [x] Notifications
 - [x] Messages
   - [ ] Search user
-  - [ ] Chats
+  - [ ] Chats *
 
 ##### Alert Dialogs
 - [x] Forgot password
-- [ ] Location access required
+~~- [ ] Location access required -> not required~~
 - [x] Verify exit report creation
 - [x] Verify publish report
 - [x] Verify logout
@@ -34,11 +34,13 @@ Android app for users to upload, rate, and interact with reports nearby.
 - [x] Verify exit profile editing
 ~~- [ ] Verify save profile edits -> maybe remove~~
 - [ ] Report rejected
+- [ ] Report reject notification message
+- [ ] Report deleted notification message
 - [ ] Verify delete report
 - [x] Input date for search filters
 - [x] Input distance for search filters
 - [ ] Verify delete chat
-- [ ] Verify verify report %%lol%%
+- [ ] Verify verify report
 - [ ] Input report rejection message
 
 #### Functionalities

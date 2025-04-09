@@ -27,7 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mapify.R
@@ -90,7 +94,7 @@ fun ExploreTab(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = Spacing.Sides),
-        verticalArrangement = Arrangement.spacedBy(Spacing.Large),
+        verticalArrangement = Arrangement.spacedBy(Spacing.Inline),
     ) {
         items(storedReports) {
             ReportCard(
@@ -114,7 +118,8 @@ fun ReportCard(
             .height(100.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Spacing.Large),
         ) {
@@ -133,7 +138,9 @@ fun ReportCard(
             }
 
             Row(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = Spacing.Small * 3),
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -141,76 +148,64 @@ fun ReportCard(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(Spacing.Small),
                 ) {
-                    Text(
-                        text = report.title,
-                        style = MaterialTheme.typography.titleSmall,
-                    )
-
-                    Spacer(modifier = Modifier.height(Spacing.Small))
-
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.Inline)
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (report.isResolved) {
-                            Text(
-                                text = stringResource(id = R.string.resolved),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(
-                                modifier = Modifier
-                                    .width(3.dp)
-                                    .height(3.dp)
-                                    .background(
-                                        color = MaterialTheme.colorScheme.secondary, shape = CircleShape
-                                    )
-                                    .align(alignment = Alignment.CenterVertically)
-                            )
-                        }
                         Text(
-                            text = report.category.displayName,
-                            style = MaterialTheme.typography.bodySmall,
+                            text = report.title,
+                            style = MaterialTheme.typography.titleSmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
-
-                        Spacer(
+                        Icon(
+                            imageVector = if (report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline,
+                            contentDescription = stringResource(id = R.string.star_icon),
                             modifier = Modifier
-                                .width(3.5.dp)
-                                .height(3.5.dp)
-                                .background(
-                                    color = MaterialTheme.colorScheme.onBackground, shape = CircleShape
-                                )
-                                .align(alignment = Alignment.CenterVertically)
-                        )
-
-                        Text(
-                            text = "1.2 KM away", //TODO: Replace with actual distance to user
-                            style = MaterialTheme.typography.bodySmall
+                                .padding(end = Spacing.Small * 3)
+                                .size(20.dp),
+                            tint = if (report.priorityCounter > 20)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.secondary
                         )
                     }
 
+                    Spacer(modifier = Modifier.height(Spacing.Small))
+
+                    val statusText = buildAnnotatedString {
+                        if (report.isResolved) {
+                            withStyle(
+                                style = SpanStyle(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            ) {
+                                append(stringResource(id = R.string.resolved))
+                            }
+                            append(" \u2022 ")
+                        }
+                        append(report.category.displayName)
+                        append(" \u2022 ")
+                        append("1.2 KM away") // TODO: Replace with actual distance
+                    }
+
                     Text(
-                        text = if (report.description.length > 25) report.description.substring(
-                            0, 25
-                        ) + "..."
-                        else report.description,
-                        style = MaterialTheme.typography.bodySmall
+                        text = statusText,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Text(
+                        text = report.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
-
-                Icon(
-                    imageVector = if (report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline,
-                    contentDescription = stringResource(id = R.string.star_icon),
-                    modifier = Modifier
-                        .padding(end = Spacing.Small * 3)
-                        .size(20.dp),
-                    tint = if (report.priorityCounter > 20)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.secondary
-                )
             }
-
         }
     }
 }
