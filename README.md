@@ -15,12 +15,12 @@ Android app for users to upload, rate, and interact with reports nearby.
     - [x] Edit profile
   - [x] Settings
 - [x] Explore
-  - [ ] Search filters *
+  - [x] Search filters
   - [ ] Report view *
     - [ ] Report view location
   - [ ] Edit report
-- [ ] Notifications *
-- [ ] Messages *
+- [x] Notifications
+- [x] Messages
   - [ ] Search user
   - [ ] Chats
 
@@ -32,22 +32,22 @@ Android app for users to upload, rate, and interact with reports nearby.
 - [x] Verify logout
 - [x] Verify delete account
 - [x] Verify exit profile editing
-- [ ] Verify save profile edits -> maybe remove
+~~- [ ] Verify save profile edits -> maybe remove~~
 - [ ] Report rejected
 - [ ] Verify delete report
-- [ ] Input date for search filters
-- [ ] Input distance for search filters
+- [x] Input date for search filters
+- [x] Input distance for search filters
 - [ ] Verify delete chat
 - [ ] Verify verify report %%lol%%
 - [ ] Input report rejection message
 
 #### Functionalities
 - [x] Manage multiple images in report creation
-- [x] Create navigation 'stack' and general navigation functionality *
-- [ ] Validate name fields and report titles
-- [ ] Search filters (date, distance, verified, priority)
+- [x] Create navigation 'stack' and general navigation functionality
+~~- [ ] Validate name fields and report titles -> not required~~
+~~- [ ] Search filters (date, distance, verified, priority) -> not required~~
 - [ ] Admin functionalities (verify, delete reports) *
-- [ ] Manage and add comments
-- [ ] Chat with and search other users
+~~- [ ] Manage and add comments -> not required~~
+~~- [ ] Chat with and search other users -> not required~~
 
 *\*: in progress*
