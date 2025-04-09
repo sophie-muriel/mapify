@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.mapify.model.Conversation
 import com.mapify.ui.users.tabs.ExploreTab
 import com.mapify.ui.users.tabs.HomeTab
 import com.mapify.ui.users.tabs.MessagesTab
@@ -18,7 +19,6 @@ fun UserNavigation(
     navController: NavHostController,
     navigateToDetail: (String) -> Unit,
     isAdmin: Boolean,
-    navigateToDetail: (String) -> Unit,
     navigateToReportView: (String) -> Unit,
     navigateToConversation: (Conversation) -> Unit
 ) {
@@ -36,6 +36,9 @@ fun UserNavigation(
             )
         }
         composable<UserRouteTab.Messages> {
-            MessagesTab() }
+            MessagesTab(
+                navigateToConversation = navigateToConversation
+            )
+        }
     }
 }
