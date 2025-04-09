@@ -7,11 +7,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.mapify.R
 import com.mapify.model.*
-import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.NotificationItem
 import com.mapify.ui.theme.Spacing
 import java.time.*
@@ -19,10 +16,8 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationsTab(
-    navController: NavHostController,
     navigateToReportView: (String) -> Unit
 ) {
     val storedReports = listOf(
@@ -127,6 +122,7 @@ fun NotificationsTab(
         }
     }
 }
+
 fun formatReportDate(date: LocalDateTime): String {
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a", Locale("es", "CO"))
     val colombiaZone = ZoneId.of("America/Bogota")
