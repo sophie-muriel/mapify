@@ -58,11 +58,8 @@ fun MessageItem(
                     )
                 }
 
-                Text(
-                    text = sender,
-                    style = MaterialTheme.typography.titleSmall
-                )
                 Spacer(Modifier.height(Spacing.Small))
+
                 Text(
                     text = message,
                     style = if (!isRead)
