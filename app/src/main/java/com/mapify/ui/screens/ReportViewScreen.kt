@@ -5,19 +5,29 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.IndeterminateCheckBox
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material.icons.outlined.IndeterminateCheckBox
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -29,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -60,7 +71,7 @@ fun ReportViewScreen(
             location = Location(
                 latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
             ),
-            status = ReportStatus.NOT_VERIFIED,
+            status = ReportStatus.PENDING_VERIFICATION,
             userId = "1",
             date = LocalDateTime.now(),
             priorityCounter = 10
@@ -143,6 +154,7 @@ fun ReportViewScreen(
     val starIconDescription = if (report.isHighPriority)
         stringResource(id = R.string.star_icon_prioritized) else stringResource(id = R.string.star_icon_not_prioritized)
     val tint = if (report.isHighPriority) MaterialTheme.colorScheme.primary else LocalContentColor.current
+    val reportStatus = report.status
 
     val state = rememberCarouselState { report.images.count() }
 
@@ -176,6 +188,51 @@ fun ReportViewScreen(
                 state = state,
                 list = report.images
             )
+
+            Spacer(modifier = Modifier.height(Spacing.Inline))
+
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = Spacing.Sides)
+                    .align(Alignment.Start),
+            ){
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.Inline),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = report.title,
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                    Icon(
+                        imageVector = when (reportStatus) {
+                            ReportStatus.VERIFIED -> Icons.Filled.CheckBox
+                            ReportStatus.NOT_VERIFIED -> Icons.Outlined.IndeterminateCheckBox
+                            else -> Icons.Filled.IndeterminateCheckBox
+                        },
+                        contentDescription = stringResource(id = R.string.star_icon),
+                        tint = when (reportStatus) {
+                            ReportStatus.VERIFIED -> MaterialTheme.colorScheme.primary
+                            ReportStatus.NOT_VERIFIED -> MaterialTheme.colorScheme.primary
+                            else -> MaterialTheme.colorScheme.tertiaryContainer
+                        }
+
+                    )
+                }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.Inline),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    InfoChip(
+                        icon = Icons.Default.Event,
+                        text = report.category.displayName
+                    )
+                    InfoChip(
+                        icon = Icons.Default.Place,
+                        text = "1.2KM away"
+                    )
+                }
+            }
         }
     }
 }
@@ -203,6 +260,31 @@ fun Carousel(
             model = item,
             contentDescription = stringResource(id = R.string.report_image),
             contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Composable
+fun InfoChip(
+    icon: ImageVector,
+    text: String
+) {
+    Row(
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.tertiaryContainer, shape = RoundedCornerShape(8.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }
