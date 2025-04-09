@@ -67,9 +67,39 @@ fun EditReportScreen(
     val locationError = false
 
     val regex = Regex("^(https?:\\/\\/)?([a-zA-Z0-9.-]+)\\.([a-zA-Z]{2,})(\\/\\S*)?$")
-    var photo by rememberSaveable { mutableStateOf(report.images[0]) }
-    var photoTouched by rememberSaveable { mutableStateOf(false) }
-    val photoError = photoTouched && !regex.matches(photo)
+    var photos by rememberSaveable { mutableStateOf(report.images) }
+    var photoTouchedList by rememberSaveable { mutableStateOf(listOf(false)) }
+    val photoErrors = photos.mapIndexed { i, url ->
+        val touched = photoTouchedList.getOrElse(i) { false }
+        touched && !regex.matches(url)
+    }
+
+    val onAddPhoto = {
+        photos = photos + ""
+        photoTouchedList = photoTouchedList + false
+    }
+
+    val onRemovePhoto: (Int) -> Unit = { index ->
+        if (index in photos.indices) {
+            photos = photos.toMutableList().also { it.removeAt(index) }
+            photoTouchedList = photoTouchedList.toMutableList().also {
+                if (index < it.size) it.removeAt(index)
+            }
+        }
+    }
+
+    val onValueChangePhotos: (List<String>) -> Unit = { updatedList ->
+        val changedIndex = updatedList.indexOfFirstIndexed { i, url -> url != photos.getOrNull(i) }
+        photos = updatedList
+        photoTouchedList = photoTouchedList.toMutableList().also {
+            if (changedIndex in updatedList.indices) {
+                while (it.size < updatedList.size) {
+                    it.add(false)
+                }
+                it[changedIndex] = true
+            }
+        }
+    }
 
     val isKeyboardActive = WindowInsets.ime.getBottom(LocalDensity.current) > 0
 
@@ -116,17 +146,17 @@ fun EditReportScreen(
                     dropDownTouched = true
                     dropDownExpanded = false
                 },
-                dropDownError = dropDownError,
                 items = categories,
+                dropDownError = dropDownError,
                 isExpanded = dropDownExpanded,
                 onExpandedChange = {
                     dropDownExpanded = it
                     dropDownTouched = true
                 },
+                isTouched = dropDownTouched,
                 onDismissRequest = {
                     dropDownExpanded = false
                 },
-                isTouched = dropDownTouched,
                 description = description,
                 onValueChangeDescription = {
                     description = it
@@ -136,20 +166,16 @@ fun EditReportScreen(
                 location = report.location.toString(),
                 onValueChangeLocation = { },
                 locationError = locationError,
-                photo = photo,
-                onValueChangePhoto = {
-                    photo = it
-                    photoTouched = true
-                },
-                photoError = photoError,
-                navigateToReportLocation = {
-                    navigateToReportLocation()
-                },
+                navigateToReportLocation = navigateToReportLocation,
                 onClickCreate = {
                     saveReportVisible = true
                 },
+                photos = photos,
+                photoErrors = photoErrors,
+                onValueChangePhotos = onValueChangePhotos,
+                onAddPhoto = onAddPhoto,
+                onRemovePhoto = onRemovePhoto,
                 editMode = true,
-                photosValues = report.images.drop(1),
                 switchCheckedValue = switchChecked.value,
                 switchCheckedOnClick = {
                     switchChecked.value = it
@@ -195,4 +221,11 @@ fun EditReportScreen(
             onExitText = stringResource(id = R.string.edit)
         )
     }
+}
+
+private inline fun <T> List<T>.indexOfFirstIndexed(predicate: (index: Int, T) -> Boolean): Int {
+    for (i in indices) {
+        if (predicate(i, this[i])) return i
+    }
+    return -1
 }
