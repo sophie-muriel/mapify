@@ -54,7 +54,6 @@ fun MessagesTab(
             isRead = false
         )
     )
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
