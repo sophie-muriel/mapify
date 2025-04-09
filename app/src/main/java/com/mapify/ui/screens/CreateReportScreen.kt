@@ -57,9 +57,45 @@ fun CreateReportScreen(
     val locationError = false
 
     val regex = Regex("^(https?:\\/\\/)?([a-zA-Z0-9.-]+)\\.([a-zA-Z]{2,})(\\/\\S*)?$")
-    var photo by rememberSaveable { mutableStateOf("") }
-    var photoTouched by rememberSaveable { mutableStateOf(false) }
-    val photoError = photoTouched && !regex.matches(photo)
+    var photos by rememberSaveable { mutableStateOf(listOf("")) }
+    var photoTouchedList by rememberSaveable { mutableStateOf(listOf(false)) }
+    val photoErrors = photos.mapIndexed { i, url ->
+        val touched = photoTouchedList.getOrElse(i) { false }
+        touched && !regex.matches(url)
+    }
+
+    val onAddPhoto = {
+        photos = photos + "" // Adds a new empty field
+        photoTouchedList = photoTouchedList + false
+    }
+
+    val onRemovePhoto: (Int) -> Unit = { index ->
+        if (index in photos.indices) {
+            photos = photos.toMutableList().also { it.removeAt(index) }
+            photoTouchedList = photoTouchedList.toMutableList().also {
+                if (index < it.size) it.removeAt(index)
+            }
+        }
+    }
+
+    val onValueChangePhotos: (List<String>) -> Unit = { updatedList ->
+        // Find the first changed photo (if any)
+        val changedIndex = updatedList.indexOfFirstIndexed { i, url -> url != photos.getOrNull(i) }
+
+        // Update photos
+        photos = updatedList
+
+        // Update only touched index
+        photoTouchedList = photoTouchedList.toMutableList().also {
+            if (changedIndex in updatedList.indices) {
+                // Expand touched list if needed
+                while (it.size < updatedList.size) {
+                    it.add(false)
+                }
+                it[changedIndex] = true
+            }
+        }
+    }
 
     val reportsList = remember { mutableStateListOf<Report>() }
     val embeddedUser = User(
@@ -119,17 +155,17 @@ fun CreateReportScreen(
                     dropDownTouched = true
                     dropDownExpanded = false
                 },
-                dropDownError = dropDownError,
                 items = categories,
+                dropDownError = dropDownError,
                 isExpanded = dropDownExpanded,
                 onExpandedChange = {
                     dropDownExpanded = it
                     dropDownTouched = true
                 },
+                isTouched = dropDownTouched,
                 onDismissRequest = {
                     dropDownExpanded = false
                 },
-                isTouched = dropDownTouched,
                 description = description,
                 onValueChangeDescription = {
                     description = it
@@ -141,18 +177,16 @@ fun CreateReportScreen(
                     location = it
                 },
                 locationError = locationError,
-                photo = photo,
-                onValueChangePhoto = {
-                    photo = it
-                    photoTouched = true
-                },
-                photoError = photoError,
-                navigateToReportLocation = {
-                    navigateToReportLocation()
-                },
+                navigateToReportLocation = navigateToReportLocation,
                 onClickCreate = {
                     publishReportVisible = true
-                }
+                },
+                editMode = false,
+                photos = photos,
+                photoErrors = photoErrors,
+                onValueChangePhotos = onValueChangePhotos,
+                onAddPhoto = onAddPhoto,
+                onRemovePhoto = onRemovePhoto
             )
         }
 
@@ -187,7 +221,7 @@ fun CreateReportScreen(
                     category = Category.entries.find { it.displayName == dropDownValue }!!,
                     description = description,
                     location = null, //TODO: This must be changed here and in Report model erase the "?"
-                    images = listOf(photo),
+                    images = photos,
                     id = reportsIdCounter.toString(),
                     status = ReportStatus.NOT_VERIFIED,
                     userId = embeddedUser.id,
@@ -201,4 +235,11 @@ fun CreateReportScreen(
             onExitText = stringResource(id = R.string.publish)
         )
     }
+}
+
+private inline fun <T> List<T>.indexOfFirstIndexed(predicate: (index: Int, T) -> Boolean): Int {
+    for (i in indices) {
+        if (predicate(i, this[i])) return i
+    }
+    return -1
 }
