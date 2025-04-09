@@ -26,7 +26,7 @@ fun Navigation() {
 
     Surface {
         NavHost(
-            navController = navController, startDestination = RouteScreen.Login
+            navController = navController, startDestination = RouteScreen.Home
         ) {
             composable<RouteScreen.Login> {
                 LoginScreen(
@@ -89,8 +89,8 @@ fun Navigation() {
             }
             composable<RouteScreen.ReportLocation> {
                 ReportLocationScreen(
-                    navigateToCreateReport = {
-                        navController.navigate(RouteScreen.CreateReport) // TODO: change to back
+                    navigateBack = {
+                        navController.popBackStack()
                     }
                 )
             }
@@ -122,12 +122,6 @@ fun Navigation() {
                     }
                 )
             }
-
-//            composable<RouteScreen.Settings> {
-//                SettingsScreen(
-//                    navigateToHome = { navController.navigate(RouteScreen.Home) }, //TODO: add back
-//                )
-//            }
             composable<RouteScreen.SearchFilters> {
                 SearchFiltersScreen(
                     navigateToExplore = { navController.navigate(RouteScreen.Explore) },
