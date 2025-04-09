@@ -41,9 +41,15 @@ fun SimpleTopBar(
                 Text(
                     text = text,
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = if (secondAction && secondActionIconVector != null)
-                        Modifier.offset(x = 24.dp)
-                    else Modifier
+                    modifier = if (secondAction && secondActionIconVector != null) {
+                        if(contentAlignment == Alignment.CenterStart){
+                            Modifier
+                        }else{
+                            Modifier.offset(x = 24.dp)
+                        }
+                    } else {
+                        Modifier
+                    }
                 )
             }
         },
