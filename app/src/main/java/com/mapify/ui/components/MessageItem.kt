@@ -3,10 +3,12 @@ package com.mapify.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -38,20 +40,43 @@ fun MessageItem(
             modifier = Modifier
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Spacing.Large),
         ) {
             Box(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.secondaryContainer)
                     .width(70.dp)
-                    .height(70.dp)
+                    .height(70.dp),
+                contentAlignment = Alignment.Center
             ) {
-                AsyncImage(
-                    modifier = Modifier.fillMaxSize(),
-                    model = profileImageUrl,
-                    contentDescription = stringResource(id = R.string.report_image),
-                    contentScale = ContentScale.FillBounds
-                )
+                Box(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(CircleShape)
+                ) {
+                    if (!profileImageUrl.isNullOrBlank()) {
+                        AsyncImage(
+                            modifier = Modifier.fillMaxSize(),
+                            model = profileImageUrl,
+                            contentDescription = stringResource(id = R.string.report_image),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        val fallbackColor = MaterialTheme.colorScheme.primaryContainer
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(fallbackColor, CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = sender.firstOrNull()?.uppercase() ?: "?",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                        }
+                    }
+                }
             }
             Row(
                 modifier = Modifier
