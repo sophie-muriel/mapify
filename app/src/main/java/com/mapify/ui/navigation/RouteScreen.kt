@@ -12,9 +12,8 @@ sealed class RouteScreen {
     @Serializable data class ReportView(val reportId: String) : RouteScreen()
     @Serializable data object Profile : RouteScreen()
     @Serializable data object Explore : RouteScreen()
-    @Serializable data object Notifications : RouteScreen()
-    @Serializable data object Messages : RouteScreen()
     @Serializable data object Settings : RouteScreen()
     @Serializable data object SearchFilters : RouteScreen()
+    @Serializable data object EditReport: RouteScreen()
 
 }
