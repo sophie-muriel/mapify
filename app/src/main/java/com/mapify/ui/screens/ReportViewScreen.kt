@@ -10,6 +10,8 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,7 +43,6 @@ fun ReportViewScreen(
             status = ReportStatus.NOT_VERIFIED,
             userId = "1",
             date = LocalDateTime.now(),
-            isResolved = false,
             priorityCounter = 10
         ),
         Report(
@@ -71,12 +72,54 @@ fun ReportViewScreen(
             status = ReportStatus.VERIFIED,
             userId = "2",
             date = LocalDateTime.now(),
-            isResolved = false,
             priorityCounter = 11
         ),
+
+        Report(
+            id = "4",
+            title = "Report 4",
+            category = Category.COMMUNITY,
+            description = "Report about illegal dumping near the river.",
+            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
+            status = ReportStatus.VERIFIED,
+            userId = "3",
+            date = LocalDateTime.now().minusHours(3),
+            priorityCounter = 21
+        ),
+        Report(
+            id = "5",
+            title = "Report 5",
+            category = Category.SECURITY,
+            description = "Potholes causing problems in traffic.",
+            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
+            status = ReportStatus.PENDING_VERIFICATION,
+            userId = "4",
+            date = LocalDateTime.now().minusDays(1),
+            isResolved = true,
+            priorityCounter = 3
+        ),
+        Report(
+            id = "6",
+            title = "Report 6",
+            category = Category.PETS,
+            description = "Lost dog seen in the neighborhood.",
+            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
+            status = ReportStatus.VERIFIED,
+            userId = "5",
+            date = LocalDateTime.now().minusMinutes(45),
+            isResolved = true,
+            priorityCounter = 15
+        )
     )
 
     val report = storedReports.find { it.id == reportId } ?: return
+    val starIcon = if (report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline
+    val starIconDescription = if (report.isHighPriority)
+        stringResource(id = R.string.star_icon_prioritized) else stringResource(id = R.string.star_icon_not_prioritized)
+    val tint = if (report.isHighPriority) MaterialTheme.colorScheme.primary else LocalContentColor.current
 
     Scaffold(
         topBar = {
@@ -87,13 +130,14 @@ fun ReportViewScreen(
                 stringResource(id = R.string.back_arrow_icon),
                 onClickNavIcon = { navigateBack() },
                 true,
-                firstActionIconVector = if (report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline,
-                stringResource(id = R.string.star_icon),
+                firstActionIconVector = starIcon,
+                starIconDescription,
                 {},
                 true,
                 Icons.Filled.MoreVert,
                 stringResource(id = R.string.more_vertical_dots),
-                {}
+                {},
+                tint = tint
             )
         }) { padding ->
         Column(
