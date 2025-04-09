@@ -20,13 +20,13 @@ fun MessageItem(
     time: String,
     isRead: Boolean,
     profileImageUrl: String? = null,
-    onClick: () -> Unit // 🔹 NUEVO: callback para navegar
+    onClick: () -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .clickable { onClick() } // 🔹 NUEVO: navegación
+            .clickable { onClick() }
     ) {
         Row(
             modifier = Modifier
