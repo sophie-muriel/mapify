@@ -45,7 +45,7 @@ fun MessagesTab(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = Spacing.Sides),
-        verticalArrangement = Arrangement.spacedBy(Spacing.Small)
+        verticalArrangement = Arrangement.spacedBy(Spacing.Inline)
     ) {
         items(messagesList) { message ->
             MessageItem(
