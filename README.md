@@ -18,7 +18,7 @@ Android app for users to upload, rate, and interact with reports nearby.
   - [x] Search filters
   - [ ] Report view *
     - [x] Report view location
-  - [ ] Edit report *
+  - [x] Edit report
 - [x] Notifications
 - [x] Messages
   - [ ] Search user
@@ -33,6 +33,8 @@ Android app for users to upload, rate, and interact with reports nearby.
 - [x] Verify delete account
 - [x] Verify exit profile editing
 ~~- [ ] Verify save profile edits -> maybe remove~~
+- [x] Verify exit report editing
+- [x] Verify save report edits
 - [ ] Report rejected
 - [ ] Report reject notification message
 - [ ] Report deleted notification message
@@ -51,5 +53,6 @@ Android app for users to upload, rate, and interact with reports nearby.
 - [ ] Admin functionalities (verify, delete reports) *
 ~~- [ ] Manage and add comments -> not required~~
 ~~- [ ] Chat with and search other users -> not required~~
+- [ ] Handle multiple images in report creation/editing (esp. editing)
 
 *\*: in progress*
