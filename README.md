@@ -53,6 +53,6 @@ Android app for users to upload, rate, and interact with reports nearby.
 - [ ] Admin functionalities (verify, delete reports) *
 ~~- [ ] Manage and add comments -> not required~~
 ~~- [ ] Chat with and search other users -> not required~~
-- [ ] Handle multiple images in report creation/editing (esp. editing)
+- [x] Handle multiple images in report creation/editing (esp. editing)
 
 *\*: in progress*
