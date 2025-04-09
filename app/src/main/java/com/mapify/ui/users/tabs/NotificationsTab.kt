@@ -13,13 +13,14 @@ import com.mapify.ui.components.NotificationItem
 import com.mapify.ui.theme.Spacing
 import java.time.*
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 @Composable
 fun NotificationsTab(
     navigateToReportView: (String) -> Unit
 ) {
+    //TODO: report deleted logic
+
     val storedReports = listOf(
         Report(
             id = "1",
@@ -101,7 +102,7 @@ fun NotificationsTab(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = Spacing.Sides),
-        verticalArrangement = Arrangement.spacedBy(Spacing.Small)
+        verticalArrangement = Arrangement.spacedBy(Spacing.Inline)
     ) {
         items(storedReports) { report ->
             NotificationItem(
@@ -110,40 +111,35 @@ fun NotificationsTab(
                     stringResource(id = R.string.verified)
                 else
                     stringResource(id = R.string.rejected),
-                supportingText = getRelativeTime(report.date),
-                statusColor = if (report.status == ReportStatus.VERIFIED)
-                    MaterialTheme.colorScheme.tertiary
+                supportingText = formatNotificationDate(report.date),
+                statusMessage = if (report.status == ReportStatus.VERIFIED)
+                    "Your report has been verified, congratulations!"
                 else
-                    MaterialTheme.colorScheme.error,
+                    "Your report has been rejected; modify it in 3 days or it will be deleted.",
                 imageUrl = report.images.first(),
-                reportDate = formatReportDate(report.date),
-                onClick = { navigateToReportView(report.id) }
+                onClick = { navigateToReportView(report.id) },
+                statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
             )
         }
     }
 }
 
-fun formatReportDate(date: LocalDateTime): String {
-    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a", Locale("es", "CO"))
-    val colombiaZone = ZoneId.of("America/Bogota")
-    val zonedDate = date.atZone(ZoneOffset.UTC).withZoneSameInstant(colombiaZone)
-    return zonedDate.format(formatter)
-}
-
-fun getRelativeTime(date: LocalDateTime): String {
-    val colombiaZone = ZoneId.of("America/Bogota")
-    val now = LocalDateTime.now(colombiaZone)
-    val reportDate = date.atZone(ZoneOffset.UTC).withZoneSameInstant(colombiaZone).toLocalDateTime()
-
-    val minutes = ChronoUnit.MINUTES.between(reportDate, now)
-    val hours = ChronoUnit.HOURS.between(reportDate, now)
-    val days = ChronoUnit.DAYS.between(reportDate, now)
-
+fun formatNotificationDate(date: LocalDateTime): String {
+    val now = LocalDate.now()
+    val messageDate = date.toLocalDate()
     return when {
-        minutes < 1 -> "justo ahora"
-        minutes < 60 -> "$minutes min"
-        hours < 24 -> "$hours h"
-        days == 1L -> "ayer"
-        else -> "$days d"
+        messageDate.isEqual(now) -> {
+            val formatter = DateTimeFormatter.ofPattern("hh:mm a", Locale("es", "CO"))
+            date.format(formatter)
+        }
+
+        messageDate.isEqual(now.minusDays(1)) -> {
+            "Yesterday"
+        }
+
+        else -> {
+            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("es", "CO"))
+            date.format(formatter)
+        }
     }
 }
