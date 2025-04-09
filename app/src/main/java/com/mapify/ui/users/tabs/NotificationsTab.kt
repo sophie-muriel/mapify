@@ -106,30 +106,24 @@ fun NotificationsTab(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = Spacing.Sides),
-        verticalArrangement = Arrangement.spacedBy(Spacing.Inline)
+        verticalArrangement = Arrangement.spacedBy(Spacing.Small)
     ) {
         items(storedReports) { report ->
-            ElevatedCard(
-                onClick = { navigateToReportView(report.id) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
-            ) {
-                NotificationItem(
-                    title = report.title,
-                    status = if (report.status == ReportStatus.VERIFIED)
-                        stringResource(id = R.string.verified)
-                    else
-                        stringResource(id = R.string.rejected),
-                    supportingText = getRelativeTime(report.date),
-                    statusColor = if (report.status == ReportStatus.VERIFIED)
-                        MaterialTheme.colorScheme.tertiary
-                    else
-                        MaterialTheme.colorScheme.error,
-                    imageUrl = report.images.first(),
-                    reportDate = formatReportDate(report.date)
-                )
-            }
+            NotificationItem(
+                title = report.title,
+                status = if (report.status == ReportStatus.VERIFIED)
+                    stringResource(id = R.string.verified)
+                else
+                    stringResource(id = R.string.rejected),
+                supportingText = getRelativeTime(report.date),
+                statusColor = if (report.status == ReportStatus.VERIFIED)
+                    MaterialTheme.colorScheme.tertiary
+                else
+                    MaterialTheme.colorScheme.error,
+                imageUrl = report.images.first(),
+                reportDate = formatReportDate(report.date),
+                onClick = { navigateToReportView(report.id) }
+            )
         }
     }
 }
