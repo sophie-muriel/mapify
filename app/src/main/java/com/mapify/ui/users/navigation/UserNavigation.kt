@@ -31,7 +31,6 @@ fun UserNavigation(
         composable<UserRouteTab.Explore> { ExploreTab(navigateToDetail = navigateToDetail) }
         composable<UserRouteTab.Notifications> {
             NotificationsTab(
-                navController = navController,
                 navigateToReportView = navigateToReportView
             )
         }
