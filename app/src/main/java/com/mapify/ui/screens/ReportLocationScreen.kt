@@ -1,58 +1,56 @@
 package com.mapify.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import com.mapify.ui.theme.Spacing
+import coil.compose.AsyncImage
 import com.mapify.R
+import com.mapify.ui.components.SimpleTopBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportLocationScreen(
-    navigateToCreateReport: () -> Unit
+    navigateBack: () -> Unit
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(modifier = Modifier.padding(horizontal = Spacing.Small), title = {
-                Text(
-                    text = stringResource(id = R.string.report_location),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }, navigationIcon = {
-                IconButton(
-                    onClick = {
-                        navigateToCreateReport()
-                    }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Close,
-                        contentDescription = stringResource(id = R.string.close_icon_description)
-                    )
-                }
-            })
+            SimpleTopBar(
+                Alignment.CenterStart,
+                stringResource(id = R.string.report_location),
+                Icons.AutoMirrored.Filled.ArrowBack,
+                stringResource(id = R.string.back_arrow_icon),
+                onClickNavIcon = { navigateBack() },
+                false
+            )
         }) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
         ) {
-            Text(text = "Map here")
-
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                AsyncImage(
+                    model = "https://i.redd.it/tol9eauarmm61.jpg",
+                    contentDescription = "Static map",
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
         }
     }
 }
