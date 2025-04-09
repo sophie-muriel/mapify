@@ -117,11 +117,11 @@ fun Navigation() {
                     }
                 )
             }
-            composable<RouteScreen.Settings> {
-                SettingsScreen(
-                    navigateToHome = { navController.navigate(RouteScreen.Home) }, //TODO: add back
-                )
-            }
+//            composable<RouteScreen.Settings> {
+//                SettingsScreen(
+//                    navigateToHome = { navController.navigate(RouteScreen.Home) }, //TODO: add back
+//                )
+//            }
             composable<RouteScreen.SearchFilters> {
                 SearchFiltersScreen(
                     navigateToExplore = { navController.navigate(RouteScreen.Explore) },
