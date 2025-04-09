@@ -110,8 +110,9 @@
     <string name="distance">Distance</string>
     <string name="ok_button">OK</string>
     <string name="selected_date">Selected date</string>
-    <string name="select_distance">Select distance</string>
+    <string name="select_distance">Selected distance of</string>
     <string name="distance_km">Distance in KM</string>
     <string name="apply_filters">Apply Filters</string>
     <string name="clean_filters">Clean Filters</string>
+    <string name="kilo_meter">KM</string>
 </resources>
