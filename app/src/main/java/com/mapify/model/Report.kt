@@ -15,6 +15,9 @@ class Report(
     var isResolved: Boolean = false,
     var priorityCounter: Int = 0
 ) {
+    init {
+        require(images.size in 1..5) { "A report must have between 1 and 5 images." }
+    }
 
     val isHighPriority: Boolean
         get() = priorityCounter > 20
