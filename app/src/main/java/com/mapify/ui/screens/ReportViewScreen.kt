@@ -94,7 +94,7 @@ import com.mapify.ui.components.GenericDialog
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportViewScreen(
-    reportId: String, reportStatusP: ReportStatus? = null, navigateBack: () -> Unit, navigateToReportEdit: ((String) -> Unit)? = null
+    reportId: String, reportStatusP: ReportStatus? = null, navigateBack: () -> Unit, navigateToReportEdit: ((String) -> Unit)? = null, navigateToReportLocation: () -> Unit
 ) {
     if (reportStatusP != null && navigateToReportEdit != null){
         var exitDialogVisible by rememberSaveable { mutableStateOf(true) }
@@ -351,7 +351,7 @@ fun ReportViewScreen(
                         icon = Icons.Default.Place,
                         text = "1.2KM",
                         onClick = {
-                            //navigate to mapView }
+                            navigateToReportLocation()
                         },
                         isClickable = true
                     )
