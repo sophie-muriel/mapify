@@ -12,7 +12,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -34,12 +33,18 @@ fun EditReportScreen(
     navigateBack: () -> Unit,
     navigateToReportLocation: () -> Unit,
 ) {
+
     val report = Report(
         id = "1",
         title = "Report 1",
         category = Category.SECURITY,
         description = "This is a report",
-        images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s"),
+        images = listOf(
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s",
+            "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQd1kWKsODGmz1P44kiLTfpeIOkaemYITnaRVOZEn372xCyrpNoQQ_dMDAV4dWLpVTDFekNEtlkJaDnhlTzoQWdNg",
+            "https://images.pexels.com/photos/104827/cat-pet-animal-domestic-104827.jpeg?cs=srgb&dl=pexels-pixabay-104827.jpg&fm=jpg",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyUELlFEGUb5UvoFSrH4kM6W5g9ALrxcbxQ5OJ2lH4rUo6qEQya0siFpNSeMx6pku24eQ&usqp=CAU"
+        ),
         location = Location(
             latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
         ),
@@ -48,7 +53,7 @@ fun EditReportScreen(
         date = LocalDateTime.now()
     )
 
-    val switchChecked = remember { mutableStateOf(false) }
+    var switchChecked by rememberSaveable { mutableStateOf(report.isResolved) }
 
     var title by rememberSaveable { mutableStateOf(report.title) }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
@@ -176,9 +181,9 @@ fun EditReportScreen(
                 onAddPhoto = onAddPhoto,
                 onRemovePhoto = onRemovePhoto,
                 editMode = true,
-                switchCheckedValue = switchChecked.value,
+                switchChecked = switchChecked,
                 switchCheckedOnClick = {
-                    switchChecked.value = it
+                    switchChecked = it
                 }
             )
         }
@@ -210,12 +215,11 @@ fun EditReportScreen(
             onExit = {
                 saveReportVisible = false
                 report.title = title
-                report.category = enumValueOf(dropDownValue)
+                report.category = Category.entries.first { it.displayName == dropDownValue }
                 report.description = description
-                report.isResolved = switchChecked.value
-                // report.images =
-                //TODO: figure out how to save a list of images
-                navigateBack()
+                report.isResolved = switchChecked
+                report.images = photos
+                navigateBack() //TODO: add proper navigation when saving the report
             },
             onCloseText = stringResource(id = R.string.cancel),
             onExitText = stringResource(id = R.string.edit)
