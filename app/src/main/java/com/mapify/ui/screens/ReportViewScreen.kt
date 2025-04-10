@@ -83,6 +83,8 @@ import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.ui.graphics.Brush
 import com.mapify.ui.components.GenericDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -320,24 +322,45 @@ fun ReportViewScreen(
                     text = report.date.format(dateFormat)
                 )
 
+                val scrollState = rememberScrollState()
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(190.dp)
-                        .verticalScroll(rememberScrollState()),
-                ){
-                    Row(
-
-                    ){
-                        Text(
-                            text = report.description
-                        )
-
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(190.dp)
+                            .verticalScroll(scrollState)
+                    ) {
+                        Row {
+                            Text(
+                                text = report.description
+                            )
+                        }
                     }
 
+                    val showGradient = remember { derivedStateOf { scrollState.value < scrollState.maxValue } }
+
+                    if (showGradient.value) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .fillMaxWidth()
+                                .height(24.dp)
+                                .background(
+                                    brush = Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color.Transparent,
+                                            MaterialTheme.colorScheme.background
+                                        )
+                                    )
+                                )
+                        )
+                    }
                 }
-
-
             }
         }
 
