@@ -229,8 +229,41 @@ fun ReportViewScreen(
             password = "ThisIsATestPass",
             role = Role.CLIENT,
             registrationLocation = Location(latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia")
+        ),
+        User(
+            id = "3",
+            fullName = "Test commenter",
+            email = "second@mail.com",
+            password = "ThisIsATestPass",
+            role = Role.CLIENT,
+            registrationLocation = Location(latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia")
         )
+
     )
+
+    var storedComments by remember { mutableStateOf(listOf<Comment>(
+        Comment(
+            id = "1",
+            content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque.",
+            userId = "1",
+            reportId = reportId,
+            date = LocalDateTime.now()
+        ),
+        Comment(
+            id = "2",
+            content = "Lorem ipsum dolor sit amet",
+            userId = "2",
+            reportId = reportId,
+            date = LocalDateTime.now()
+        ),
+        Comment(
+            id = "3",
+            content = "Lorem ipsum dolor sit amet",
+            userId = "2",
+            reportId = reportId,
+            date = LocalDateTime.now()
+        )
+    )) }
 
     val report = storedReports.find { it.id == reportId } ?: return
     val starIcon = if (report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline
@@ -334,30 +367,6 @@ fun ReportViewScreen(
             }
         }
 
-        var storedComments by remember { mutableStateOf(listOf<Comment>(
-            Comment(
-                id = "1",
-                content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque.",
-                userId = "1",
-                reportId = reportId,
-                date = LocalDateTime.now()
-            ),
-            Comment(
-                id = "2",
-                content = "Lorem ipsum dolor sit amet",
-                userId = "2",
-                reportId = reportId,
-                date = LocalDateTime.now()
-            ),
-            Comment(
-                id = "3",
-                content = "Lorem ipsum dolor sit amet",
-                userId = "2",
-                reportId = reportId,
-                date = LocalDateTime.now()
-            )
-        )) }
-
         if(showComments){
             Comments(
                 state = bottomSheetState,
@@ -371,7 +380,7 @@ fun ReportViewScreen(
                     var newComment = Comment(
                         id = commentCounter.toString(),
                         content = comment,
-                        userId = "1",
+                        userId = "3",
                         reportId = reportId,
                         date = LocalDateTime.now()
                     )
@@ -471,10 +480,23 @@ fun Comments(
             items(comments){ comment ->
                 ListItem(
                     headlineContent = {
-                        Text(
-                            text = users.find { it.id == comment.userId }?.fullName ?: "",
-                            style = MaterialTheme.typography.titleSmall
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.Inline)
+
+                        ) {
+                            Text(
+                                text = users.find { it.id == comment.userId }?.fullName ?: "",
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                            if(comment.userId == "3"){
+                                Text(
+                                    text = "(Me)",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
                     },
                     supportingContent = {
                         Text(
