@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.mapify.model.Conversation
+import com.mapify.model.ReportStatus
 import com.mapify.ui.screens.SearchContactScreen
 import com.mapify.ui.users.tabs.ExploreTab
 import com.mapify.ui.users.tabs.HomeTab
@@ -20,7 +21,7 @@ fun UserNavigation(
     navController: NavHostController,
     navigateToDetail: (String) -> Unit,
     isAdmin: Boolean,
-    navigateToReportView: (String) -> Unit,
+    navigateToReportView: (String, ReportStatus) -> Unit,
     navigateToConversation: (Conversation) -> Unit
 ) {
     NavHost(
