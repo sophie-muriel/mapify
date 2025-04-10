@@ -73,6 +73,9 @@ fun Navigation() {
                     },
                     navigateToReportView = {
                         navController.navigate(RouteScreen.ReportView(it))
+                    },
+                    navigateToSearchFilters = {
+                        navController.navigate(RouteScreen.SearchFilters)
                     }
                 )
             }
@@ -126,7 +129,7 @@ fun Navigation() {
             }
             composable<RouteScreen.SearchFilters> {
                 SearchFiltersScreen(
-                    navigateToExplore = { navController.navigate(RouteScreen.Explore) },
+                    navigateBack = { navController.popBackStack() },
                 )
             }
             composable<RouteScreen.EditReport> {
