@@ -342,7 +342,25 @@ fun ReportViewScreen(
                         }
                     }
 
+                    val showTopGradient = remember { derivedStateOf { scrollState.value > 0 } }
                     val showGradient = remember { derivedStateOf { scrollState.value < scrollState.maxValue } }
+
+                    if (showTopGradient.value) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .fillMaxWidth()
+                                .height(24.dp)
+                                .background(
+                                    brush = Brush.verticalGradient(
+                                        colors = listOf(
+                                            MaterialTheme.colorScheme.background,
+                                            Color.Transparent
+                                        )
+                                    )
+                                )
+                        )
+                    }
 
                     if (showGradient.value) {
                         Box(
