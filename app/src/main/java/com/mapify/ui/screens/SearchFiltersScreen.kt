@@ -403,7 +403,7 @@ fun DistanceSelectionDialog(
     onCancel: () -> Unit
 ) {
     Dialog(
-        onDismissRequest = { onClose() }) {
+        onDismissRequest = { onCancel() }) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
