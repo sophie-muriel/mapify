@@ -85,7 +85,9 @@ import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.Brush
+import com.mapify.model.Comment
 import com.mapify.ui.components.GenericDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -243,6 +245,7 @@ fun ReportViewScreen(
     var bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var comment by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
+    var commentCounter by rememberSaveable { mutableIntStateOf(4) }
 
     Scaffold(
         topBar = {
@@ -331,11 +334,28 @@ fun ReportViewScreen(
             }
         }
 
-        //ToDo: Add proper comments
-        var storedComments by remember { mutableStateOf(listOf<String>(
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque.",
-            "Lorem ipsum dolor sit amet",
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus"
+        var storedComments by remember { mutableStateOf(listOf<Comment>(
+            Comment(
+                id = "1",
+                content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque.",
+                userId = "1",
+                reportId = reportId,
+                date = LocalDateTime.now()
+            ),
+            Comment(
+                id = "2",
+                content = "Lorem ipsum dolor sit amet",
+                userId = "2",
+                reportId = reportId,
+                date = LocalDateTime.now()
+            ),
+            Comment(
+                id = "3",
+                content = "Lorem ipsum dolor sit amet",
+                userId = "2",
+                reportId = reportId,
+                date = LocalDateTime.now()
+            )
         )) }
 
         if(showComments){
@@ -347,10 +367,19 @@ fun ReportViewScreen(
                 comments = storedComments,
                 comment = comment,
                 onCommentChange = { comment = it },
-                onClik = {
-                    storedComments = storedComments + comment
+                onClick = {
+                    var newComment = Comment(
+                        id = commentCounter.toString(),
+                        content = comment,
+                        userId = "1",
+                        reportId = reportId,
+                        date = LocalDateTime.now()
+                    )
+                    commentCounter++
+                    storedComments = storedComments + newComment
                     comment = ""
                 },
+                users = storedUsers,
             )
         }
     }
@@ -423,10 +452,11 @@ fun DescriptionText(
 fun Comments(
     state: SheetState,
     onDismissRequest: () -> Unit,
-    comments: List<String>,
+    comments: List<Comment>,
+    users: List<User>,
     comment: String,
     onCommentChange: (String) -> Unit,
-    onClik: () -> Unit
+    onClick: () -> Unit
 ){
 
     ModalBottomSheet(
@@ -438,17 +468,17 @@ fun Comments(
                 .background(MaterialTheme.colorScheme.background),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(comments){
+            items(comments){ comment ->
                 ListItem(
                     headlineContent = {
                         Text(
-                            text = "User Name",
+                            text = users.find { it.id == comment.userId }?.fullName ?: "",
                             style = MaterialTheme.typography.titleSmall
                         )
                     },
                     supportingContent = {
                         Text(
-                            text = it
+                            text = comment.content
                         )
                     },
                     leadingContent = {
@@ -481,7 +511,7 @@ fun Comments(
                 }
             )
             IconButton(
-                onClick = onClik
+                onClick = onClick
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.Send,
