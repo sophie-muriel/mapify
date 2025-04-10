@@ -45,7 +45,8 @@ fun SimpleTopBar(
     tint: Color = LocalContentColor.current,
     isSearch: Boolean = false,
     searchQuery: String = "",
-    onSearchQueryChange: (String) -> Unit = {}
+    onSearchQueryChange: (String) -> Unit = {},
+    secondActionContent: (@Composable () -> Unit)? = null
 ) {
     TopAppBar(
         title = {
@@ -115,12 +116,16 @@ fun SimpleTopBar(
                             tint = tint
                         )
                     }
-                    if (secondAction && secondActionIconVector != null) {
-                        IconButton(onClick = secondOnClickAction) {
-                            Icon(
-                                imageVector = secondActionIconVector,
-                                contentDescription = secondActionIconDescription,
-                            )
+                    secondActionContent?.let {
+                        it()
+                    } ?: run {
+                        if (secondAction && secondActionIconVector != null) {
+                            IconButton(onClick = secondOnClickAction) {
+                                Icon(
+                                    imageVector = secondActionIconVector,
+                                    contentDescription = secondActionIconDescription,
+                                )
+                            }
                         }
                     }
                 } else {
