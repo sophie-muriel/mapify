@@ -71,11 +71,19 @@ fun Navigation() {
                     navigateToConversation = { conversation ->
                         println("Navigate to conversation with: $conversation")
                     },
-                    navigateToReportView = {
-                        navController.navigate(RouteScreen.ReportView(it))
+                    navigateToReportView = { id, status ->
+                        navController.navigate(
+                            RouteScreen.ReportView(
+                                reportId = id,
+                                reportStatus = status
+                            )
+                        )
                     },
                     navigateToSearchFilters = {
                         navController.navigate(RouteScreen.SearchFilters)
+                    },
+                    navigateToSearchContact = {
+                        navController.navigate(RouteScreen.SearchContact)
                     }
                 )
             }
@@ -99,12 +107,19 @@ fun Navigation() {
                     }
                 )
             }
-            composable<RouteScreen.ReportView> {
+            composable<RouteScreen.ReportView> { it ->
                 val args = it.toRoute<RouteScreen.ReportView>()
                 ReportViewScreen(
                     reportId = args.reportId,
+                    reportStatusP = args.reportStatus,
                     navigateBack = {
                         navController.popBackStack()
+                    },
+                    navigateToReportEdit = {
+                        navController.navigate(RouteScreen.EditReport(it))
+                    },
+                    navigateToReportLocation = {
+                        navController.navigate(RouteScreen.ReportLocation)
                     }
                 )
             }
@@ -132,10 +147,12 @@ fun Navigation() {
                     navigateBack = { navController.popBackStack() },
                 )
             }
-            composable<RouteScreen.EditReport> {
+            composable<RouteScreen.EditReport> { it ->
+                val args = it.toRoute<RouteScreen.EditReport>()
                 EditReportScreen(
                     navigateBack = { navController.popBackStack() },
-                    navigateToReportLocation = { navController.navigate(RouteScreen.ReportLocation) }
+                    navigateToReportLocation = { navController.navigate(RouteScreen.ReportLocation) },
+                    reportId = args.reportId
                 )
             }
             composable<RouteScreen.SearchContact> {

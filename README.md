@@ -21,7 +21,7 @@ Android app for users to upload, rate, and interact with reports nearby.
   - [x] Edit report
 - [x] Notifications
 - [x] Messages
-  - [ ] Search user
+  - [x] Search user
   - [ ] Chats *
 
 ##### Alert Dialogs
@@ -35,9 +35,8 @@ Android app for users to upload, rate, and interact with reports nearby.
 ~~- [ ] Verify save profile edits -> maybe remove~~
 - [x] Verify exit report editing
 - [x] Verify save report edits
-- [ ] Report rejected
-- [ ] Report reject notification message
-- [ ] Report deleted notification message
+- [x] Report reject notification message
+- [x] Report deleted notification message
 - [ ] Verify delete report
 - [x] Input date for search filters
 - [x] Input distance for search filters
@@ -54,5 +53,6 @@ Android app for users to upload, rate, and interact with reports nearby.
 ~~- [ ] Manage and add comments -> not required~~
 ~~- [ ] Chat with and search other users -> not required~~
 - [x] Handle multiple images in report creation/editing (esp. editing)
+- [ ] Navigate to user specific chat from contacts screen
 
 *\*: in progress*
