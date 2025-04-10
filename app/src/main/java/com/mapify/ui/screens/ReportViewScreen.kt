@@ -84,13 +84,18 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.Brush
 import com.mapify.model.Comment
 import com.mapify.ui.components.GenericDialog
+import com.mapify.ui.components.MinimalDropdownMenu
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportViewScreen(
-    reportId: String, reportStatusP: ReportStatus? = null, navigateBack: () -> Unit, navigateToReportEdit: ((String) -> Unit)? = null, navigateToReportLocation: () -> Unit
+    reportId: String,
+    reportStatusP: ReportStatus? = null,
+    navigateBack: () -> Unit,
+    navigateToReportEdit: ((String) -> Unit)? = null,
+    navigateToReportLocation: () -> Unit
 ) {
-    if (reportStatusP != null && navigateToReportEdit != null){
+    if (reportStatusP != null && navigateToReportEdit != null) {
         var exitDialogVisible by rememberSaveable { mutableStateOf(true) }
 
         if (exitDialogVisible && reportStatusP == ReportStatus.PENDING_VERIFICATION) {
@@ -101,7 +106,7 @@ fun ReportViewScreen(
                     exitDialogVisible = false
                 },
                 onExit = {
-                        navigateToReportEdit(reportId)
+                    navigateToReportEdit(reportId)
                 },
                 onCloseText = stringResource(id = R.string.cancel),
                 onExitText = stringResource(id = R.string.edit_report_now)
@@ -122,7 +127,8 @@ fun ReportViewScreen(
                     "Donec sed pharetra sapien. Nam vitae mi eleifend ex pellentesque vulputate ac in elit.",
             images = listOf(
                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s",
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOvSWqWExnQHszC2ZfSLd-xZNC94pRxMO7ag&s"),
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOvSWqWExnQHszC2ZfSLd-xZNC94pRxMO7ag&s"
+            ),
             location = Location(
                 latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
             ),
@@ -139,7 +145,8 @@ fun ReportViewScreen(
             images = listOf(
                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHtshKCjboh0e9X3dP5l-igYWWA4C8-nSaw&s",
                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThXTf5MoQt2F4rJ9lnIRpA-fQ7zZNSRQwtkQ&s",
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFSUC03tbmiZ9hVh3ShKNIJmVyPVk4XIf16A&s"),
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFSUC03tbmiZ9hVh3ShKNIJmVyPVk4XIf16A&s"
+            ),
             location = Location(
                 latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
             ),
@@ -215,7 +222,12 @@ fun ReportViewScreen(
             email = "first@mail.com",
             password = "ThisIsATestPass",
             role = Role.CLIENT,
-            registrationLocation = Location(latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia")
+            registrationLocation = Location(
+                latitude = 43230.1,
+                longitude = 753948.7,
+                country = "Colombia",
+                city = "Armenia"
+            )
         ),
         User(
             id = "2",
@@ -223,7 +235,12 @@ fun ReportViewScreen(
             email = "second@mail.com",
             password = "ThisIsATestPass",
             role = Role.CLIENT,
-            registrationLocation = Location(latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia")
+            registrationLocation = Location(
+                latitude = 43230.1,
+                longitude = 753948.7,
+                country = "Colombia",
+                city = "Armenia"
+            )
         ),
         User(
             id = "3",
@@ -231,40 +248,50 @@ fun ReportViewScreen(
             email = "second@mail.com",
             password = "ThisIsATestPass",
             role = Role.CLIENT,
-            registrationLocation = Location(latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia")
+            registrationLocation = Location(
+                latitude = 43230.1,
+                longitude = 753948.7,
+                country = "Colombia",
+                city = "Armenia"
+            )
         )
 
     )
 
-    var storedComments by remember { mutableStateOf(listOf<Comment>(
-        Comment(
-            id = "1",
-            content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque.",
-            userId = "1",
-            reportId = reportId,
-            date = LocalDateTime.now()
-        ),
-        Comment(
-            id = "2",
-            content = "Lorem ipsum dolor sit amet",
-            userId = "2",
-            reportId = reportId,
-            date = LocalDateTime.now()
-        ),
-        Comment(
-            id = "3",
-            content = "Lorem ipsum dolor sit amet",
-            userId = "2",
-            reportId = reportId,
-            date = LocalDateTime.now()
+    var storedComments by remember {
+        mutableStateOf(
+            listOf<Comment>(
+                Comment(
+                    id = "1",
+                    content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque.",
+                    userId = "1",
+                    reportId = reportId,
+                    date = LocalDateTime.now()
+                ),
+                Comment(
+                    id = "2",
+                    content = "Lorem ipsum dolor sit amet",
+                    userId = "2",
+                    reportId = reportId,
+                    date = LocalDateTime.now()
+                ),
+                Comment(
+                    id = "3",
+                    content = "Lorem ipsum dolor sit amet",
+                    userId = "2",
+                    reportId = reportId,
+                    date = LocalDateTime.now()
+                )
+            )
         )
-    )) }
+    }
 
     val report = storedReports.find { it.id == reportId } ?: return
     val starIcon = if (report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline
     val starIconDescription = if (report.isHighPriority)
         stringResource(id = R.string.star_icon_prioritized) else stringResource(id = R.string.star_icon_not_prioritized)
-    val tint = if (report.isHighPriority) MaterialTheme.colorScheme.primary else LocalContentColor.current
+    val tint =
+        if (report.isHighPriority) MaterialTheme.colorScheme.primary else LocalContentColor.current
     val reportStatus = report.status
 
     val state = rememberCarouselState { report.images.count() }
@@ -287,10 +314,10 @@ fun ReportViewScreen(
                 firstActionIconVector = starIcon,
                 starIconDescription,
                 {},
-                true,
-                Icons.Filled.MoreVert,
-                stringResource(id = R.string.more_vertical_dots),
-                {},
+                secondAction = true,
+                secondActionContent = {
+                    MinimalDropdownMenu()
+                },
                 tint = tint
             )
         },
@@ -318,7 +345,7 @@ fun ReportViewScreen(
                     .padding(horizontal = Spacing.Sides)
                     .align(Alignment.Start),
                 verticalArrangement = Arrangement.spacedBy(Spacing.Sides)
-            ){
+            ) {
                 TitleAndVerified(
                     report = report,
                     reportStatus = reportStatus
@@ -329,17 +356,17 @@ fun ReportViewScreen(
                     horizontalArrangement = Arrangement.spacedBy(Spacing.Inline),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if(report.isResolved){
+                    if (report.isResolved) {
                         InfoChip(
                             icon = Icons.Outlined.Check,
                             text = stringResource(id = R.string.resolved),
-                            onClick = {  }
+                            onClick = { }
                         )
                     }
                     InfoChip(
                         icon = Icons.Outlined.Sell,
                         text = report.category.displayName,
-                        onClick = {  }
+                        onClick = { }
                     )
                     InfoChip(
                         icon = Icons.Default.Place,
@@ -354,7 +381,7 @@ fun ReportViewScreen(
                 ItemDetailReport(
                     icon = Icons.Default.Person,
                     iconDescription = stringResource(id = R.string.person_icon),
-                    text = storedUsers.find{ it.id == report.userId }?.fullName ?: ""
+                    text = storedUsers.find { it.id == report.userId }?.fullName ?: ""
                 )
 
                 ItemDetailReport(
@@ -370,7 +397,7 @@ fun ReportViewScreen(
             }
         }
 
-        if(showComments){
+        if (showComments) {
             Comments(
                 state = bottomSheetState,
                 onDismissRequest = {
@@ -401,7 +428,7 @@ fun ReportViewScreen(
 fun DescriptionText(
     text: String,
     scrollState: ScrollState
-){
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -469,18 +496,19 @@ fun Comments(
     comment: String,
     onCommentChange: (String) -> Unit,
     onClick: () -> Unit
-){
+) {
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = state,
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.background),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(comments){ comment ->
+            items(comments) { comment ->
                 ListItem(
                     headlineContent = {
                         Row(
@@ -492,7 +520,7 @@ fun Comments(
                                 text = users.find { it.id == comment.userId }?.fullName ?: "",
                                 style = MaterialTheme.typography.titleSmall
                             )
-                            if(comment.userId == "3"){ //ToDo: when we have proper user navigation we can use currentUser.Id
+                            if (comment.userId == "3") { //ToDo: when we have proper user navigation we can use currentUser.Id
                                 Text(
                                     text = stringResource(id = R.string.me),
                                     style = MaterialTheme.typography.bodySmall,
@@ -553,13 +581,13 @@ fun ItemDetailReport(
     icon: ImageVector,
     iconDescription: String,
     text: String
-){
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Spacing.Inline)
-    ){
+    ) {
         Icon(
             imageVector = icon,
             contentDescription = iconDescription,
@@ -577,7 +605,7 @@ fun ItemDetailReport(
 fun TitleAndVerified(
     report: Report,
     reportStatus: ReportStatus
-){
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(Spacing.Inline),
         verticalAlignment = Alignment.CenterVertically
@@ -608,7 +636,7 @@ fun TitleAndVerified(
 fun Carousel(
     state: CarouselState,
     list: List<String>
-){
+) {
     HorizontalUncontainedCarousel(
         state = state,
         modifier = Modifier
