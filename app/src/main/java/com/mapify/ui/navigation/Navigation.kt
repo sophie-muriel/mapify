@@ -71,8 +71,8 @@ fun Navigation() {
                     navigateToConversation = { conversation ->
                         println("Navigate to conversation with: $conversation")
                     },
-                    navigateToReportView = {
-                        navController.navigate(RouteScreen.ReportView(it))
+                    navigateToReportView = { reportId, reportStatus ->
+                        navController.navigate(RouteScreen.ReportView(reportId, reportStatus))
                     },
                     navigateToSearchFilters = {
                         navController.navigate(RouteScreen.SearchFilters)
@@ -102,12 +102,16 @@ fun Navigation() {
                     }
                 )
             }
-            composable<RouteScreen.ReportView> {
+            composable<RouteScreen.ReportView> { it ->
                 val args = it.toRoute<RouteScreen.ReportView>()
                 ReportViewScreen(
                     reportId = args.reportId,
+                    reportStatusP = args.reportStatus,
                     navigateBack = {
                         navController.popBackStack()
+                    },
+                    navigateToReportEdit = {
+                        navController.navigate(RouteScreen.EditReport(it))
                     }
                 )
             }
