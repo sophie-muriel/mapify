@@ -32,14 +32,15 @@ fun HomeScreen(
     navigateToDetail: (String) -> Unit,
     navigateToSettings: () -> Unit,
     navigateToConversation: (Conversation) -> Unit,
-    navigateToReportView: (String) -> Unit
+    navigateToReportView: (String) -> Unit,
+    navigateToSearchFilters: () -> Unit,
+    navigateToSearchContact: () -> Unit
 ) {
 
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
     val currentRoute = navBackStackEntry?.destination?.route
 
-    //Common top bar parameters for UserNavigationTabs
     val alignment = Alignment.Center
     val navIconVector = Icons.Filled.AccountCircle
     val navIconDescription = stringResource(id = R.string.name_icon_description)
@@ -61,7 +62,7 @@ fun HomeScreen(
                     SimpleTopBar(alignment, stringResource(id = R.string.explore_screen),
                         navIconVector, navIconDescription, onClickNavIcon, actions,
                         Icons.Filled.Search, stringResource(id = R.string.search_icon),
-                        { }, true,settingsIconVector, settingsIconDescription, secondOnClickAction = { navigateToSettings() }
+                        { navigateToSearchFilters() }, true,settingsIconVector, settingsIconDescription, secondOnClickAction = { navigateToSettings() }
                     )
                 }
                 UserRouteTab.Notifications::class.qualifiedName -> {
@@ -94,7 +95,7 @@ fun HomeScreen(
                 }
                 UserRouteTab.Messages::class.qualifiedName -> {
                     CreateFAB(
-                        { /* navigate to messages list */ },
+                        { navigateToSearchContact() },
                         Icons.Filled.Mail,
                         stringResource(id = R.string.messages_icon)
                     )
@@ -114,8 +115,6 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-        ) {
-
-        }
+        )
     }
 }
