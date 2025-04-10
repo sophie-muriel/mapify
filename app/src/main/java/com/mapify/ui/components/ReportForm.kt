@@ -26,8 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -63,15 +61,11 @@ fun ReportForm(
     photos: List<String>,
     photoErrors: List<Boolean>,
     onValueChangePhotos: (List<String>) -> Unit,
-    switchCheckedValue: Boolean = false,
+    switchChecked: Boolean = false,
     switchCheckedOnClick: ((Boolean) -> Unit)? = null,
     onAddPhoto: () -> Unit,
     onRemovePhoto: (Int) -> Unit,
 ) {
-
-    val regex = Regex("^(https?:\\/\\/)?([a-zA-Z0-9.-]+)\\.([a-zA-Z]{2,})(\\/\\S*)?$")
-
-    val switchChecked = remember { mutableStateOf(switchCheckedValue) }
 
     Column(
         modifier = Modifier
@@ -234,7 +228,7 @@ fun ReportForm(
                 }
 
                 Switch(
-                    checked = switchChecked.value,
+                    checked = switchChecked,
                     onCheckedChange = switchCheckedOnClick,
                     modifier = Modifier
                         .scale(0.85f)
