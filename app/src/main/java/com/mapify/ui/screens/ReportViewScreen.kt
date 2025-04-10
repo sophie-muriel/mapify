@@ -15,11 +15,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Comment
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.AddComment
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.IndeterminateCheckBox
@@ -35,14 +39,23 @@ import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.CarouselState
 import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,7 +75,14 @@ import com.mapify.model.Role
 import com.mapify.ui.theme.Spacing
 import java.time.LocalDateTime
 import com.mapify.model.User
+import com.mapify.ui.components.CreateFAB
 import java.time.format.DateTimeFormatter
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.outlined.Send
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -195,6 +215,10 @@ fun ReportViewScreen(
     val reportStatus = report.status
 
     val state = rememberCarouselState { report.images.count() }
+    val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    var showComments by remember { mutableStateOf(false) }
+    var bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var comment by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -213,6 +237,13 @@ fun ReportViewScreen(
                 stringResource(id = R.string.more_vertical_dots),
                 {},
                 tint = tint
+            )
+        },
+        floatingActionButton = {
+            CreateFAB(
+                onClick = { showComments = true },
+                icon = Icons.AutoMirrored.Default.Comment,
+                iconDescription = "TestDescription"
             )
         }) { padding ->
         Column(
@@ -263,8 +294,6 @@ fun ReportViewScreen(
                     text = storedUsers.find{ it.id == report.userId }?.fullName ?: ""
                 )
 
-                val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-
                 ItemDetailReport(
                     icon = Icons.Filled.Today,
                     iconDescription = stringResource(id = R.string.date_icon),
@@ -278,10 +307,9 @@ fun ReportViewScreen(
                         .verticalScroll(rememberScrollState()),
                 ){
                     Row(
-                        //modifier = Modifier.fillMaxWidth().height(190.dp),
+
                     ){
                         Text(
-                            //modifier = Modifier.,
                             text = report.description
                         )
 
@@ -290,6 +318,104 @@ fun ReportViewScreen(
                 }
 
 
+            }
+        }
+
+        //ToDo: Add proper comments
+        var storedComments by remember { mutableStateOf(listOf<String>(
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque.",
+            "Lorem ipsum dolor sit amet",
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus"
+        )) }
+
+        if(showComments){
+            Comments(
+                state = bottomSheetState,
+                onDismissRequest = {
+                    showComments = false
+                },
+                comments = storedComments,
+                comment = comment,
+                onCommentChange = { comment = it },
+                onClik = {
+                    storedComments = storedComments + comment
+                    comment = ""
+                },
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Comments(
+    state: SheetState,
+    onDismissRequest: () -> Unit,
+    comments: List<String>,
+    comment: String,
+    onCommentChange: (String) -> Unit,
+    onClik: () -> Unit
+){
+
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = state,
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items(comments){
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = "User Name",
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                    },
+                    supportingContent = {
+                        Text(
+                            text = it
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            modifier = Modifier
+                                .width(40.dp)
+                                .height(40.dp),
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = stringResource(id = R.string.person_icon)
+                        )
+                    },
+                )
+            }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(start = Spacing.Sides, end = 8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                modifier = Modifier.weight(1f),
+                value = comment,
+                onValueChange = onCommentChange,
+                shape = RoundedCornerShape(16.dp),
+                placeholder = {
+                    Text(text = "Leave a comment...")
+                }
+            )
+            IconButton(
+                onClick = onClik
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.Send,
+                    contentDescription = "send icon",
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }
@@ -314,7 +440,7 @@ fun ItemDetailReport(
         )
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyLarge
         )
     }
 
