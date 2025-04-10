@@ -81,6 +81,7 @@ import java.time.format.DateTimeFormatter
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -330,9 +331,17 @@ fun ReportViewScreen(
                 )
 
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(Spacing.Inline),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    if(report.isResolved){
+                        InfoChip(
+                            icon = Icons.Outlined.Check,
+                            text = stringResource(id = R.string.resolved),
+                            onClick = {  }
+                        )
+                    }
                     InfoChip(
                         icon = Icons.Outlined.Sell,
                         text = report.category.displayName,
@@ -340,7 +349,7 @@ fun ReportViewScreen(
                     )
                     InfoChip(
                         icon = Icons.Default.Place,
-                        text = "1.2KM away",
+                        text = "1.2KM",
                         onClick = {
                             //navigate to mapView }
                         },
