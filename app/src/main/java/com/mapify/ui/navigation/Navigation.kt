@@ -102,12 +102,16 @@ fun Navigation() {
                     }
                 )
             }
-            composable<RouteScreen.ReportView> {
+            composable<RouteScreen.ReportView> { it ->
                 val args = it.toRoute<RouteScreen.ReportView>()
                 ReportViewScreen(
                     reportId = args.reportId,
+                    reportStatusP = args.reportStatus,
                     navigateBack = {
                         navController.popBackStack()
+                    },
+                    navigateToReportEdit = {
+                        navController.navigate(RouteScreen.EditReport(it))
                     }
                 )
             }
