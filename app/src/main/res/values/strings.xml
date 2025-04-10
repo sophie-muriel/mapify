@@ -138,4 +138,5 @@
     <string name="edit_report">Edit Report</string>
     <string name="edit">Edit</string>
     <string name="is_report_solved">Is the report resolved?</string>
+    <string name="search_for_user">Search for a user…</string>
 </resources>
