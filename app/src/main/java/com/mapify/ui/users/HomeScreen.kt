@@ -32,7 +32,8 @@ fun HomeScreen(
     navigateToDetail: (String) -> Unit,
     navigateToSettings: () -> Unit,
     navigateToConversation: (Conversation) -> Unit,
-    navigateToReportView: (String) -> Unit
+    navigateToReportView: (String) -> Unit,
+    navigateToSearchFilters: () -> Unit
 ) {
 
     val navController = rememberNavController()
@@ -60,7 +61,7 @@ fun HomeScreen(
                     SimpleTopBar(alignment, stringResource(id = R.string.explore_screen),
                         navIconVector, navIconDescription, onClickNavIcon, actions,
                         Icons.Filled.Search, stringResource(id = R.string.search_icon),
-                        { }, true,settingsIconVector, settingsIconDescription, secondOnClickAction = { navigateToSettings() }
+                        { navigateToSearchFilters() }, true,settingsIconVector, settingsIconDescription, secondOnClickAction = { navigateToSettings() }
                     )
                 }
                 UserRouteTab.Notifications::class.qualifiedName -> {
