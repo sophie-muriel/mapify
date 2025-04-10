@@ -17,7 +17,7 @@ import java.util.*
 
 @Composable
 fun NotificationsTab(
-    navigateToReportView: (String) -> Unit
+    navigateToReportView: (String, ReportStatus) -> Unit
 ) {
     //TODO: report deleted logic
 
@@ -117,7 +117,7 @@ fun NotificationsTab(
                 else
                     "Your report has been rejected; modify it in 3 days or it will be deleted.",
                 imageUrl = report.images.first(),
-                onClick = { navigateToReportView(report.id) },
+                onClick = { navigateToReportView(report.id, report.status) },
                 statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
             )
         }
