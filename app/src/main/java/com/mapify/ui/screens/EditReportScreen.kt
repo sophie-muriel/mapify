@@ -10,12 +10,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import com.mapify.R
@@ -26,6 +29,8 @@ import com.mapify.model.Category
 import com.mapify.model.Location
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.SimpleTopBar
+import com.mapify.utils.isImageValid
+import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 
 @Composable
@@ -33,6 +38,8 @@ fun EditReportScreen(
     navigateBack: () -> Unit,
     navigateToReportLocation: () -> Unit,
 ) {
+    val context = LocalContext.current
+    var isValidating by remember { mutableStateOf(false) }
 
     val report = Report(
         id = "1",
@@ -71,12 +78,32 @@ fun EditReportScreen(
 
     val locationError = false
 
-    val regex = Regex("^(https?:\\/\\/)?([a-zA-Z0-9.-]+)\\.([a-zA-Z]{2,})(\\/\\S*)?$")
     var photos by rememberSaveable { mutableStateOf(report.images) }
-    var photoTouchedList by rememberSaveable { mutableStateOf(listOf(false)) }
-    val photoErrors = photos.mapIndexed { i, url ->
-        val touched = photoTouchedList.getOrElse(i) { false }
-        touched && !regex.matches(url)
+    var photoTouchedList by rememberSaveable { mutableStateOf(List(photos.size) { false }) }
+    var photoErrors by remember { mutableStateOf(List(photos.size) { false }) }
+
+    LaunchedEffect(photos, photoTouchedList) {
+        isValidating = true
+        delay(100)
+        val validated = photos.mapIndexed { i, url ->
+            val touched = photoTouchedList.getOrElse(i) { false }
+            if (touched) !isImageValid(context, url) else false
+        }
+        photoErrors = validated
+        isValidating = false
+    }
+
+    LaunchedEffect(photos.size) {
+        if (photoTouchedList.size != photos.size) {
+            photoTouchedList = List(photos.size) { i ->
+                photoTouchedList.getOrElse(i) { false }
+            }
+        }
+        if (photoErrors.size != photos.size) {
+            photoErrors = List(photos.size) { i ->
+                photoErrors.getOrElse(i) { false }
+            }
+        }
     }
 
     val onAddPhoto = {
@@ -173,7 +200,7 @@ fun EditReportScreen(
                 locationError = locationError,
                 navigateToReportLocation = navigateToReportLocation,
                 onClickCreate = {
-                    saveReportVisible = true
+                    if (!isValidating) saveReportVisible = true
                 },
                 photos = photos,
                 photoErrors = photoErrors,
@@ -184,7 +211,8 @@ fun EditReportScreen(
                 switchChecked = switchChecked,
                 switchCheckedOnClick = {
                     switchChecked = it
-                }
+                },
+                isLoading = isValidating
             )
         }
 
