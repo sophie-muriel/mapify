@@ -93,9 +93,9 @@ fun ReportViewScreen(
     reportId: String, reportStatusP: ReportStatus? = null, navigateBack: () -> Unit, navigateToReportEdit: ((String) -> Unit)? = null
 ) {
     if (reportStatusP != null && navigateToReportEdit != null){
-        var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
+        var exitDialogVisible by rememberSaveable { mutableStateOf(true) }
 
-        if (exitDialogVisible) {
+        if (exitDialogVisible && reportStatusP == ReportStatus.PENDING_VERIFICATION) {
             GenericDialog(
                 title = stringResource(id = R.string.report_rejected),
                 message = stringResource(id = R.string.report_rejected_message),
