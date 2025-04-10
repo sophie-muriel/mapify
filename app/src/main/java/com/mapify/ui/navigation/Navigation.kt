@@ -117,6 +117,9 @@ fun Navigation() {
                     },
                     navigateToReportEdit = {
                         navController.navigate(RouteScreen.EditReport(it))
+                    },
+                    navigateToReportLocation = {
+                        navController.navigate(RouteScreen.ReportLocation)
                     }
                 )
             }
