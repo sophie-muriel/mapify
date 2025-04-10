@@ -76,6 +76,9 @@ fun Navigation() {
                     },
                     navigateToSearchFilters = {
                         navController.navigate(RouteScreen.SearchFilters)
+                    },
+                    navigateToSearchContact = {
+                        navController.navigate(RouteScreen.SearchContact)
                     }
                 )
             }

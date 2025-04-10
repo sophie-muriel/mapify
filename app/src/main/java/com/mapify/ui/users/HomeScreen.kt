@@ -33,7 +33,8 @@ fun HomeScreen(
     navigateToSettings: () -> Unit,
     navigateToConversation: (Conversation) -> Unit,
     navigateToReportView: (String) -> Unit,
-    navigateToSearchFilters: () -> Unit
+    navigateToSearchFilters: () -> Unit,
+    navigateToSearchContact: () -> Unit
 ) {
 
     val navController = rememberNavController()
@@ -94,7 +95,7 @@ fun HomeScreen(
                 }
                 UserRouteTab.Messages::class.qualifiedName -> {
                     CreateFAB(
-                        {navController.navigate("SearchContact") },
+                        { navigateToSearchContact() },
                         Icons.Filled.Mail,
                         stringResource(id = R.string.messages_icon)
                     )
