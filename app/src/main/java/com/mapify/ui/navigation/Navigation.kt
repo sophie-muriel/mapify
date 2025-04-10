@@ -15,6 +15,7 @@ import com.mapify.ui.screens.RegistrationScreen
 import com.mapify.ui.screens.ProfileScreen
 import com.mapify.ui.screens.ReportLocationScreen
 import com.mapify.ui.screens.ReportViewScreen
+import com.mapify.ui.screens.SearchContactScreen
 import com.mapify.ui.screens.SettingsScreen
 import com.mapify.ui.screens.SearchFiltersScreen
 import com.mapify.ui.users.HomeScreen
@@ -72,6 +73,12 @@ fun Navigation() {
                     },
                     navigateToReportView = {
                         navController.navigate(RouteScreen.ReportView(it))
+                    },
+                    navigateToSearchFilters = {
+                        navController.navigate(RouteScreen.SearchFilters)
+                    },
+                    navigateToSearchContact = {
+                        navController.navigate(RouteScreen.SearchContact)
                     }
                 )
             }
@@ -125,13 +132,21 @@ fun Navigation() {
             }
             composable<RouteScreen.SearchFilters> {
                 SearchFiltersScreen(
-                    navigateToExplore = { navController.navigate(RouteScreen.Explore) },
+                    navigateBack = { navController.popBackStack() },
                 )
             }
             composable<RouteScreen.EditReport> {
                 EditReportScreen(
                     navigateBack = { navController.popBackStack() },
                     navigateToReportLocation = { navController.navigate(RouteScreen.ReportLocation) }
+                )
+            }
+            composable<RouteScreen.SearchContact> {
+                SearchContactScreen(
+                    navigateBack = { navController.popBackStack() },
+                    onUserSelected = { username ->
+                        navController.navigate(RouteScreen.Conversation(username))
+                    }
                 )
             }
         }

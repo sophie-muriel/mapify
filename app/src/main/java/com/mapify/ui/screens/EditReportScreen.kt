@@ -1,11 +1,14 @@
 package com.mapify.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Scaffold
@@ -19,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import com.mapify.R
 import com.mapify.ui.components.ReportForm
@@ -133,8 +135,6 @@ fun EditReportScreen(
         }
     }
 
-    val isKeyboardActive = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
     var saveReportVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -144,78 +144,85 @@ fun EditReportScreen(
 
     Scaffold(
         topBar = {
-            if (!isKeyboardActive) {
-                SimpleTopBar(
-                    Alignment.CenterStart,
-                    stringResource(id = R.string.edit_report),
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    stringResource(id = R.string.back_arrow_icon),
-                    onClickNavIcon = {
-                        exitDialogVisible = true
-                    },
-                    false
-                )
-            }
-        }) { padding ->
-
-        Column(
+            SimpleTopBar(
+                Alignment.CenterStart,
+                stringResource(id = R.string.edit_report),
+                Icons.AutoMirrored.Filled.ArrowBack,
+                stringResource(id = R.string.back_arrow_icon),
+                onClickNavIcon = {
+                    exitDialogVisible = true
+                },
+                false
+            )
+        },
+        contentWindowInsets = WindowInsets.systemBars,
+        modifier = Modifier.fillMaxSize()
+    ) { innerPadding ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
         ) {
-            ReportForm(
-                title = title,
-                onValueChangeTitle = {
-                    title = it
-                    titleTouched = true
-                },
-                titleError = titleError,
-                placeHolder = stringResource(id = R.string.category),
-                value = dropDownValue,
-                onValueChange = {
-                    dropDownValue = it
-                    dropDownTouched = true
-                    dropDownExpanded = false
-                },
-                items = categories,
-                dropDownError = dropDownError,
-                isExpanded = dropDownExpanded,
-                onExpandedChange = {
-                    dropDownExpanded = it
-                    dropDownTouched = true
-                },
-                isTouched = dropDownTouched,
-                onDismissRequest = {
-                    dropDownExpanded = false
-                },
-                description = description,
-                onValueChangeDescription = {
-                    description = it
-                    descriptionTouched = true
-                },
-                descriptionError = descriptionError,
-                location = report.location.toString(),
-                onValueChangeLocation = { },
-                locationError = locationError,
-                navigateToReportLocation = navigateToReportLocation,
-                onClickCreate = {
-                    if (!isValidating) saveReportVisible = true
-                },
-                photos = photos,
-                photoErrors = photoErrors,
-                onValueChangePhotos = onValueChangePhotos,
-                onAddPhoto = onAddPhoto,
-                onRemovePhoto = onRemovePhoto,
-                editMode = true,
-                switchChecked = switchChecked,
-                switchCheckedOnClick = {
-                    switchChecked = it
-                },
-                isLoading = isValidating
-            )
-        }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .imePadding(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
+                ReportForm(
+                    title = title,
+                    onValueChangeTitle = {
+                        title = it
+                        titleTouched = true
+                    },
+                    titleError = titleError,
+                    placeHolder = stringResource(id = R.string.category),
+                    value = dropDownValue,
+                    onValueChange = {
+                        dropDownValue = it
+                        dropDownTouched = true
+                        dropDownExpanded = false
+                    },
+                    items = categories,
+                    dropDownError = dropDownError,
+                    isExpanded = dropDownExpanded,
+                    onExpandedChange = {
+                        dropDownExpanded = it
+                        dropDownTouched = true
+                    },
+                    isTouched = dropDownTouched,
+                    onDismissRequest = {
+                        dropDownExpanded = false
+                    },
+                    description = description,
+                    onValueChangeDescription = {
+                        description = it
+                        descriptionTouched = true
+                    },
+                    descriptionError = descriptionError,
+                    location = report.location.toString(),
+                    onValueChangeLocation = { },
+                    locationError = locationError,
+                    navigateToReportLocation = navigateToReportLocation,
+                    onClickCreate = {
+                        if (!isValidating) saveReportVisible = true
+                    },
+                    photos = photos,
+                    photoErrors = photoErrors,
+                    onValueChangePhotos = onValueChangePhotos,
+                    onAddPhoto = onAddPhoto,
+                    onRemovePhoto = onRemovePhoto,
+                    editMode = true,
+                    switchChecked = switchChecked,
+                    switchCheckedOnClick = {
+                        switchChecked = it
+                    },
+                    isLoading = isValidating
+                )
+            }
+        }
     }
     if (exitDialogVisible) {
         GenericDialog(
