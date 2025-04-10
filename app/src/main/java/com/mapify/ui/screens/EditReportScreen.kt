@@ -40,6 +40,7 @@ fun EditReportScreen(
     navigateBack: () -> Unit,
     navigateToReportLocation: () -> Unit,
 ) {
+    //TODO: receive report id
     val context = LocalContext.current
     var isValidating by remember { mutableStateOf(false) }
 
