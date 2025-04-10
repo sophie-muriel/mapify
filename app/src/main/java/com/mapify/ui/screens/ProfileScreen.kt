@@ -22,6 +22,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mapify.R
+import com.mapify.model.Location
+import com.mapify.model.Role
+import com.mapify.model.User
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.SimpleTopBar
@@ -32,19 +35,22 @@ fun ProfileScreen(
     navigateBack: () -> Unit,
     isAdmin: Boolean
 ) {
-    //TODO: add back handler to exit if editmode is false
-    //TODO: use actual profile model
+    val user = User(
+        id = "1",
+        fullName = if (isAdmin) "Administrator" else "Average User",
+        email = if (isAdmin) "admin" else "root",
+        password = if (isAdmin) "admin" else "root",
+        role = if (isAdmin) Role.ADMIN else Role.CLIENT,
+        registrationLocation = Location(
+            latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
+        ),
+    )
 
-    var oldName by rememberSaveable { mutableStateOf(if (isAdmin) "Administrator" else "Average User") }
-    var oldEmail by rememberSaveable { mutableStateOf(if (isAdmin) "admin" else "root") }
-    var oldPassword by rememberSaveable { mutableStateOf(if (isAdmin) "admin" else "root") }
-    val location = "4°32;30.1;N 75°39;48.7;W" // how to update location? beats me!
-
-    var name by rememberSaveable { mutableStateOf(oldName) }
+    var name by rememberSaveable { mutableStateOf(user.fullName) }
     var nameTouched by rememberSaveable { mutableStateOf(false) }
-    var email by rememberSaveable { mutableStateOf(oldEmail) }
+    var email by rememberSaveable { mutableStateOf(user.email) }
     var emailTouched by rememberSaveable { mutableStateOf(false) }
-    var password by rememberSaveable { mutableStateOf(oldPassword) }
+    var password by rememberSaveable { mutableStateOf(user.password) }
     var passwordTouched by rememberSaveable { mutableStateOf(false) }
 
     val nameError = nameTouched && name.isBlank()
@@ -55,9 +61,13 @@ fun ProfileScreen(
     var editMode by rememberSaveable { mutableStateOf(false) }
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
 
-    if (nameTouched || emailTouched || passwordTouched) {
+    if ((nameTouched || emailTouched || passwordTouched) && editMode) {
         BackHandler(enabled = true) {
             exitDialogVisible = true
+        }
+    } else if (editMode){
+        BackHandler(enabled = true) {
+            editMode = false
         }
     }
 
@@ -71,6 +81,8 @@ fun ProfileScreen(
                 onClickNavIcon = {
                     if (editMode && (nameTouched || emailTouched || passwordTouched)) {
                         exitDialogVisible = true
+                    } else if (editMode) {
+                        editMode = false
                     } else {
                         navigateBack()
                     }
@@ -99,7 +111,7 @@ fun ProfileScreen(
                 oldName = name,
                 oldEmail = email,
                 oldPassword = password,
-                location = location,
+                location = user.registrationLocation.toString(),
                 isEditMode = editMode,
                 onValueChangeName = {
                     name = it
@@ -114,11 +126,11 @@ fun ProfileScreen(
                     passwordTouched = true
                 },
                 onClickEdit = {
-                    oldName = name
+                    user.fullName = name
                     nameTouched = false
-                    oldEmail = email
+                    user.email = email
                     emailTouched = false
-                    oldPassword = password
+                    user.password = password
                     passwordTouched = false
                     editMode = !editMode
                 },
@@ -145,10 +157,9 @@ fun ProfileScreen(
                 } else {
                     exitDialogVisible = false
                     editMode = false
-
-                    name = oldName
-                    email = oldEmail
-                    password = oldPassword
+                    name = user.fullName
+                    email = user.email
+                    password = user.password
                 }
             },
             onCloseText = stringResource(id = R.string.cancel),

@@ -18,6 +18,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mapify.R
 import com.mapify.model.Conversation
+import com.mapify.model.ReportStatus
 import com.mapify.ui.users.navigation.UserNavigation
 import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.CreateFAB
@@ -32,8 +33,9 @@ fun HomeScreen(
     navigateToDetail: (String) -> Unit,
     navigateToSettings: () -> Unit,
     navigateToConversation: (Conversation) -> Unit,
-    navigateToReportView: (String) -> Unit,
-    navigateToSearchFilters: () -> Unit
+    navigateToReportView: (String, ReportStatus) -> Unit,
+    navigateToSearchFilters: () -> Unit,
+    navigateToSearchContact: () -> Unit
 ) {
 
     val navController = rememberNavController()
@@ -94,7 +96,7 @@ fun HomeScreen(
                 }
                 UserRouteTab.Messages::class.qualifiedName -> {
                     CreateFAB(
-                        {navController.navigate("SearchContact") },
+                        { navigateToSearchContact() },
                         Icons.Filled.Mail,
                         stringResource(id = R.string.messages_icon)
                     )

@@ -28,7 +28,7 @@ fun NotificationItem(
     status: String,
     supportingText: String,
     statusMessage: String,
-    imageUrl: String,
+    imageUrl: String? = null,
     statusColor: Color,
     onClick: () -> Unit
 ) {
@@ -50,12 +50,14 @@ fun NotificationItem(
                     .width(80.dp)
                     .height(80.dp)
             ) {
-                AsyncImage(
-                    modifier = Modifier.fillMaxSize(),
-                    model = imageUrl,
-                    contentDescription = stringResource(id = R.string.report_image),
-                    contentScale = ContentScale.FillBounds
-                )
+                if (imageUrl != null) {
+                    AsyncImage(
+                        modifier = Modifier.fillMaxSize(),
+                        model = imageUrl,
+                        contentDescription = stringResource(id = R.string.report_image),
+                        contentScale = ContentScale.FillBounds
+                    )
+                }
             }
             Row(
                 modifier = Modifier

@@ -5,10 +5,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.mapify.R
 import com.mapify.model.*
+import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.NotificationItem
 import com.mapify.ui.theme.Spacing
 import java.time.*
@@ -17,9 +22,9 @@ import java.util.*
 
 @Composable
 fun NotificationsTab(
-    navigateToReportView: (String) -> Unit
+    navigateToReportView: (String, ReportStatus) -> Unit
 ) {
-    //TODO: report deleted logic
+    var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     val storedReports = listOf(
         Report(
@@ -29,7 +34,7 @@ fun NotificationsTab(
             description = "This is a report",
             images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s"),
             location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
-            status = ReportStatus.NOT_VERIFIED,
+            status = ReportStatus.PENDING_VERIFICATION,
             userId = "1",
             date = LocalDateTime.now()
         ),
@@ -55,7 +60,7 @@ fun NotificationsTab(
             location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
             status = ReportStatus.VERIFIED,
             userId = "2",
-            date = LocalDateTime.now()
+            date = LocalDateTime.now().minusHours(13)
         ),
         Report(
             id = "4",
@@ -104,7 +109,19 @@ fun NotificationsTab(
             .padding(horizontal = Spacing.Sides),
         verticalArrangement = Arrangement.spacedBy(Spacing.Large)
     ) {
-        items(storedReports) { report ->
+        item {
+            NotificationItem(
+                title = "Report deleted",
+                status = "Deleted",
+                supportingText = formatNotificationDate(LocalDateTime.now()),
+                statusMessage = "Your report 'title' has been removed by an admin.",
+                onClick = {
+                    exitDialogVisible = true
+                },
+                statusColor = MaterialTheme.colorScheme.error
+            )
+        }
+        items(storedReports.sortedByDescending { it.date }) { report ->
             NotificationItem(
                 title = report.title,
                 status = if (report.status == ReportStatus.VERIFIED)
@@ -117,10 +134,36 @@ fun NotificationsTab(
                 else
                     "Your report has been rejected; modify it in 3 days or it will be deleted.",
                 imageUrl = report.images.first(),
-                onClick = { navigateToReportView(report.id) },
+                onClick = { navigateToReportView(report.id, report.status) },
                 statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
             )
         }
+        item {
+            NotificationItem(
+                title = "Report deleted",
+                status = "Deleted",
+                supportingText = formatNotificationDate(LocalDateTime.now().minusDays(2)),
+                statusMessage = "Your report 'title 2' has been removed by an admin.",
+                onClick = {
+                    exitDialogVisible = true
+                },
+                statusColor = MaterialTheme.colorScheme.error
+            )
+        }
+        item {
+            Spacer(modifier = Modifier.height(Spacing.Large))
+        }
+    }
+
+    if (exitDialogVisible) {
+        GenericDialog(
+            title = stringResource(id = R.string.report_deleted),
+            message = stringResource(id = R.string.report_deleted_message),
+            onExit = {
+                exitDialogVisible = false
+            },
+            onExitText = stringResource(id = R.string.ok)
+        )
     }
 }
 
