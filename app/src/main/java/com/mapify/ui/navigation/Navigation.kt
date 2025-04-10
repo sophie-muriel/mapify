@@ -71,8 +71,8 @@ fun Navigation() {
                     navigateToConversation = { conversation ->
                         println("Navigate to conversation with: $conversation")
                     },
-                    navigateToReportView = {
-                        navController.navigate(RouteScreen.ReportView(it))
+                    navigateToReportView = { reportId, reportStatus ->
+                        navController.navigate(RouteScreen.ReportView(reportId, reportStatus))
                     },
                     navigateToSearchFilters = {
                         navController.navigate(RouteScreen.SearchFilters)
