@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.mapify.model.Conversation
+import com.mapify.ui.screens.SearchContactScreen
 import com.mapify.ui.users.tabs.ExploreTab
 import com.mapify.ui.users.tabs.HomeTab
 import com.mapify.ui.users.tabs.MessagesTab
@@ -37,6 +38,14 @@ fun UserNavigation(
         composable<UserRouteTab.Messages> {
             MessagesTab(
                 navigateToConversation = navigateToConversation
+            )
+        }
+        composable("SearchContact") {
+            SearchContactScreen(
+                navigateBack = { navController.popBackStack() },
+                onUserSelected = { username ->
+                    navController.navigate("Conversation/$username")
+                }
             )
         }
     }
