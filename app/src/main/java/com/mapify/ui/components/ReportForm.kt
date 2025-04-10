@@ -4,8 +4,10 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -72,9 +74,10 @@ fun ReportForm(
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = Spacing.Sides), horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = Spacing.Sides),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         GenericTextField(
@@ -249,8 +252,8 @@ fun ReportForm(
                 .fillMaxWidth()
                 .padding(horizontal = Spacing.Sides)
                 .height(40.dp),
-            enabled = (!titleError && title.isNotBlank() && !dropDownError && !descriptionError
-                    && description.isNotBlank() && vogosBinted && noBlanks) || isLoading, // TODO: Location has to be added here later
+            enabled = !titleError && title.isNotBlank() && !dropDownError && !descriptionError
+                    && description.isNotBlank() && vogosBinted && noBlanks && !isLoading, // TODO: Location has to be added here later
             onClick = onClickCreate,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
