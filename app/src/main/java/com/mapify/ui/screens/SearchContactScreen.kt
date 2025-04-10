@@ -5,98 +5,85 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.mapify.R
 import com.mapify.ui.theme.Spacing
 import com.mapify.ui.components.SearchUserItem
+import com.mapify.ui.components.SimpleTopBar
 
 @Composable
 fun SearchContactScreen(
     navigateBack: () -> Unit,
     onUserSelected: (String) -> Unit
 ) {
-    var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
+    var searchQuery by remember { mutableStateOf("") }
 
     val recentSearches = listOf("Laura Mejía", "Carlos Ruiz", "Andrea Torres")
     val allUsers = listOf("Laura Mejía", "Carlos Ruiz", "Andrea Torres", "Ana López", "Luis Gómez")
 
     val filteredUsers = remember(searchQuery) {
-        if (searchQuery.text.isNotBlank()) {
+        if (searchQuery.isNotBlank()) {
             allUsers.filter {
-                it.contains(searchQuery.text, ignoreCase = true)
+                it.contains(searchQuery, ignoreCase = true)
             }
         } else {
             emptyList()
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Spacing.Sides)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp, bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = navigateBack,
-                modifier = Modifier.size(25.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back"
-                )
-            }
-
-            Spacer(modifier = Modifier.width(Spacing.Small))
-
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = { Text("Buscar usuario") },
-                singleLine = true,
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Buscar"
-                    )
-                },
-                shape = MaterialTheme.shapes.large,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(52.dp)
+    Scaffold(
+        modifier = Modifier.padding(Spacing.Inline),
+        topBar = {
+            SimpleTopBar(
+                Alignment.CenterStart,
+                stringResource(id = R.string.search_for_user),
+                Icons.AutoMirrored.Filled.ArrowBack,
+                stringResource(id = R.string.back_arrow_icon),
+                onClickNavIcon = { navigateBack() },
+                false,
+                isSearch = true,
+                searchQuery = searchQuery,
+                onSearchQueryChange = {
+                    searchQuery = it
+                }
             )
         }
-
-        Spacer(modifier = Modifier.height(Spacing.Large))
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(Spacing.Inline)
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = Spacing.Sides),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
         ) {
-            if (searchQuery.text.isBlank()) {
-                items(recentSearches) { username ->
-                    RecentSearchItem(
-                        username = username,
-                        onClick = { onUserSelected(username) }
-                    )
-                }
-            } else {
-                items(filteredUsers) { username ->
-                    SearchUserItem(
-                        fullName = username,
-                        usernameTag = "@${username.lowercase().replace(" ", "")}",
-                        onClick = { onUserSelected(username) }
-                    )
+
+            Spacer(modifier = Modifier.height(Spacing.Large))
+
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(Spacing.Inline)
+            ) {
+                if (searchQuery.isBlank()) {
+                    items(recentSearches) { username ->
+                        RecentSearchItem(
+                            username = username,
+                            onClick = { onUserSelected(username) }
+                        )
+                    }
+                } else {
+                    items(filteredUsers) { username ->
+                        SearchUserItem(
+                            fullName = username,
+                            usernameTag = "@${username.lowercase().replace(" ", "")}",
+                            onClick = { onUserSelected(username) }
+                        )
+                    }
                 }
             }
         }
