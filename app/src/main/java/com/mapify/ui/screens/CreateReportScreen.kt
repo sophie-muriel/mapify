@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -19,6 +20,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import com.mapify.R
@@ -31,6 +33,8 @@ import com.mapify.model.Role
 import com.mapify.model.User
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.SimpleTopBar
+import com.mapify.utils.isImageValid
+import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 
 @Composable
@@ -39,6 +43,9 @@ fun CreateReportScreen(
     navigateToReportLocation: () -> Unit,
     navigateToReportView: (String) -> Unit
 ) {
+    val context = LocalContext.current
+    var isValidating by remember { mutableStateOf(false) }
+
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
     val titleError = titleTouched && title.isBlank()
@@ -47,7 +54,7 @@ fun CreateReportScreen(
     var dropDownExpanded by rememberSaveable { mutableStateOf(false) }
     var dropDownTouched by rememberSaveable { mutableStateOf(false) }
     val categories = Category.entries.map { it.displayName }
-    val dropDownError = dropDownValue.isBlank()
+    val dropDownError = dropDownTouched && dropDownValue.isBlank()
 
     var description by rememberSaveable { mutableStateOf("") }
     var descriptionTouched by rememberSaveable { mutableStateOf(false) }
@@ -56,23 +63,47 @@ fun CreateReportScreen(
     var location by rememberSaveable { mutableStateOf("") }
     val locationError = false
 
-    val regex = Regex("^(https?:\\/\\/)?([a-zA-Z0-9.-]+)\\.([a-zA-Z]{2,})(\\/\\S*)?$")
     var photos by rememberSaveable { mutableStateOf(listOf("")) }
-    var photoTouchedList by rememberSaveable { mutableStateOf(listOf(false)) }
-    val photoErrors = photos.mapIndexed { i, url ->
-        val touched = photoTouchedList.getOrElse(i) { false }
-        touched && !regex.matches(url)
+    var photoTouchedList by rememberSaveable { mutableStateOf(List(photos.size) { false }) }
+    var photoErrors by remember { mutableStateOf(List(photos.size) { false }) }
+
+    LaunchedEffect(photos, photoTouchedList) {
+        isValidating = true
+        delay(100)
+        val validated = photos.mapIndexed { i, url ->
+            val touched = photoTouchedList.getOrElse(i) { false }
+            if (touched) !isImageValid(context, url) else false
+        }
+        photoErrors = validated
+        isValidating = false
+    }
+
+    LaunchedEffect(photos.size) {
+        if (photoTouchedList.size != photos.size) {
+            photoTouchedList = List(photos.size) { i ->
+                photoTouchedList.getOrElse(i) { false }
+            }
+        }
+        if (photoErrors.size != photos.size) {
+            photoErrors = List(photos.size) { i ->
+                photoErrors.getOrElse(i) { false }
+            }
+        }
     }
 
     val onAddPhoto = {
         photos = photos + ""
         photoTouchedList = photoTouchedList + false
+        photoErrors = photoErrors + false
     }
 
     val onRemovePhoto: (Int) -> Unit = { index ->
         if (index in photos.indices) {
             photos = photos.toMutableList().also { it.removeAt(index) }
             photoTouchedList = photoTouchedList.toMutableList().also {
+                if (index < it.size) it.removeAt(index)
+            }
+            photoErrors = photoErrors.toMutableList().also {
                 if (index < it.size) it.removeAt(index)
             }
         }
@@ -87,6 +118,11 @@ fun CreateReportScreen(
                     it.add(false)
                 }
                 it[changedIndex] = true
+            }
+        }
+        photoErrors = photoErrors.toMutableList().also {
+            while (it.size < updatedList.size) {
+                it.add(false)
             }
         }
     }
@@ -173,14 +209,15 @@ fun CreateReportScreen(
                 locationError = locationError,
                 navigateToReportLocation = navigateToReportLocation,
                 onClickCreate = {
-                    publishReportVisible = true
+                    if (!isValidating) publishReportVisible = true
                 },
                 editMode = false,
                 photos = photos,
                 photoErrors = photoErrors,
                 onValueChangePhotos = onValueChangePhotos,
                 onAddPhoto = onAddPhoto,
-                onRemovePhoto = onRemovePhoto
+                onRemovePhoto = onRemovePhoto,
+                isLoading = isValidating
             )
         }
 
