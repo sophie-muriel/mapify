@@ -143,4 +143,9 @@
     <string name="report_rejected">Report rejected</string>
     <string name="report_rejected_message">Your report has been rejected due to the following reasons:</string>
     <string name="edit_report_now">Edit report now</string>
+
+    <string name="comment_icon">Comment Icon</string>
+    <string name="me">(Me)</string>
+    <string name="leave_a_comment">Leave a comment…</string>
+    <string name="send_icon">Send Icon</string>
 </resources>
