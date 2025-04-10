@@ -303,7 +303,7 @@ fun ReportViewScreen(
             CreateFAB(
                 onClick = { showComments = true },
                 icon = Icons.AutoMirrored.Default.Comment,
-                iconDescription = "TestDescription"
+                iconDescription = stringResource(id = R.string.comment_icon)
             )
         }) { padding ->
         Column(
@@ -380,7 +380,7 @@ fun ReportViewScreen(
                     var newComment = Comment(
                         id = commentCounter.toString(),
                         content = comment,
-                        userId = "3",
+                        userId = "3", //ToDo: when we have proper user navigation we can use currentUser.Id
                         reportId = reportId,
                         date = LocalDateTime.now()
                     )
@@ -489,9 +489,9 @@ fun Comments(
                                 text = users.find { it.id == comment.userId }?.fullName ?: "",
                                 style = MaterialTheme.typography.titleSmall
                             )
-                            if(comment.userId == "3"){
+                            if(comment.userId == "3"){ //ToDo: when we have proper user navigation we can use currentUser.Id
                                 Text(
-                                    text = "(Me)",
+                                    text = stringResource(id = R.string.me),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.primary
                                 )
@@ -529,7 +529,7 @@ fun Comments(
                 onValueChange = onCommentChange,
                 shape = RoundedCornerShape(16.dp),
                 placeholder = {
-                    Text(text = "Leave a comment...")
+                    Text(text = stringResource(id = R.string.leave_a_comment))
                 }
             )
             IconButton(
@@ -537,7 +537,7 @@ fun Comments(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.Send,
-                    contentDescription = "send icon",
+                    contentDescription = stringResource(id = R.string.send_icon),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -666,7 +666,6 @@ fun InfoChip(
             )
         }
     }
-
 }
 
 
