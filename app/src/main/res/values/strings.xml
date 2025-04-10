@@ -90,7 +90,7 @@
     <string name="search_icon">Search Icon</string>
     <string name="notifications_icon">Notifications Icon</string>
     <string name="messages_icon">Messages Icon</string>
-    
+
     <string name="report_image">The report image</string>
     <string name="settings_icon">Settings Icon</string>
     <string name="resolved">Resolved</string>
@@ -139,4 +139,8 @@
     <string name="edit">Edit</string>
     <string name="is_report_solved">Is the report resolved?</string>
     <string name="search_for_user">Search for a user…</string>
+
+    <string name="report_rejected">Report rejected</string>
+    <string name="report_rejected_message">Your report has been rejected due to the following reasons:</string>
+    <string name="edit_report_now">Edit report now</string>
 </resources>
