@@ -1,6 +1,5 @@
 package com.mapify.ui.screens
 
-import android.content.res.Resources.Theme
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,7 +50,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -66,7 +64,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchFiltersScreen(
-    navigateToExplore: () -> Unit
+    navigateBack: () -> Unit
 ) {
 
     var priorityChecked by rememberSaveable { mutableStateOf(false) }
@@ -90,7 +88,7 @@ fun SearchFiltersScreen(
                 stringResource(id = R.string.search_filters),
                 Icons.AutoMirrored.Filled.ArrowBack,
                 stringResource(id = R.string.back_arrow_icon),
-                onClickNavIcon = { navigateToExplore() },
+                onClickNavIcon = { navigateBack() },
                 false
             )
         }) { padding ->
@@ -120,7 +118,7 @@ fun SearchFiltersScreen(
             Spacer(modifier = Modifier.height(Spacing.Sides))
 
             Buttons(
-                onClickApplyFilters = navigateToExplore,
+                onClickApplyFilters = navigateBack,
                 onClickCleanFilters = {
                     priorityChecked = false
                     resolvedChecked = false
