@@ -231,7 +231,6 @@ fun ReportViewScreen(
                 modifier = Modifier
                     .padding(horizontal = Spacing.Sides)
                     .align(Alignment.Start),
-                    //.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(Spacing.Sides)
             ){
                 TitleAndVerified(
@@ -273,10 +272,13 @@ fun ReportViewScreen(
                 )
 
                 Box(
-                    modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(190.dp)
+                        .verticalScroll(rememberScrollState()),
                 ){
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        //modifier = Modifier.fillMaxWidth().height(190.dp),
                     ){
                         Text(
                             //modifier = Modifier.,
