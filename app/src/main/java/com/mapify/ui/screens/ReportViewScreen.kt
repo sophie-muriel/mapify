@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -241,6 +242,7 @@ fun ReportViewScreen(
     var showComments by remember { mutableStateOf(false) }
     var bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var comment by remember { mutableStateOf("") }
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
@@ -322,63 +324,10 @@ fun ReportViewScreen(
                     text = report.date.format(dateFormat)
                 )
 
-                val scrollState = rememberScrollState()
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(190.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(190.dp)
-                            .verticalScroll(scrollState)
-                    ) {
-                        Row {
-                            Text(
-                                text = report.description
-                            )
-                        }
-                    }
-
-                    val showTopGradient = remember { derivedStateOf { scrollState.value > 0 } }
-                    val showGradient = remember { derivedStateOf { scrollState.value < scrollState.maxValue } }
-
-                    if (showTopGradient.value) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.TopCenter)
-                                .fillMaxWidth()
-                                .height(24.dp)
-                                .background(
-                                    brush = Brush.verticalGradient(
-                                        colors = listOf(
-                                            MaterialTheme.colorScheme.background,
-                                            Color.Transparent
-                                        )
-                                    )
-                                )
-                        )
-                    }
-
-                    if (showGradient.value) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .fillMaxWidth()
-                                .height(24.dp)
-                                .background(
-                                    brush = Brush.verticalGradient(
-                                        colors = listOf(
-                                            Color.Transparent,
-                                            MaterialTheme.colorScheme.background
-                                        )
-                                    )
-                                )
-                        )
-                    }
-                }
+                DescriptionText(
+                    text = report.description,
+                    scrollState = scrollState
+                )
             }
         }
 
@@ -402,6 +351,68 @@ fun ReportViewScreen(
                     storedComments = storedComments + comment
                     comment = ""
                 },
+            )
+        }
+    }
+}
+
+@Composable
+fun DescriptionText(
+    text: String,
+    scrollState: ScrollState
+){
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(190.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(190.dp)
+                .verticalScroll(scrollState)
+        ) {
+            Row {
+                Text(
+                    text = text
+                )
+            }
+        }
+
+        val showTopGradient = remember { derivedStateOf { scrollState.value > 0 } }
+        val showGradient = remember { derivedStateOf { scrollState.value < scrollState.maxValue } }
+
+        if (showTopGradient.value) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .height(24.dp)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.background,
+                                Color.Transparent
+                            )
+                        )
+                    )
+            )
+        }
+
+        if (showGradient.value) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(24.dp)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                MaterialTheme.colorScheme.background
+                            )
+                        )
+                    )
             )
         }
     }
