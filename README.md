@@ -35,7 +35,6 @@ Android app for users to upload, rate, and interact with reports nearby.
 ~~- [ ] Verify save profile edits -> maybe remove~~
 - [x] Verify exit report editing
 - [x] Verify save report edits
-- [ ] Report rejected
 - [x] Report reject notification message
 - [x] Report deleted notification message
 - [ ] Verify delete report
