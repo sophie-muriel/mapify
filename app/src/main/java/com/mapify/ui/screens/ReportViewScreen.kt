@@ -15,16 +15,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.IndeterminateCheckBox
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.outlined.IndeterminateCheckBox
 import androidx.compose.material.icons.outlined.Sell
 import androidx.compose.material.icons.outlined.Star
@@ -54,8 +58,11 @@ import com.mapify.model.Category
 import com.mapify.model.Location
 import com.mapify.model.Report
 import com.mapify.model.ReportStatus
+import com.mapify.model.Role
 import com.mapify.ui.theme.Spacing
 import java.time.LocalDateTime
+import com.mapify.model.User
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +74,12 @@ fun ReportViewScreen(
             id = "1",
             title = "Report 1",
             category = Category.SECURITY,
-            description = "This is a report",
+            description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque. " +
+                    "Donec et tortor scelerisque, ornare mi et, tempus sem. Maecenas ullamcorper nulla vel arcu malesuada consectetur. " +
+                    "Donec sed pharetra sapien. Nam vitae mi eleifend ex pellentesque vulputate ac in elit." +
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque. " +
+                    "Donec et tortor scelerisque, ornare mi et, tempus sem. Maecenas ullamcorper nulla vel arcu malesuada consectetur. " +
+                    "Donec sed pharetra sapien. Nam vitae mi eleifend ex pellentesque vulputate ac in elit.",
             images = listOf(
                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s",
                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOvSWqWExnQHszC2ZfSLd-xZNC94pRxMO7ag&s"),
@@ -101,7 +113,9 @@ fun ReportViewScreen(
             id = "3",
             title = "Report 3",
             category = Category.INFRASTRUCTURE,
-            description = "This is an embedded test report",
+            description = "Etiam tristique, risus ac pellentesque ullamcorper, mauris nisl tincidunt dui, sit amet porttitor eros nisl a dolor. " +
+                    "Mauris eu sapien tincidunt, pulvinar leo a, tincidunt orci. In leo justo, hendrerit at convallis nec, semper in neque. Nunc " +
+                    "at metus eros. Aliquam erat volutpat. Sed nec faucibus leo, quis cursus nisl.",
             images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
             location = Location(
                 latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
@@ -116,11 +130,11 @@ fun ReportViewScreen(
             id = "4",
             title = "Report 4",
             category = Category.COMMUNITY,
-            description = "Report about illegal dumping near the river.",
+            description = "Etiam tristique, risus ac pellentesque ullamcorper, mauris nisl tincidunt dui, sit amet porttitor eros nisl a dolor.",
             images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
             location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
             status = ReportStatus.VERIFIED,
-            userId = "3",
+            userId = "2",
             date = LocalDateTime.now().minusHours(3),
             priorityCounter = 21
         ),
@@ -128,11 +142,12 @@ fun ReportViewScreen(
             id = "5",
             title = "Report 5",
             category = Category.SECURITY,
-            description = "Potholes causing problems in traffic.",
+            description = "Mauris eu sapien tincidunt, pulvinar leo a, tincidunt orci. In leo justo, hendrerit at convallis nec, semper in neque. Nunc " +
+                    "at metus eros. Aliquam erat volutpat. Sed nec faucibus leo, quis cursus nisl.",
             images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
             location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
             status = ReportStatus.PENDING_VERIFICATION,
-            userId = "4",
+            userId = "2",
             date = LocalDateTime.now().minusDays(1),
             isResolved = true,
             priorityCounter = 3
@@ -141,14 +156,34 @@ fun ReportViewScreen(
             id = "6",
             title = "Report 6",
             category = Category.PETS,
-            description = "Lost dog seen in the neighborhood.",
+            description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque. " +
+                    "Donec et tortor scelerisque, ornare mi et, tempus sem. Maecenas ullamcorper nulla vel arcu malesuada consectetur. ",
             images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
             location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
             status = ReportStatus.VERIFIED,
-            userId = "5",
+            userId = "2",
             date = LocalDateTime.now().minusMinutes(45),
             isResolved = true,
             priorityCounter = 15
+        )
+    )
+
+    val storedUsers = listOf(
+        User(
+            id = "1",
+            fullName = "First User",
+            email = "first@mail.com",
+            password = "ThisIsATestPass",
+            role = Role.CLIENT,
+            registrationLocation = Location(latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia")
+        ),
+        User(
+            id = "2",
+            fullName = "Second User",
+            email = "second@mail.com",
+            password = "ThisIsATestPass",
+            role = Role.CLIENT,
+            registrationLocation = Location(latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia")
         )
     )
 
@@ -196,7 +231,8 @@ fun ReportViewScreen(
                 modifier = Modifier
                     .padding(horizontal = Spacing.Sides)
                     .align(Alignment.Start),
-                verticalArrangement = Arrangement.spacedBy(Spacing.Large)
+                    //.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(Spacing.Sides)
             ){
                 TitleAndVerified(
                     report = report,
@@ -221,9 +257,65 @@ fun ReportViewScreen(
                         isClickable = true
                     )
                 }
+
+                ItemDetailReport(
+                    icon = Icons.Default.Person,
+                    iconDescription = stringResource(id = R.string.person_icon),
+                    text = storedUsers.find{ it.id == report.userId }?.fullName ?: ""
+                )
+
+                val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+                ItemDetailReport(
+                    icon = Icons.Filled.Today,
+                    iconDescription = stringResource(id = R.string.date_icon),
+                    text = report.date.format(dateFormat)
+                )
+
+                Box(
+                    modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
+                ){
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                    ){
+                        Text(
+                            //modifier = Modifier.,
+                            text = report.description
+                        )
+
+                    }
+
+                }
+
+
             }
         }
     }
+}
+
+@Composable
+fun ItemDetailReport(
+    icon: ImageVector,
+    iconDescription: String,
+    text: String
+){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.Inline)
+    ){
+        Icon(
+            imageVector = icon,
+            contentDescription = iconDescription,
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+
 }
 
 @Composable
