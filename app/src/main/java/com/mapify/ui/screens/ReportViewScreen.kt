@@ -83,12 +83,32 @@ import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import com.mapify.ui.components.GenericDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportViewScreen(
-    reportId: String, navigateBack: () -> Unit
+    reportId: String, reportStatusP: ReportStatus? = null, navigateBack: () -> Unit, navigateToReportEdit: ((String) -> Unit)? = null
 ) {
+    if (reportStatusP != null && navigateToReportEdit != null){
+        var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
+
+        if (exitDialogVisible) {
+            GenericDialog(
+                title = stringResource(id = R.string.report_rejected),
+                message = stringResource(id = R.string.report_rejected_message),
+                onClose = {
+                    exitDialogVisible = false
+                },
+                onExit = {
+                        navigateToReportEdit(reportId)
+                },
+                onCloseText = stringResource(id = R.string.cancel),
+                onExitText = stringResource(id = R.string.edit_report_now)
+            )
+        }
+    }
+
     val storedReports = listOf(
         Report(
             id = "1",
