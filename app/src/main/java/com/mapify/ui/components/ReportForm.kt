@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -65,6 +67,7 @@ fun ReportForm(
     switchCheckedOnClick: ((Boolean) -> Unit)? = null,
     onAddPhoto: () -> Unit,
     onRemovePhoto: (Int) -> Unit,
+    isLoading: Boolean
 ) {
 
     Column(
@@ -246,18 +249,26 @@ fun ReportForm(
                 .fillMaxWidth()
                 .padding(horizontal = Spacing.Sides)
                 .height(40.dp),
-            enabled = !titleError && title.isNotBlank() && !dropDownError && !descriptionError
-                    && description.isNotBlank() && vogosBinted && noBlanks, //TODO: Location has to be added here later
+            enabled = (!titleError && title.isNotBlank() && !dropDownError && !descriptionError
+                    && description.isNotBlank() && vogosBinted && noBlanks) || isLoading, // TODO: Location has to be added here later
             onClick = onClickCreate,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-        ) {
-            Text(
-                text = if (editMode) stringResource(id = R.string.edit) else stringResource(id = R.string.create),
-                style = MaterialTheme.typography.bodyMedium
             )
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = if (editMode) stringResource(id = R.string.edit) else stringResource(id = R.string.create),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
 
         Spacer(modifier = Modifier.padding(Spacing.Large))
