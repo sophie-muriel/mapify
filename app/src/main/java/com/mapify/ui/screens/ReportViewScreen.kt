@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -75,6 +76,8 @@ import com.mapify.model.User
 import com.mapify.ui.components.CreateFAB
 import java.time.format.DateTimeFormatter
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.IconButton
@@ -82,7 +85,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.input.TextFieldValue
 import com.mapify.model.Comment
+import com.mapify.model.Message
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MinimalDropdownMenu
 
@@ -505,11 +510,11 @@ fun Comments(
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = state,
+        containerColor = MaterialTheme.colorScheme.surface
     ) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background),
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(comments) { comment ->
@@ -553,27 +558,40 @@ fun Comments(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(start = Spacing.Sides, end = 8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+                .padding(horizontal = Spacing.Small + Spacing.Sides, vertical = Spacing.Large),
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                modifier = Modifier.weight(1f),
                 value = comment,
                 onValueChange = onCommentChange,
-                shape = RoundedCornerShape(16.dp),
                 placeholder = {
-                    Text(text = stringResource(id = R.string.leave_a_comment))
-                }
+                    Text(
+                        text = stringResource(id = R.string.leave_a_comment),
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .height(52.dp)
+                    .padding(end = Spacing.Large)
+                    .heightIn(min = 52.dp, max = 140.dp),
+                maxLines = 4,
+                singleLine = false,
+                shape = MaterialTheme.shapes.large,
+                textStyle = MaterialTheme.typography.bodyMedium,
             )
             IconButton(
-                onClick = onClick
+                onClick = { onClick() },
+                modifier = Modifier
+                    .size(46.dp)
+                    .background(MaterialTheme.colorScheme.primary, CircleShape)
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.Send,
+                    imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = stringResource(id = R.string.send_icon),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
