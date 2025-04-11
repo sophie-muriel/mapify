@@ -27,7 +27,7 @@ fun Navigation() {
 
     val navController = rememberNavController()
     val isAdmin = rememberSaveable { mutableStateOf(false) }
-    val userId = rememberSaveable { mutableStateOf("") }
+    val userId = rememberSaveable { mutableStateOf("1") }
 
     Surface {
         NavHost(
