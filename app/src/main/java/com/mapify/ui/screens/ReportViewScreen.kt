@@ -326,7 +326,7 @@ fun ReportViewScreen(
     var showVerifyDialogle by rememberSaveable { mutableStateOf(false) }
     var showRejectionInputDialog by rememberSaveable { mutableStateOf(false) }
     var rejectionMessage by remember { mutableStateOf("") }
-    var boostCounter by rememberSaveable { mutableIntStateOf(0) }
+    var boostCounter by rememberSaveable { mutableIntStateOf(0) } //One to one database table is needed for this
     var showBoostToast by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
