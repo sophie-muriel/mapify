@@ -27,6 +27,7 @@ fun Navigation() {
 
     val navController = rememberNavController()
     val isAdmin = rememberSaveable { mutableStateOf(false) }
+    val userId = rememberSaveable { mutableStateOf("1") }
 
     Surface {
         NavHost(
@@ -37,8 +38,9 @@ fun Navigation() {
                     navigateToRegistration = {
                         navController.navigate(RouteScreen.Registration)
                     },
-                    navigateToHome = { adminValue ->
+                    navigateToHome = { adminValue, userIdValue ->
                         isAdmin.value = adminValue
+                        userId.value = userIdValue
                         navController.navigate(RouteScreen.Home) {
                             popUpTo(0) {
                                 inclusive = true
@@ -58,6 +60,7 @@ fun Navigation() {
             composable<RouteScreen.Home> {
                 HomeScreen(
                     isAdmin = isAdmin.value,
+                    userId = userId.value,
                     navigateToProfile = {
                         navController.navigate(RouteScreen.Profile)
                     },
@@ -122,7 +125,9 @@ fun Navigation() {
                     },
                     navigateToReportLocation = {
                         navController.navigate(RouteScreen.ReportLocation)
-                    }
+                    },
+                    isAdmin = isAdmin.value,
+                    userId = userId.value
                 )
             }
             composable<RouteScreen.Profile> {
