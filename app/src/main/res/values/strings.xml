@@ -157,4 +157,8 @@
     <string name="verify">Verify</string>
     <string name="reject">Reject</string>
     <string name="boost_priority">Boost Priority</string>
+    <string name="delete_icon">Delete Icon</string>
+    <string name="check_circle_icon">Check Circle Icon</string>
+    <string name="unpublished_icon">Unpublished Icon</string>
+    <string name="trending_up_icon">Trending Up Icon</string>
 </resources>
