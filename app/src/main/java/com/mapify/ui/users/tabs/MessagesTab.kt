@@ -18,7 +18,7 @@ import java.util.*
 fun MessagesTab(
     navigateToConversation: (Conversation) -> Unit
 ) {
-    var messagesList by remember{
+    var messagesList by remember {
         mutableStateOf(
             listOf(
                 Message(
@@ -45,13 +45,14 @@ fun MessagesTab(
             )
         )
     }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = Spacing.Sides),
         verticalArrangement = Arrangement.spacedBy(Spacing.Large)
     ) {
-        items(messagesList) { message ->
+        items(messagesList, key = { it.id }) { message ->
             MessageItem(
                 sender = message.sender,
                 message = message.content,
@@ -67,6 +68,19 @@ fun MessagesTab(
                         messages = listOf(message)
                     )
                     navigateToConversation(conversation)
+                },
+                onMarkRead = {
+                    messagesList = messagesList.map {
+                        if (it.id == message.id) it.copy(isRead = true) else it
+                    }
+                },
+                onMarkUnread = {
+                    messagesList = messagesList.map {
+                        if (it.id == message.id) it.copy(isRead = false) else it
+                    }
+                },
+                onDelete = {
+                    messagesList = messagesList.filterNot { it.id == message.id }
                 }
             )
         }
