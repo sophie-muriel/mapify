@@ -49,7 +49,7 @@ Android app for users to upload, rate, and interact with reports nearby.
 - [x] Create navigation 'stack' and general navigation functionality
 ~~- [ ] Validate name fields and report titles -> not required~~
 ~~- [ ] Search filters (date, distance, verified, priority) -> not required~~
-- [ ] Admin functionalities (verify, delete reports) *
+- [x] Admin functionalities (verify, delete reports) *
 ~~- [ ] Manage and add comments -> not required~~
 ~~- [ ] Chat with and search other users -> not required~~
 - [x] Handle multiple images in report creation/editing (esp. editing)
