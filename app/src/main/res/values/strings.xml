@@ -166,5 +166,8 @@
     <string name="verify_report_title">Are you sure you want to verify this report?</string>
     <string name="verify_report_description">Once verified, this report will be tagged as verified for all users.</string>
     <string name="report_verified">Report Verified</string>
-
+    <string name="reject_report_title">Specify the reasons for rejection</string>
+    <string name="reject_report_description">This information is essential for the user.</string>"
+    <string name="send">Send</string>
+    <string name="rejection_message_send">Rejection message sent</string>
 </resources>
