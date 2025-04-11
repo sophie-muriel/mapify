@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -91,12 +92,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import com.mapify.model.Comment
 import com.mapify.model.Message
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -319,6 +322,8 @@ fun ReportViewScreen(
     var isCreator = userId == report.userId
     var showDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
 
+    val context = LocalContext.current
+
     val menuItems =
         if (isCreator) {
             listOf(
@@ -517,6 +522,21 @@ fun ReportViewScreen(
                     comment = ""
                 },
                 users = storedUsers,
+            )
+        }
+
+        if(showDeleteDialogVisible){
+            GenericDialog(
+                title = "Are you sure you want to delete your report?",
+                message = "This action is irreversible, and your report’s data will be permanently lost.",
+                onClose = { showDeleteDialogVisible = false },
+                onExit = {
+                    Toast.makeText(context, "Report deleted", Toast.LENGTH_LONG).show()
+                    showDeleteDialogVisible = false
+                    navigateBack()
+                },
+                onCloseText = "Cancel",
+                onExitText = "Delete"
             )
         }
     }
