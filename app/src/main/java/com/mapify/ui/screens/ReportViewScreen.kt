@@ -765,7 +765,6 @@ fun Comments(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .height(52.dp)
                     .padding(end = Spacing.Large)
                     .heightIn(min = 52.dp, max = 140.dp),
                 maxLines = 4,
