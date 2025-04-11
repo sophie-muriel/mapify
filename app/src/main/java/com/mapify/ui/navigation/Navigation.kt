@@ -8,7 +8,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.mapify.model.Conversation
 import com.mapify.ui.screens.ConversationScreen
 import com.mapify.ui.screens.CreateReportScreen
 import com.mapify.ui.screens.EditReportScreen
@@ -73,8 +72,8 @@ fun Navigation() {
                     navigateToSettings = {
                         navController.navigate(RouteScreen.Settings)
                     },
-                    navigateToConversation = { conversation ->
-                        navController.navigate(RouteScreen.Conversation(conversation.id, conversation.sender))
+                    navigateToConversation = { conversationId ->
+                        navController.navigate(RouteScreen.Conversation(conversationId))
                     },
                     navigateToReportView = { id, status ->
                         navController.navigate(
@@ -165,25 +164,20 @@ fun Navigation() {
             composable<RouteScreen.SearchContact> {
                 SearchContactScreen(
                     navigateBack = { navController.popBackStack() },
-                    onUserSelected = { username ->
-                        navController.navigate(RouteScreen.Conversation(conversationId = username, senderName = username))
+                    onUserSelected = { conversationId ->
+                        navController.navigate(RouteScreen.Conversation(conversationId))
                     }
                 )
             }
             composable<RouteScreen.Conversation> { backStackEntry ->
                 val args = backStackEntry.toRoute<RouteScreen.Conversation>()
                 ConversationScreen(
-                    conversation =  Conversation(
-                        id = args.conversationId,
-                        sender = args.senderName,
-                        messages = emptyList()
-                    ),
+                    conversationId = args.conversationId,
                     navigateBack = {
                         navController.popBackStack()
                     }
                 )
             }
-
         }
     }
 }

@@ -10,9 +10,13 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
@@ -46,7 +50,6 @@ import com.mapify.ui.theme.Spacing
 fun RegistrationScreen(
     navigateBack: () -> Unit
 ) {
-
     var name by rememberSaveable { mutableStateOf("") }
     var nameTouched by rememberSaveable { mutableStateOf(false) }
     var email by rememberSaveable { mutableStateOf("") }
@@ -79,11 +82,16 @@ fun RegistrationScreen(
         passwordConfirmationTouched = false
     }
 
-    Scaffold { padding ->
+    Scaffold(
+        modifier = Modifier
+            .imePadding()
+            .navigationBarsPadding()
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // registration form first part
@@ -93,7 +101,7 @@ fun RegistrationScreen(
                 // logo + name
                 LogoTitle(3.5f)
 
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(Spacing.Large * 2.8f))
 
                 RegistrationForm(name, onValueChangeName = {
                     name = it
@@ -162,7 +170,7 @@ fun RegistrationScreen(
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(Spacing.Inline))
 
                 ConfirmLocationForm(
                     locationShared, onClickConfirmLocation = {
@@ -179,8 +187,8 @@ fun RegistrationScreen(
                         } else {
                             locationShared = true
                         }
-                    })
-
+                    }
+                )
             }
         }
     }
