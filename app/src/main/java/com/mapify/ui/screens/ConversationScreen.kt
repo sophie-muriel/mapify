@@ -25,6 +25,7 @@ import com.mapify.model.Location
 import com.mapify.model.Message
 import com.mapify.model.Role
 import com.mapify.model.User
+import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.theme.Spacing
@@ -139,6 +140,8 @@ fun ConversationScreen(
     var messageText by remember { mutableStateOf(TextFieldValue("")) }
     val messages = remember { mutableStateListOf<Message>().apply { addAll(conversation.messages) } }
 
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     val menuItems =
         listOf(
             MenuAction.Simple(
@@ -151,7 +154,7 @@ fun ConversationScreen(
                     )
                 }
             ) {
-                // show delete dialog
+                showDeleteDialog = true
             }
         )
 
@@ -267,6 +270,19 @@ fun ConversationScreen(
                 }
             }
         }
+    }
+    if (showDeleteDialog) {
+        GenericDialog(
+            title = "Delete message",
+            message = "Are you sure you want to delete this conversation? This action is irreversible.",
+            onCloseText = "Cancel",
+            onClose = { showDeleteDialog = false },
+            onExitText = "Delete",
+            onExit = {
+                conversationsList = conversationsList.filterNot { it.id == conversation.id }
+                showDeleteDialog = false
+            }
+        )
     }
 }
 
