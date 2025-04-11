@@ -131,14 +131,15 @@ fun MessageItem(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .height(20.dp)
-                                    .fillMaxWidth(),
+                                    .weight(1f)
+                                    .fillMaxHeight(),
                                 contentAlignment = Alignment.CenterStart
                             ) {
                                 Text(
                                     text = message,
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontWeight = if (!isRead) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (!isRead) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline,
                                         lineHeight = 16.sp
                                     ),
                                     maxLines = 1,
@@ -163,7 +164,8 @@ fun MessageItem(
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier
                                         .padding(start = 4.dp)
-                                        .alignByBaseline()
+                                        .align(Alignment.CenterVertically)
+                                        .offset(y = (-2.5).dp)
                                 )
                             }
                         }
