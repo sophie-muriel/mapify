@@ -78,7 +78,13 @@ import java.time.format.DateTimeFormatter
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.Unpublished
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -89,6 +95,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.mapify.model.Comment
 import com.mapify.model.Message
 import com.mapify.ui.components.GenericDialog
+import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -310,6 +317,88 @@ fun ReportViewScreen(
     var commentCounter by rememberSaveable { mutableIntStateOf(4) }
 
     var isCreator = userId == report.userId
+    var showDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
+
+    val menuItems =
+        if (isCreator) {
+            listOf(
+                MenuAction.Simple(
+                    "Edit",
+                    {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = null,
+                        )
+                    }
+                ) {
+                    // navigate to edit
+                },
+                MenuAction.Simple(
+                    "Delete",
+                    {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                ) {
+                    showDeleteDialogVisible = true
+                }
+            )
+        } else if (isAdmin) {
+            listOf(
+                MenuAction.Simple(
+                    "Verify",
+                    {
+                        Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = null,
+                        )
+                    }
+                ) {
+                    // show you sure dialog into toast
+                },
+                MenuAction.Simple(
+                    "Reject",
+                    {
+                        Icon(
+                            Icons.Default.Unpublished,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                ) {
+                    // show dialog with text fields
+                },
+                MenuAction.Simple(
+                    "Delete",
+                    {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                ) {
+                    showDeleteDialogVisible = true
+                }
+            )
+        } else {
+            listOf(
+                MenuAction.Simple(
+                    "Boost priority",
+                    {
+                        Icon(
+                            Icons.AutoMirrored.Filled.TrendingUp,
+                            contentDescription = null,
+                        )
+                    }
+                ) {
+                    // show toast
+                }
+            )
+        }
 
     Scaffold(
         topBar = {
@@ -325,7 +414,7 @@ fun ReportViewScreen(
                 {},
                 secondAction = true,
                 secondActionContent = {
-                    MinimalDropdownMenu(isAdmin, isCreator)
+                    MinimalDropdownMenu(menuItems)
                 },
                 tint = tint
             )
