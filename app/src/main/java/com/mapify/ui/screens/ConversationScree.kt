@@ -52,6 +52,10 @@ fun ConversationScreen(
                 }
             )
         },
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding() // Important to respect keyboard
+            .navigationBarsPadding()
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -63,9 +67,10 @@ fun ConversationScreen(
                     .weight(1f)
                     .fillMaxWidth()
                     .padding(horizontal = Spacing.Sides),
-                verticalArrangement = Arrangement.spacedBy(Spacing.Small)
+                verticalArrangement = Arrangement.spacedBy(Spacing.Small),
+                reverseLayout = true // newer messages appear at the bottom
             ) {
-                items(messages) { msg ->
+                items(messages.reversed()) { msg ->
                     ChatBubble(
                         message = msg,
                         isMe = msg.sender == "Yo",
@@ -74,23 +79,25 @@ fun ConversationScreen(
                     )
                 }
             }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(Spacing.Sides)
-                    .imePadding(),
+                    .padding(horizontal = Spacing.Sides, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
                     value = messageText,
                     onValueChange = { messageText = it },
                     placeholder = { Text("Write a message...") },
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(20),
                     modifier = Modifier
                         .weight(1f)
-                        .heightIn(min = 56.dp, max = 140.dp),
-                    maxLines = 4
+                        .heightIn(min = 52.dp, max = 140.dp),
+                    maxLines = 4,
+                    singleLine = false
                 )
+                Spacer(modifier = Modifier.width(6.dp))
                 IconButton(
                     onClick = {
                         if (messageText.text.isNotBlank()) {
@@ -107,13 +114,12 @@ fun ConversationScreen(
                         }
                     },
                     modifier = Modifier
-                        .padding(start = 8.dp)
-                        .size(42.dp)
-                        .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
+                        .size(46.dp)
+                        .background(MaterialTheme.colorScheme.primary, CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Send,
-                        contentDescription = "Enviar",
+                        contentDescription = "Send",
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
