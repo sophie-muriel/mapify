@@ -173,4 +173,6 @@
     <string name="report_already_verified">This report has already been verified</string>
     <string name="ten_characters_message">You must provide at least a 10 characters message</string>
     <string name="report_already_rejected">This report has already been rejected</string>
+    <string name="report_boosted">Report boosted</string>
+    <string name="report_already_boosted">You already boosted this report</string>
 </resources>
