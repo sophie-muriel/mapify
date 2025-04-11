@@ -17,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,7 @@ import com.mapify.model.Role
 import com.mapify.model.User
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
+import com.mapify.ui.components.MessageUserIcon
 import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.theme.Spacing
 import java.time.LocalDateTime
@@ -303,17 +305,17 @@ fun ChatBubble(
         modifier = Modifier
             .fillMaxWidth(),
         horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Bottom
     ) {
         if (!isMe) {
-            Icon(
+            Box(
                 modifier = Modifier
-                    .height(36.dp)
-                    .width(36.dp).offset((-5).dp),
-                imageVector = Icons.Outlined.AccountCircle,
-                contentDescription = null
-            )
-            Spacer(modifier = Modifier.width(2.dp))
+                    .size(50.dp)
+                    .clip(CircleShape)
+            ) {
+                MessageUserIcon(profileImageUrl, senderName)
+            }
+            Spacer(modifier = Modifier.width(6.dp))
         }
 
         Column(
@@ -328,23 +330,29 @@ fun ChatBubble(
                 color = bubbleColor,
                 tonalElevation = 2.dp,
                 modifier = Modifier
-                    .widthIn(max = 280.dp),
+                    .widthIn(max = 250.dp),
                 shadowElevation = 2.dp
             ) {
-                Column(
-                    modifier = Modifier.padding(12.dp)
-                ) {
-                    Text(
-                        text = message.content,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = textColor
-                    )
-                    Text(
-                        text = formatTime(message.timestamp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = textColor.copy(alpha = 0.7f),
-                        modifier = Modifier.align(Alignment.End)
-                    )
+                Box(modifier = Modifier.padding(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        Text(
+                            text = message.content,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = textColor,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = formatTime(message.timestamp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = textColor.copy(alpha = 0.7f),
+                            modifier = Modifier.align(Alignment.Bottom)
+                        )
+                    }
                 }
             }
         }

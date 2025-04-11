@@ -75,31 +75,7 @@ fun ConversationItem(
                             .size(50.dp)
                             .clip(CircleShape)
                     ) {
-                        if (!conversation.recipient.profileImageUrl.isNullOrBlank()) {
-                            AsyncImage(
-                                modifier = Modifier.fillMaxSize(),
-                                model = conversation.recipient.profileImageUrl,
-                                contentDescription = stringResource(id = R.string.report_image),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            val fallbackColor = MaterialTheme.colorScheme.primaryContainer
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(fallbackColor, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = conversation.recipient.fullName.firstOrNull()
-                                        ?.uppercase() ?: "?",
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                )
-                            }
-                        }
+                        MessageUserIcon(conversation.recipient.profileImageUrl, conversation.recipient.fullName)
                     }
                 }
 
@@ -231,6 +207,38 @@ fun ConversationItem(
                     onDelete()
                     showDeleteDialog = false
                 }
+            )
+        }
+    }
+}
+
+@Composable
+fun MessageUserIcon(
+    profileImageUrl: String? = null,
+    fullName: String
+){
+    if (!profileImageUrl.isNullOrBlank()) {
+        AsyncImage(
+            modifier = Modifier.fillMaxSize(),
+            model = profileImageUrl,
+            contentDescription = stringResource(id = R.string.report_image),
+            contentScale = ContentScale.Crop
+        )
+    } else {
+        val fallbackColor = MaterialTheme.colorScheme.primaryContainer
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(fallbackColor, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = fullName.firstOrNull()
+                    ?.uppercase() ?: "?",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    fontWeight = FontWeight.Bold
+                )
             )
         }
     }
