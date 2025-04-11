@@ -122,7 +122,6 @@ fun ConversationScreen(
                     shape = MaterialTheme.shapes.large,
                     textStyle = MaterialTheme.typography.bodyMedium,
                 )
-                Spacer(modifier = Modifier.width(0.dp))
                 IconButton(
                     onClick = {
                         if (messageText.text.isNotBlank()) {
