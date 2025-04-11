@@ -71,7 +71,7 @@ fun Navigation() {
                         navController.navigate(RouteScreen.Settings)
                     },
                     navigateToConversation = { conversation ->
-                        navController.navigate(RouteScreen.Conversation(conversation.id))
+                        navController.navigate(RouteScreen.Conversation(conversation.id, conversation.sender))
                     },
                     navigateToReportView = { id, status ->
                         navController.navigate(
@@ -161,7 +161,7 @@ fun Navigation() {
                 SearchContactScreen(
                     navigateBack = { navController.popBackStack() },
                     onUserSelected = { username ->
-                        navController.navigate(RouteScreen.Conversation(username))
+                        navController.navigate(RouteScreen.Conversation(conversationId = username, senderName = username))
                     }
                 )
             }
@@ -170,8 +170,8 @@ fun Navigation() {
                 ConversationScreen(
                     conversation =  Conversation(
                         id = args.conversationId,
-                        sender = args.conversationId, // puedes ajustar esto si manejas un objeto real
-                        messages = emptyList() // puedes cargar mensajes reales aquí
+                        sender = args.senderName,
+                        messages = emptyList()
                     ),
                     navigateBack = {
                         navController.popBackStack()
