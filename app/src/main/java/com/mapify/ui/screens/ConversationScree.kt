@@ -18,6 +18,7 @@ import com.mapify.model.Message
 import com.mapify.ui.theme.Spacing
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversationScreen(
     conversation: Conversation,
