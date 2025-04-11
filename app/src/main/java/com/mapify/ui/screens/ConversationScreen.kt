@@ -7,20 +7,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import com.mapify.R
 import com.mapify.model.Conversation
 import com.mapify.model.Message
+import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.theme.Spacing
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -32,35 +31,51 @@ fun ConversationScreen(
     conversation: Conversation,
     navigateBack: () -> Unit
 ) {
+
     var messageText by remember { mutableStateOf(TextFieldValue("")) }
-    val messages = remember { mutableStateListOf<Message>().apply { addAll(conversation.messages) } }
+    val messages =
+        remember { mutableStateListOf<Message>().apply { addAll(conversation.messages) } }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        ProfileAvatar(senderName = conversation.sender, imageUrl = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(conversation.sender)
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text(
+                            text = conversation.sender,
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.offset(x = 24.dp)
+                        )
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = navigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(id = R.string.back_arrow_icon)
+                        )
                     }
+                },
+                actions = {
+                    MinimalDropdownMenu()
                 }
             )
         },
         modifier = Modifier
             .fillMaxSize()
-            .imePadding() // Important to respect keyboard
+            .imePadding()
             .navigationBarsPadding()
-    ) { innerPadding ->
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(padding)
+                .padding(horizontal = Spacing.Sides),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
         ) {
             LazyColumn(
                 modifier = Modifier
@@ -68,12 +83,12 @@ fun ConversationScreen(
                     .fillMaxWidth()
                     .padding(horizontal = Spacing.Sides),
                 verticalArrangement = Arrangement.spacedBy(Spacing.Small),
-                reverseLayout = true // newer messages appear at the bottom
+                reverseLayout = true
             ) {
                 items(messages.reversed()) { msg ->
                     ChatBubble(
                         message = msg,
-                        isMe = msg.sender == "Yo",
+                        isMe = msg.sender == "Me",
                         senderName = msg.sender,
                         profileImageUrl = null
                     )
@@ -83,28 +98,38 @@ fun ConversationScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = Spacing.Sides, vertical = 4.dp),
+                    .padding(horizontal = Spacing.Small, vertical = Spacing.Large),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
                     value = messageText,
                     onValueChange = { messageText = it },
-                    placeholder = { Text("Write a message...") },
-                    shape = RoundedCornerShape(20),
+                    placeholder = {
+                        Text(
+                            text = "Write a message...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            maxLines = 1
+                        )
+                    },
                     modifier = Modifier
+                        .fillMaxWidth()
                         .weight(1f)
+                        .height(52.dp)
+                        .padding(end = Spacing.Large)
                         .heightIn(min = 52.dp, max = 140.dp),
                     maxLines = 4,
-                    singleLine = false
+                    singleLine = false,
+                    shape = MaterialTheme.shapes.large,
+                    textStyle = MaterialTheme.typography.bodyMedium,
                 )
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(0.dp))
                 IconButton(
                     onClick = {
                         if (messageText.text.isNotBlank()) {
                             messages.add(
                                 Message(
                                     id = "${messages.size + 1}",
-                                    sender = "Yo",
+                                    sender = "Me",
                                     content = messageText.text,
                                     timestamp = LocalDateTime.now(),
                                     isRead = true
@@ -118,7 +143,7 @@ fun ConversationScreen(
                         .background(MaterialTheme.colorScheme.primary, CircleShape)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Send,
+                        imageVector = Icons.AutoMirrored.Filled.Send,
                         contentDescription = "Send",
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
@@ -135,8 +160,10 @@ fun ChatBubble(
     senderName: String,
     profileImageUrl: String? = null
 ) {
-    val bubbleColor = if (isMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
-    val textColor = if (isMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+    val bubbleColor =
+        if (isMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+    val textColor =
+        if (isMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
 
     Row(
         modifier = Modifier
@@ -170,34 +197,6 @@ fun ChatBubble(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun ProfileAvatar(senderName: String, imageUrl: String?) {
-    Box(
-        modifier = Modifier
-            .size(36.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primaryContainer),
-        contentAlignment = Alignment.Center
-    ) {
-        if (!imageUrl.isNullOrBlank()) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = "User Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            Text(
-                text = senderName.firstOrNull()?.uppercase() ?: "?",
-                style = MaterialTheme.typography.titleSmall.copy(
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    fontWeight = FontWeight.Bold
-                )
-            )
         }
     }
 }
