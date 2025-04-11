@@ -150,4 +150,11 @@
     <string name="send_icon">Send Icon</string>
     <string name="report_deleted">Report deleted</string>
     <string name="report_deleted_message">Your report has been rejected due to the following reasons:</string>
+
+    <string name="mark_as_read">Mark as read</string>
+    <string name="mark_as_unread">Mark as unread</string>
+    <string name="delete">Delete</string>
+    <string name="verify">Verify</string>
+    <string name="reject">Reject</string>
+    <string name="boost_priority">Boost Priority</string>
 </resources>
