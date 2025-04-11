@@ -538,7 +538,7 @@ fun ReportViewScreen(
                 message = stringResource(id = R.string.delete_report_description),
                 onClose = { showDeleteDialogVisible = false },
                 onExit = {
-                    Toast.makeText(context, reportDeleted, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, reportDeleted, Toast.LENGTH_SHORT).show()
                     showDeleteDialogVisible = false
                     navigateBack()
                 },
@@ -548,6 +548,7 @@ fun ReportViewScreen(
         }
 
         val reportVerified = stringResource(id = R.string.report_verified)
+        val reportVerifiedMessage = stringResource(id = R.string.report_already_verified)
 
         if(showVerifyDialogle && reportStatus != ReportStatus.VERIFIED){
             GenericDialog(
@@ -555,7 +556,7 @@ fun ReportViewScreen(
                 message = stringResource(id = R.string.verify_report_description),
                 onClose = { showVerifyDialogle = false },
                 onExit = {
-                    Toast.makeText(context, reportVerified, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, reportVerified, Toast.LENGTH_SHORT).show()
                     showVerifyDialogle = false
                     reportStatus = ReportStatus.VERIFIED
                 },
@@ -563,11 +564,13 @@ fun ReportViewScreen(
                 onExitText = stringResource(id = R.string.verify)
             )
         }else if(showVerifyDialogle && reportStatus == ReportStatus.VERIFIED){
-            Toast.makeText(context, "This report has already been verified", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, reportVerifiedMessage, Toast.LENGTH_SHORT).show()
             showVerifyDialogle = false
         }
 
         val rejectionMessageSend = stringResource(id = R.string.rejection_message_send)
+        val rejectionMessageToast = stringResource(id = R.string.ten_characters_message)
+        val reportAlreadyRejected = stringResource(id = R.string.report_already_rejected)
 
         if(showRejectionInputDialog && reportStatus != ReportStatus.PENDING_VERIFICATION){
             GenericDialog(
@@ -576,13 +579,14 @@ fun ReportViewScreen(
                 onClose = { showRejectionInputDialog = false },
                 onExit = {
                     if(rejectionMessage.isBlank() || rejectionMessage.length < 10){
-                        Toast.makeText(context, "Please enter at least 10 characters message", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, rejectionMessageToast, Toast.LENGTH_SHORT).show()
                         return@GenericDialog
                     }
-                    Toast.makeText(context, rejectionMessageSend, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, rejectionMessageSend, Toast.LENGTH_SHORT).show()
                     showRejectionInputDialog = false
                     reportStatus = ReportStatus.PENDING_VERIFICATION
                     rejectionMessage = ""
+                    //TODO: here we will have to create an instance of message and save it in the database
                 },
                 onCloseText =stringResource(id = R.string.cancel),
                 onExitText = stringResource(id = R.string.send),
@@ -600,7 +604,7 @@ fun ReportViewScreen(
                 }
             )
         }else if(showRejectionInputDialog && reportStatus == ReportStatus.PENDING_VERIFICATION){
-            Toast.makeText(context, "This report has already been rejected", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, reportAlreadyRejected, Toast.LENGTH_SHORT).show()
             showRejectionInputDialog = false
         }
     }
