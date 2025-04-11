@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MarkChatRead
@@ -23,26 +24,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mapify.R
+import com.mapify.model.Conversation
 import com.mapify.ui.theme.Spacing
+import com.mapify.ui.users.tabs.formatMessageDate
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageItem(
-    sender: String,
-    message: String,
-    time: String,
-    isRead: Boolean,
-    profileImageUrl: String? = null,
+fun ConversationItem(
+    conversation: Conversation,
     onClick: () -> Unit,
     onMarkRead: () -> Unit,
     onMarkUnread: () -> Unit,
     onDelete: () -> Unit
 ) {
+
     var expanded by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
+    val lastMessage = conversation.messages.maxByOrNull { it.timestamp }
+    val time = lastMessage?.timestamp?.let { formatMessageDate(it) } ?: ""
+    val content = lastMessage?.content ?: ""
+
     Box(
         modifier = Modifier
+            .wrapContentSize()
+            .clip(RoundedCornerShape(16.dp))
             .fillMaxWidth()
             .height(70.dp)
             .combinedClickable(
@@ -57,6 +63,7 @@ fun MessageItem(
                 modifier = Modifier.fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+
                 Box(
                     modifier = Modifier
                         .width(70.dp)
@@ -68,10 +75,10 @@ fun MessageItem(
                             .size(50.dp)
                             .clip(CircleShape)
                     ) {
-                        if (!profileImageUrl.isNullOrBlank()) {
+                        if (!conversation.recipient.profileImageUrl.isNullOrBlank()) {
                             AsyncImage(
                                 modifier = Modifier.fillMaxSize(),
-                                model = profileImageUrl,
+                                model = conversation.recipient.profileImageUrl,
                                 contentDescription = stringResource(id = R.string.report_image),
                                 contentScale = ContentScale.Crop
                             )
@@ -84,7 +91,8 @@ fun MessageItem(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = sender.firstOrNull()?.uppercase() ?: "?",
+                                    text = conversation.recipient.fullName.firstOrNull()
+                                        ?.uppercase() ?: "?",
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                         fontWeight = FontWeight.Bold
@@ -112,7 +120,7 @@ fun MessageItem(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = sender,
+                                text = conversation.recipient.fullName,
                                 style = MaterialTheme.typography.titleSmall,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
@@ -136,28 +144,18 @@ fun MessageItem(
                                 contentAlignment = Alignment.CenterStart
                             ) {
                                 Text(
-                                    text = message,
+                                    text = content,
                                     style = MaterialTheme.typography.bodySmall.copy(
-                                        fontWeight = if (!isRead) FontWeight.Bold else FontWeight.Normal,
-                                        color = if (!isRead) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline,
+                                        fontWeight = if (!conversation.isRead) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (!conversation.isRead) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline,
                                         lineHeight = 16.sp
                                     ),
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
-
-                                Text(
-                                    text = message,
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        fontWeight = if (!isRead) FontWeight.Normal else FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.background.copy(alpha = 0f),
-                                        lineHeight = 16.sp
-                                    ),
-                                    maxLines = 1
-                                )
                             }
 
-                            if (!isRead) {
+                            if (!conversation.isRead) {
                                 Text(
                                     text = "\u2B24",
                                     color = MaterialTheme.colorScheme.primary,
@@ -180,26 +178,30 @@ fun MessageItem(
             modifier = Modifier.align(Alignment.TopEnd),
             offset = DpOffset(x = 165.dp, y = 0.dp)
         ) {
-            DropdownMenuItem(
-                text = { Text("Mark as read") },
-                onClick = {
-                    expanded = false
-                    onMarkRead()
-                },
-                leadingIcon = {
-                    Icon(Icons.Default.MarkChatRead, contentDescription = null)
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Mark as unread") },
-                onClick = {
-                    expanded = false
-                    onMarkUnread()
-                },
-                leadingIcon = {
-                    Icon(Icons.Default.MarkChatUnread, contentDescription = null)
-                }
-            )
+            if (!conversation.isRead) {
+                DropdownMenuItem(
+                    text = { Text("Mark as read") },
+                    onClick = {
+                        expanded = false
+                        onMarkRead()
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Default.MarkChatRead, contentDescription = null)
+                    }
+                )
+            }
+            if (conversation.isRead) {
+                DropdownMenuItem(
+                    text = { Text("Mark as unread") },
+                    onClick = {
+                        expanded = false
+                        onMarkUnread()
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Default.MarkChatUnread, contentDescription = null)
+                    }
+                )
+            }
             DropdownMenuItem(
                 text = {
                     Text("Delete", color = MaterialTheme.colorScheme.error)
