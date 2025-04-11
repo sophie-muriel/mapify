@@ -9,6 +9,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MarkChatRead
+import androidx.compose.material.icons.filled.MarkChatUnread
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.model.Conversation
 import com.mapify.model.Message
+import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.theme.Spacing
 import java.time.LocalDateTime
@@ -35,6 +40,44 @@ fun ConversationScreen(
     var messageText by remember { mutableStateOf(TextFieldValue("")) }
     val messages =
         remember { mutableStateListOf<Message>().apply { addAll(conversation.messages) } }
+
+    val menuItems =
+        listOf(
+            MenuAction.Simple(
+                "Mark as read",
+                {
+                    Icon(
+                        Icons.Default.MarkChatRead,
+                        contentDescription = null,
+                    )
+                }
+            ) {
+                // mark as read action
+            },
+            MenuAction.Simple(
+                "Mark as unread",
+                {
+                    Icon(
+                        Icons.Default.MarkChatUnread,
+                        contentDescription = null
+                    )
+                }
+            ) {
+                // mark as unread actions
+            },
+            MenuAction.Simple(
+                "Delete",
+                {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            ) {
+                // show delete dialog
+            }
+        )
 
     Scaffold(
         topBar = {
@@ -60,7 +103,7 @@ fun ConversationScreen(
                     }
                 },
                 actions = {
-                    MinimalDropdownMenu(isChat = true)
+                    MinimalDropdownMenu(menuItems)
                 }
             )
         },
