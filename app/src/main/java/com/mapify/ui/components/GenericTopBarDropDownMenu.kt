@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun MinimalDropdownMenu() {
+fun MinimalDropdownMenu(isAdmin: Boolean, isCreator: Boolean) {
     val expanded = remember { mutableStateOf(false) }
 
     Box(
