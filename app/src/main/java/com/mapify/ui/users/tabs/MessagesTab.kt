@@ -18,29 +18,33 @@ import java.util.*
 fun MessagesTab(
     navigateToConversation: (Conversation) -> Unit
 ) {
-    val messagesList = listOf(
-        Message(
-            id = "1",
-            sender = "Laura Mejía",
-            content = "Hola, quería saber si hay novedades sobre el reporte.",
-            timestamp = LocalDateTime.now().minusMinutes(5),
-            isRead = false
-        ),
-        Message(
-            id = "2",
-            sender = "Carlos Ruiz",
-            content = "Gracias por tu respuesta.",
-            timestamp = LocalDateTime.now().minusHours(2),
-            isRead = true
-        ),
-        Message(
-            id = "3",
-            sender = "Andrea Torres",
-            content = "¿Podrías revisar el archivo que te envié?",
-            timestamp = LocalDateTime.now().minusDays(5),
-            isRead = false
+    var messagesList by remember{
+        mutableStateOf(
+            listOf(
+                Message(
+                    id = "1",
+                    sender = "Laura Mejía",
+                    content = "Hola, quería saber si hay novedades sobre el reporte.",
+                    timestamp = LocalDateTime.now().minusMinutes(5),
+                    isRead = false
+                ),
+                Message(
+                    id = "2",
+                    sender = "Carlos Ruiz",
+                    content = "Gracias por tu respuesta.",
+                    timestamp = LocalDateTime.now().minusHours(2),
+                    isRead = true
+                ),
+                Message(
+                    id = "3",
+                    sender = "Andrea Torres",
+                    content = "¿Podrías revisar el archivo que te envié?",
+                    timestamp = LocalDateTime.now().minusDays(5),
+                    isRead = false
+                )
+            )
         )
-    )
+    }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -54,6 +58,9 @@ fun MessagesTab(
                 time = formatMessageDate(message.timestamp),
                 isRead = message.isRead,
                 onClick = {
+                    messagesList = messagesList.map {
+                        if (it.id == message.id) it.copy(isRead = true) else it
+                    }
                     val conversation = Conversation(
                         id = message.id,
                         sender = message.sender,
