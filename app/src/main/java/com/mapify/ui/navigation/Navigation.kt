@@ -8,6 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.mapify.model.Conversation
+import com.mapify.ui.screens.ConversationScreen
 import com.mapify.ui.screens.CreateReportScreen
 import com.mapify.ui.screens.EditReportScreen
 import com.mapify.ui.screens.LoginScreen
@@ -69,7 +71,7 @@ fun Navigation() {
                         navController.navigate(RouteScreen.Settings)
                     },
                     navigateToConversation = { conversation ->
-                        println("Navigate to conversation with: $conversation")
+                        navController.navigate(RouteScreen.Conversation(conversation.id))
                     },
                     navigateToReportView = { id, status ->
                         navController.navigate(
@@ -163,6 +165,20 @@ fun Navigation() {
                     }
                 )
             }
+            composable<RouteScreen.Conversation> { backStackEntry ->
+                val args = backStackEntry.toRoute<RouteScreen.Conversation>()
+                ConversationScreen(
+                    conversation =  Conversation(
+                        id = args.conversationId,
+                        sender = args.conversationId, // puedes ajustar esto si manejas un objeto real
+                        messages = emptyList() // puedes cargar mensajes reales aquí
+                    ),
+                    navigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
         }
     }
 }
