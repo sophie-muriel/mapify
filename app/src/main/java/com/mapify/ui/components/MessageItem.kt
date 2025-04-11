@@ -1,11 +1,16 @@
 package com.mapify.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MarkChatRead
+import androidx.compose.material.icons.filled.MarkChatUnread
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -16,11 +21,13 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mapify.R
 import com.mapify.ui.theme.Spacing
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageItem(
     sender: String,
@@ -28,128 +35,202 @@ fun MessageItem(
     time: String,
     isRead: Boolean,
     profileImageUrl: String? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onMarkRead: () -> Unit,
+    onMarkUnread: () -> Unit,
+    onDelete: () -> Unit
 ) {
-    ElevatedCard(
+    var expanded by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(70.dp)
-            .clickable { onClick() }
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = { expanded = true }
+            )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
+        ElevatedCard(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Box(
-                modifier = Modifier
-                    .width(70.dp)
-                    .height(70.dp),
-                contentAlignment = Alignment.Center
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(
                     modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape)
+                        .width(70.dp)
+                        .height(70.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    if (!profileImageUrl.isNullOrBlank()) {
-                        AsyncImage(
-                            modifier = Modifier.fillMaxSize(),
-                            model = profileImageUrl,
-                            contentDescription = stringResource(id = R.string.report_image),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        val fallbackColor = MaterialTheme.colorScheme.primaryContainer
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(fallbackColor, CircleShape),
-                            contentAlignment = Alignment.Center
+                    Box(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .clip(CircleShape)
+                    ) {
+                        if (!profileImageUrl.isNullOrBlank()) {
+                            AsyncImage(
+                                modifier = Modifier.fillMaxSize(),
+                                model = profileImageUrl,
+                                contentDescription = stringResource(id = R.string.report_image),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            val fallbackColor = MaterialTheme.colorScheme.primaryContainer
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(fallbackColor, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = sender.firstOrNull()?.uppercase() ?: "?",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = Spacing.Small * 3),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.Small),
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = sender.firstOrNull()?.uppercase() ?: "?",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                text = sender,
+                                style = MaterialTheme.typography.titleSmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
-                        }
-                    }
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = Spacing.Small * 3),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(Spacing.Small),
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = sender,
-                            style = MaterialTheme.typography.titleSmall,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = time,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-
-                    val styledMessage = buildAnnotatedString {
-                        if (!isRead) {
-                            withStyle(
-                                style = SpanStyle(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            ) {
-                                append(message)
-                            }
-                        } else {
-                            withStyle(
-                                style = SpanStyle(
-                                    color = MaterialTheme.colorScheme.outline
-                                )
-                            ) {
-                                append(message)
-                            }
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = styledMessage,
-                            style = MaterialTheme.typography.bodySmall,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f)
-                        )
-
-                        if (!isRead) {
                             Text(
-                                text = "\u2B24",
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(start = 4.dp)
+                                text = time,
+                                style = MaterialTheme.typography.bodySmall
                             )
+                        }
+
+                        val styledMessage = buildAnnotatedString {
+                            if (!isRead) {
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                ) {
+                                    append(message)
+                                }
+                            } else {
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = MaterialTheme.colorScheme.outline
+                                    )
+                                ) {
+                                    append(message)
+                                }
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = styledMessage,
+                                style = MaterialTheme.typography.bodySmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            if (!isRead) {
+                                Text(
+                                    text = "\u2B24",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(start = 4.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.align(Alignment.TopEnd),
+            offset = DpOffset(x = 165.dp, y = 0.dp)
+        ) {
+            DropdownMenuItem(
+                text = { Text("Mark as read") },
+                onClick = {
+                    expanded = false
+                    onMarkRead()
+                },
+                leadingIcon = {
+                    Icon(Icons.Default.MarkChatRead, contentDescription = null)
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Mark as unread") },
+                onClick = {
+                    expanded = false
+                    onMarkUnread()
+                },
+                leadingIcon = {
+                    Icon(Icons.Default.MarkChatUnread, contentDescription = null)
+                }
+            )
+            DropdownMenuItem(
+                text = {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                },
+                onClick = {
+                    expanded = false
+                    showDeleteDialog = true
+                },
+                leadingIcon = {
+                    Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                }
+            )
+        }
+
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text("Delete message") },
+                text = { Text("Are you sure you want to delete this message?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        onDelete()
+                        showDeleteDialog = false
+                    }) {
+                        Text("Delete", color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
     }
 }
