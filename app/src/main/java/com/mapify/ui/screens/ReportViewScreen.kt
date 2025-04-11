@@ -93,7 +93,9 @@ fun ReportViewScreen(
     reportStatusP: ReportStatus? = null,
     navigateBack: () -> Unit,
     navigateToReportEdit: ((String) -> Unit)? = null,
-    navigateToReportLocation: () -> Unit
+    navigateToReportLocation: () -> Unit,
+    isAdmin: Boolean,
+    userId: String
 ) {
     if (reportStatusP != null && navigateToReportEdit != null) {
         var exitDialogVisible by rememberSaveable { mutableStateOf(true) }
@@ -302,6 +304,8 @@ fun ReportViewScreen(
     val scrollState = rememberScrollState()
     var commentCounter by rememberSaveable { mutableIntStateOf(4) }
 
+    var isCreator = userId == report.userId
+
     Scaffold(
         topBar = {
             SimpleTopBar(
@@ -316,7 +320,7 @@ fun ReportViewScreen(
                 {},
                 secondAction = true,
                 secondActionContent = {
-                    MinimalDropdownMenu()
+                    MinimalDropdownMenu(isAdmin, isCreator)
                 },
                 tint = tint
             )
