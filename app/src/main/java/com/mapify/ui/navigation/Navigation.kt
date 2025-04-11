@@ -2,15 +2,12 @@ package com.mapify.ui.navigation
 
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.mapify.model.Conversation
 import com.mapify.ui.screens.ConversationScreen
 import com.mapify.ui.screens.CreateReportScreen
 import com.mapify.ui.screens.EditReportScreen
