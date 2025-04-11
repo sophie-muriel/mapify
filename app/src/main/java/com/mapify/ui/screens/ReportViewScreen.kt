@@ -525,18 +525,20 @@ fun ReportViewScreen(
             )
         }
 
+        val report_deleted = stringResource(id = R.string.report_deleted)
+
         if(showDeleteDialogVisible){
             GenericDialog(
-                title = "Are you sure you want to delete your report?",
-                message = "This action is irreversible, and your report’s data will be permanently lost.",
+                title = stringResource(id = R.string.delete_report_title),
+                message = stringResource(id = R.string.delete_report_description),
                 onClose = { showDeleteDialogVisible = false },
                 onExit = {
-                    Toast.makeText(context, "Report deleted", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, report_deleted, Toast.LENGTH_LONG).show()
                     showDeleteDialogVisible = false
                     navigateBack()
                 },
-                onCloseText = "Cancel",
-                onExitText = "Delete"
+                onCloseText = stringResource(id = R.string.cancel),
+                onExitText = stringResource(id = R.string.delete)
             )
         }
     }
