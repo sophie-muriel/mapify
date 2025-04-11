@@ -331,7 +331,7 @@ fun ReportViewScreen(
                         )
                     }
                 ) {
-                    // navigate to edit
+                    navigateToReportEdit?.let { it(reportId) }
                 },
                 MenuAction.Simple(
                     stringResource(id = R.string.delete),
