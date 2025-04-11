@@ -16,13 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mapify.R
 import com.mapify.ui.theme.Spacing
@@ -125,45 +123,47 @@ fun MessageItem(
                             )
                         }
 
-                        val styledMessage = buildAnnotatedString {
-                            if (!isRead) {
-                                withStyle(
-                                    style = SpanStyle(
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                ) {
-                                    append(message)
-                                }
-                            } else {
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = MaterialTheme.colorScheme.outline
-                                    )
-                                ) {
-                                    append(message)
-                                }
-                            }
-                        }
-
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(20.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = styledMessage,
-                                style = MaterialTheme.typography.bodySmall,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f)
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .height(20.dp)
+                                    .fillMaxWidth(),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Text(
+                                    text = message,
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        fontWeight = if (!isRead) FontWeight.Bold else FontWeight.Normal,
+                                        lineHeight = 16.sp
+                                    ),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+
+                                Text(
+                                    text = message,
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        fontWeight = if (!isRead) FontWeight.Normal else FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.background.copy(alpha = 0f),
+                                        lineHeight = 16.sp
+                                    ),
+                                    maxLines = 1
+                                )
+                            }
 
                             if (!isRead) {
                                 Text(
                                     text = "\u2B24",
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(start = 4.dp)
+                                    modifier = Modifier
+                                        .padding(start = 4.dp)
+                                        .alignByBaseline()
                                 )
                             }
                         }
@@ -207,28 +207,25 @@ fun MessageItem(
                     showDeleteDialog = true
                 },
                 leadingIcon = {
-                    Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error
+                    )
                 }
             )
         }
 
         if (showDeleteDialog) {
-            AlertDialog(
-                onDismissRequest = { showDeleteDialog = false },
-                title = { Text("Delete message") },
-                text = { Text("Are you sure you want to delete this message?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        onDelete()
-                        showDeleteDialog = false
-                    }) {
-                        Text("Delete", color = MaterialTheme.colorScheme.error)
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDeleteDialog = false }) {
-                        Text("Cancel")
-                    }
+            GenericDialog(
+                title = "Delete message",
+                message = "Are you sure you want to delete this conversation? This action is irreversible.",
+                onCloseText = "Cancel",
+                onClose = { showDeleteDialog = false },
+                onExitText = "Delete",
+                onExit = {
+                    onDelete()
+                    showDeleteDialog = false
                 }
             )
         }
