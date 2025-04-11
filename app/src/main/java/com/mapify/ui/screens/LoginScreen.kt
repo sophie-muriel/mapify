@@ -1,6 +1,8 @@
 package com.mapify.ui.screens
 
+import android.app.Activity
 import android.util.Patterns
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,10 +41,29 @@ import com.mapify.ui.components.LogoTitle
 import com.mapify.ui.theme.Spacing
 
 @Composable
+fun SetSoftInputModePan() {
+    val context = LocalContext.current
+    DisposableEffect(Unit) {
+        val activity = context as? Activity
+        val window = activity?.window
+        val originalMode = window?.attributes?.softInputMode
+
+        window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+
+        onDispose {
+            if (originalMode != null) {
+                window.setSoftInputMode(originalMode)
+            }
+        }
+    }
+}
+
+@Composable
 fun LoginScreen(
     navigateToRegistration: () -> Unit,
     navigateToHome: (Boolean, String) -> Unit
 ) {
+    SetSoftInputModePan()
     var email by rememberSaveable { mutableStateOf("") }
     var recoveryEmail by rememberSaveable { mutableStateOf("") }
     var recoveryEmailTouched by rememberSaveable { mutableStateOf(false) }
@@ -62,7 +84,10 @@ fun LoginScreen(
         recoveryEmailTouched = false
     }
 
-    Scaffold { padding ->
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -74,7 +99,7 @@ fun LoginScreen(
             // logo + name
             LogoTitle(2f)
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(Spacing.Large * 7.8f))
 
             // text form
             LoginForm(
