@@ -60,7 +60,7 @@ fun ConversationScreen(
                     }
                 },
                 actions = {
-                    MinimalDropdownMenu()
+                    MinimalDropdownMenu(isChat = true)
                 }
             )
         },
