@@ -1,7 +1,5 @@
 package com.mapify.ui.components
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
@@ -12,32 +10,27 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
 @Composable
-fun MinimalDropdownMenu(isAdmin: Boolean, isCreator: Boolean) {
+fun MinimalDropdownMenu(isAdmin: Boolean? = null, isCreator: Boolean? = null) {
     val expanded = remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .padding(16.dp)
+    IconButton(onClick = { expanded.value = !expanded.value }) {
+        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+    }
+    DropdownMenu(
+        expanded = expanded.value,
+        onDismissRequest = { expanded.value = false }
     ) {
-        IconButton(onClick = { expanded.value = !expanded.value }) {
-            Icon(Icons.Default.MoreVert, contentDescription = "More options")
-        }
-        DropdownMenu(
-            expanded = expanded.value,
-            onDismissRequest = { expanded.value = false }
-        ) {
-            DropdownMenuItem(
-                text = { Text("Option 1") },
-                onClick = { /* Do something... */ }
-            )
-            DropdownMenuItem(
-                text = { Text("Option 2") },
-                onClick = { /* Do something... */ }
-            )
-        }
+        DropdownMenuItem(
+            text = {
+                Text(if (isCreator != null) "Creator" else "Viewer")
+            },
+            onClick = { /* Do something... */ }
+        )
+        DropdownMenuItem(
+            text = { Text("Option 2") },
+            onClick = { /* Do something... */ }
+        )
     }
 }
