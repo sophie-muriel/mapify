@@ -161,4 +161,7 @@
     <string name="check_circle_icon">Check Circle Icon</string>
     <string name="unpublished_icon">Unpublished Icon</string>
     <string name="trending_up_icon">Trending Up Icon</string>
+    <string name="delete_report_title">Are you sure you want to delete your report?</string>
+    <string name="delete_report_description">This action is irreversible, and your report’s data will be permanently lost.</string>
+
 </resources>
