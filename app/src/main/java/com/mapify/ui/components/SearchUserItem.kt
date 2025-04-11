@@ -16,7 +16,7 @@ import com.mapify.ui.theme.Spacing
 @Composable
 fun SearchUserItem(
     fullName: String,
-    usernameTag: String,
+    email: String,
     onClick: () -> Unit
 ) {
     Row(
@@ -49,7 +49,7 @@ fun SearchUserItem(
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = usernameTag,
+                text = email,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.outline
             )
