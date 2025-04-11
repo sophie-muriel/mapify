@@ -33,7 +33,7 @@ fun HomeScreen(
     navigateToCreateReport: () -> Unit,
     navigateToDetail: (String) -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToConversation: (Conversation) -> Unit,
+    navigateToConversation: (String) -> Unit,
     navigateToReportView: (String, ReportStatus) -> Unit,
     navigateToSearchFilters: () -> Unit,
     navigateToSearchContact: () -> Unit

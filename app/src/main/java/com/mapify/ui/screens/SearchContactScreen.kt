@@ -13,9 +13,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.mapify.R
+import com.mapify.model.Conversation
+import com.mapify.model.Location
+import com.mapify.model.Message
+import com.mapify.model.Role
+import com.mapify.model.User
 import com.mapify.ui.theme.Spacing
 import com.mapify.ui.components.SearchUserItem
 import com.mapify.ui.components.SimpleTopBar
+import java.time.LocalDateTime
 
 @Composable
 fun SearchContactScreen(
@@ -24,17 +30,113 @@ fun SearchContactScreen(
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
-    val recentSearches = listOf("Laura Mejía", "Carlos Ruiz", "Andrea Torres")
-    val allUsers = listOf("Laura Mejía", "Carlos Ruiz", "Andrea Torres", "Ana López", "Luis Gómez")
+    val recentSearches = listOf(
+        "barry.mccoquiner@example.com",
+        "john.smith@example.com",
+        "alice.johnson@example.com"
+    )
+
+    val allUsers = listOf(
+        User(
+            id = "69",
+            fullName = "Barry McCoquiner",
+            email = "barry.mccoquiner@example.com",
+            password = "sizedoesntmatter",
+            role = Role.CLIENT,
+            registrationLocation = Location(0.0, 0.0, "USA", "City"),
+            profileImageUrl = null
+        ),
+        User(
+            id = "70",
+            fullName = "John Smith",
+            email = "john.smith@example.com",
+            password = "mockPassword2",
+            role = Role.CLIENT,
+            registrationLocation = Location(0.0, 0.0, "USA", "City"),
+            profileImageUrl = null
+        ),
+        User(
+            id = "72",
+            fullName = "Alice Johnson",
+            email = "alice.johnson@example.com",
+            password = "mockPassword3",
+            role = Role.CLIENT,
+            registrationLocation = Location(0.0, 0.0, "USA", "City"),
+            profileImageUrl = null
+        ),
+        User(
+            id = "73",
+            fullName = "Mike Cox",
+            email = "mike.cox@example.com",
+            password = "mockPassword4",
+            role = Role.CLIENT,
+            registrationLocation = Location(0.0, 0.0, "USA", "City"),
+            profileImageUrl = null
+        ),
+        User(
+            id = "74",
+            fullName = "Hugh Jass",
+            email = "hugh.jass@example.com",
+            password = "mockPassword5",
+            role = Role.CLIENT,
+            registrationLocation = Location(0.0, 0.0, "USA", "City"),
+            profileImageUrl = null
+        )
+    )
+
+    var conversationsList by remember {
+        mutableStateOf(
+            listOf(
+                Conversation(
+                    id = "1",
+                    recipient = allUsers[0],
+                    messages = listOf(
+                        Message(
+                            id = "msg1",
+                            sender = allUsers[0].fullName,
+                            content = "Hi, just checking if there are any updates on the report.",
+                            timestamp = LocalDateTime.now().minusMinutes(5)
+                        )
+                    ),
+                    isRead = false
+                ),
+                Conversation(
+                    id = "2",
+                    recipient = allUsers[1],
+                    messages = listOf(
+                        Message(
+                            id = "msg2",
+                            sender = allUsers[1].fullName,
+                            content = "Thanks for your response.",
+                            timestamp = LocalDateTime.now().minusHours(2)
+                        )
+                    ),
+                    isRead = true
+                ),
+                Conversation(
+                    id = "conv3",
+                    recipient = allUsers[2],
+                    messages = listOf(
+                        Message(
+                            id = "msg3",
+                            sender = allUsers[2].fullName,
+                            content = "Could you take a look at the file I sent you?",
+                            timestamp = LocalDateTime.now().minusDays(5)
+                        )
+                    ),
+                    isRead = false
+                )
+            )
+        )
+    }
 
     val filteredUsers = remember(searchQuery) {
         if (searchQuery.isNotBlank()) {
             allUsers.filter {
-                it.contains(searchQuery, ignoreCase = true)
+                it.email.contains(searchQuery, ignoreCase = true) ||
+                        it.fullName.contains(searchQuery, ignoreCase = true)
             }
-        } else {
-            emptyList()
-        }
+        } else emptyList()
     }
 
     Scaffold(
@@ -45,13 +147,11 @@ fun SearchContactScreen(
                 stringResource(id = R.string.search_for_user),
                 Icons.AutoMirrored.Filled.ArrowBack,
                 stringResource(id = R.string.back_arrow_icon),
-                onClickNavIcon = { navigateBack() },
+                onClickNavIcon = navigateBack,
                 false,
                 isSearch = true,
                 searchQuery = searchQuery,
-                onSearchQueryChange = {
-                    searchQuery = it
-                }
+                onSearchQueryChange = { searchQuery = it }
             )
         }
     ) { padding ->
@@ -63,25 +163,33 @@ fun SearchContactScreen(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Top
         ) {
-
             Spacer(modifier = Modifier.height(Spacing.Large))
 
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(Spacing.Inline)
             ) {
                 if (searchQuery.isBlank()) {
-                    items(recentSearches) { username ->
-                        RecentSearchItem(
-                            username = username,
-                            onClick = { onUserSelected(username) }
-                        )
+                    items(recentSearches) { email ->
+                        val conversation = conversationsList.find { it.recipient.email == email }
+                        if (conversation != null) {
+                            RecentSearchItem(
+                                email = email,
+                                onClick = {
+                                    onUserSelected(conversation.id)
+                                }
+                            )
+                        }
                     }
                 } else {
-                    items(filteredUsers) { username ->
+                    items(filteredUsers) { user ->
+                        val conversation = conversationsList.find { it.recipient.email == user.email }
                         SearchUserItem(
-                            fullName = username,
-                            usernameTag = "@${username.lowercase().replace(" ", "")}",
-                            onClick = { onUserSelected(username) }
+                            fullName = user.fullName,
+                            email = user.email,
+                            onClick = {
+                                val idToPass = conversation?.id ?: user.id
+                                onUserSelected(idToPass)
+                            }
                         )
                     }
                 }
@@ -92,7 +200,7 @@ fun SearchContactScreen(
 
 @Composable
 fun RecentSearchItem(
-    username: String,
+    email: String,
     onClick: () -> Unit
 ) {
     Row(
@@ -104,7 +212,7 @@ fun RecentSearchItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = username,
+            text = email,
             style = MaterialTheme.typography.bodyMedium
         )
         Icon(
