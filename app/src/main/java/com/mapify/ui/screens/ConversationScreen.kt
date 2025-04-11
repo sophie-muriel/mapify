@@ -10,8 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.MarkChatRead
-import androidx.compose.material.icons.filled.MarkChatUnread
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -281,6 +279,7 @@ fun ConversationScreen(
             onExit = {
                 conversationsList = conversationsList.filterNot { it.id == conversation.id }
                 showDeleteDialog = false
+                navigateBack()
             }
         )
     }
