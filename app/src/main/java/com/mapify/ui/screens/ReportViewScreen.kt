@@ -326,11 +326,13 @@ fun ReportViewScreen(
     var showVerifyDialogle by rememberSaveable { mutableStateOf(false) }
     var showRejectionInputDialog by rememberSaveable { mutableStateOf(false) }
     var rejectionMessage by remember { mutableStateOf("") }
+    var boostCounter by rememberSaveable { mutableIntStateOf(0) }
+    var showBoostToast by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
 
     val menuItems =
-        if (!isCreator) {
+        if (isCreator) {
             listOf(
                 MenuAction.Simple(
                     stringResource(id = R.string.edit),
@@ -356,7 +358,7 @@ fun ReportViewScreen(
                     showDeleteDialogVisible = true
                 }
             )
-        } else if (true) {
+        } else if (isAdmin) {
             listOf(
                 MenuAction.Simple(
                     stringResource(id = R.string.verify),
@@ -405,7 +407,8 @@ fun ReportViewScreen(
                         )
                     }
                 ) {
-                    // show toast
+                    boostCounter++
+                    showBoostToast = true
                 }
             )
         }
@@ -606,6 +609,17 @@ fun ReportViewScreen(
         }else if(showRejectionInputDialog && reportStatus == ReportStatus.PENDING_VERIFICATION){
             Toast.makeText(context, reportAlreadyRejected, Toast.LENGTH_SHORT).show()
             showRejectionInputDialog = false
+        }
+
+        val reportBoosted = stringResource(id = R.string.report_boosted)
+        val reportAlreadyBoosted = stringResource(id = R.string.report_already_boosted)
+
+        if(showBoostToast && boostCounter == 1){
+            Toast.makeText(context, reportBoosted, Toast.LENGTH_SHORT).show()
+            showBoostToast = false
+        }else if(showBoostToast && boostCounter > 1){
+            Toast.makeText(context, reportAlreadyBoosted, Toast.LENGTH_SHORT).show()
+            showBoostToast = false
         }
     }
 }
