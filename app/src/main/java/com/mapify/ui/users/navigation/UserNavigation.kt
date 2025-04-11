@@ -22,7 +22,7 @@ fun UserNavigation(
     navigateToDetail: (String) -> Unit,
     isAdmin: Boolean,
     navigateToReportView: (String, ReportStatus) -> Unit,
-    navigateToConversation: (Conversation) -> Unit
+    navigateToConversation: (String) -> Unit
 ) {
     NavHost(
         modifier = Modifier.padding(padding),
