@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MarkChatRead
 import androidx.compose.material.icons.filled.MarkChatUnread
 import androidx.compose.material3.*
@@ -22,7 +21,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.model.Conversation
+import com.mapify.model.Location
 import com.mapify.model.Message
+import com.mapify.model.Role
+import com.mapify.model.User
 import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.theme.Spacing
@@ -33,38 +35,112 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversationScreen(
-    conversation: Conversation,
+    conversationId: String,
     navigateBack: () -> Unit
 ) {
+    val allUsers = listOf(
+        User(
+            id = "69",
+            fullName = "Barry McCoquiner",
+            email = "barry.mccoquiner@example.com",
+            password = "sizedoesntmatter",
+            role = Role.CLIENT,
+            registrationLocation = Location(0.0, 0.0, "USA", "City"),
+            profileImageUrl = null
+        ),
+        User(
+            id = "70",
+            fullName = "John Smith",
+            email = "john.smith@example.com",
+            password = "mockPassword2",
+            role = Role.CLIENT,
+            registrationLocation = Location(0.0, 0.0, "USA", "City"),
+            profileImageUrl = null
+        ),
+        User(
+            id = "72",
+            fullName = "Alice Johnson",
+            email = "alice.johnson@example.com",
+            password = "mockPassword3",
+            role = Role.CLIENT,
+            registrationLocation = Location(0.0, 0.0, "USA", "City"),
+            profileImageUrl = null
+        ),
+        User(
+            id = "73",
+            fullName = "Mike Cox",
+            email = "mike.cox@example.com",
+            password = "mockPassword4",
+            role = Role.CLIENT,
+            registrationLocation = Location(0.0, 0.0, "USA", "City"),
+            profileImageUrl = null
+        ),
+        User(
+            id = "74",
+            fullName = "Hugh Jass",
+            email = "hugh.jass@example.com",
+            password = "mockPassword5",
+            role = Role.CLIENT,
+            registrationLocation = Location(0.0, 0.0, "USA", "City"),
+            profileImageUrl = null
+        )
+    )
+
+    var conversationsList by remember {
+        mutableStateOf(
+            listOf(
+                Conversation(
+                    id = "1",
+                    recipient = allUsers[0],
+                    messages = listOf(
+                        Message(
+                            id = "msg1",
+                            sender = allUsers[0].fullName,
+                            content = "Hi, just checking if there are any updates on the report.",
+                            timestamp = LocalDateTime.now().minusMinutes(5)
+                        )
+                    ),
+                    isRead = false
+                ),
+                Conversation(
+                    id = "2",
+                    recipient = allUsers[1],
+                    messages = listOf(
+                        Message(
+                            id = "msg2",
+                            sender = allUsers[1].fullName,
+                            content = "Thanks for your response.",
+                            timestamp = LocalDateTime.now().minusHours(2)
+                        )
+                    ),
+                    isRead = true
+                ),
+                Conversation(
+                    id = "conv3",
+                    recipient = allUsers[2],
+                    messages = listOf(
+                        Message(
+                            id = "msg3",
+                            sender = allUsers[2].fullName,
+                            content = "Could you take a look at the file I sent you?",
+                            timestamp = LocalDateTime.now().minusDays(5)
+                        )
+                    ),
+                    isRead = false
+                )
+            )
+        )
+    }
+
+    val conversation = remember(conversationId) {
+        conversationsList.find { it.id == conversationId }!!
+    }
 
     var messageText by remember { mutableStateOf(TextFieldValue("")) }
-    val messages =
-        remember { mutableStateListOf<Message>().apply { addAll(conversation.messages) } }
+    val messages = remember { mutableStateListOf<Message>().apply { addAll(conversation.messages) } }
 
     val menuItems =
         listOf(
-            MenuAction.Simple(
-                "Mark as read",
-                {
-                    Icon(
-                        Icons.Default.MarkChatRead,
-                        contentDescription = null,
-                    )
-                }
-            ) {
-                // mark as read action
-            },
-            MenuAction.Simple(
-                "Mark as unread",
-                {
-                    Icon(
-                        Icons.Default.MarkChatUnread,
-                        contentDescription = null
-                    )
-                }
-            ) {
-                // mark as unread actions
-            },
             MenuAction.Simple(
                 "Delete",
                 {
@@ -88,7 +164,7 @@ fun ConversationScreen(
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
-                            text = conversation.sender,
+                            text = conversation.recipient.fullName,
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.offset(x = 24.dp)
                         )
@@ -133,7 +209,7 @@ fun ConversationScreen(
                         message = msg,
                         isMe = msg.sender == "Me",
                         senderName = msg.sender,
-                        profileImageUrl = null
+                        profileImageUrl = conversation.recipient.profileImageUrl
                     )
                 }
             }
@@ -173,8 +249,7 @@ fun ConversationScreen(
                                     id = "${messages.size + 1}",
                                     sender = "Me",
                                     content = messageText.text,
-                                    timestamp = LocalDateTime.now(),
-                                    isRead = true
+                                    timestamp = LocalDateTime.now()
                                 )
                             )
                             messageText = TextFieldValue("")
