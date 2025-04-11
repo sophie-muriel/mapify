@@ -40,7 +40,7 @@ Android app for users to upload, rate, and interact with reports nearby.
 - [ ] Verify delete report
 - [x] Input date for search filters
 - [x] Input distance for search filters
-- [ ] Verify delete chat
+- [ ] Verify delete chat *
 - [ ] Verify verify report
 - [ ] Input report rejection message
 
@@ -54,6 +54,6 @@ Android app for users to upload, rate, and interact with reports nearby.
 ~~- [ ] Chat with and search other users -> not required~~
 - [x] Handle multiple images in report creation/editing (esp. editing)
 - [x] Navigate to user specific chat from contacts screen
-- [ ] Load conversations in chat screen
+- [x] Load conversations in chat screen
 
 *\*: in progress*
