@@ -1,7 +1,8 @@
 package com.mapify.model
 
-class Conversation(
+data class Conversation(
     val id: String,
-    val sender: String,
-    val messages: List<Message>
+    val recipient: User,
+    val messages: List<Message>,
+    val isRead: Boolean = false
 )
