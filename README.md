@@ -37,12 +37,12 @@ Android app for users to upload, rate, and interact with reports nearby.
 - [x] Verify save report edits
 - [x] Report reject notification message
 - [x] Report deleted notification message
-- [ ] Verify delete report
+- [x] Verify delete report
 - [x] Input date for search filters
 - [x] Input distance for search filters
-- [ ] Verify delete chat *
-- [ ] Verify verify report
-- [ ] Input report rejection message
+- [x] Verify delete chat
+- [x] Verify verify report
+- [x] Input report rejection message
 
 #### Functionalities
 - [x] Manage multiple images in report creation
