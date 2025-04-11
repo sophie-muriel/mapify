@@ -36,7 +36,7 @@ fun ProfileScreen(
     isAdmin: Boolean
 ) {
     val user = User(
-        id = "1",
+        id = if (isAdmin) "2" else "1",
         fullName = if (isAdmin) "Administrator" else "Average User",
         email = if (isAdmin) "admin" else "root",
         password = if (isAdmin) "admin" else "root",

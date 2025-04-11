@@ -40,7 +40,7 @@ import com.mapify.ui.theme.Spacing
 @Composable
 fun LoginScreen(
     navigateToRegistration: () -> Unit,
-    navigateToHome: (Boolean) -> Unit
+    navigateToHome: (Boolean, String) -> Unit
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var recoveryEmail by rememberSaveable { mutableStateOf("") }
@@ -84,12 +84,12 @@ fun LoginScreen(
                 onValueChangePassword = { password = it },
                 onClickLogin = {
                     if (email == "root" && password == "root") {
-                        navigateToHome(false)
+                        navigateToHome(false, "1")
                         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                             resetFields()
                         }, 200)
                     } else if (email == "admin" && password == "admin") {
-                        navigateToHome(true)
+                        navigateToHome(true, "2")
                         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                             resetFields()
                         }, 200)
