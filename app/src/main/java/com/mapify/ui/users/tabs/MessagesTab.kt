@@ -18,7 +18,6 @@ import java.util.*
 fun MessagesTab(
     navigateToConversation: (Conversation) -> Unit
 ) {
-    //TODO: fix line height so bold doesn't mess style up
 
     var messagesList by remember {
         mutableStateOf(
