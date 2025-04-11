@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mapify.R
 import com.mapify.ui.theme.Spacing
 
@@ -61,9 +60,7 @@ fun SimpleTopBar(
                         placeholder = {
                             Text(
                                 text = text,
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    lineHeight = 20.sp // match your font size or tweak slightly!
-                                ),
+                                style = MaterialTheme.typography.bodyMedium,
                                 maxLines = 1
                             )
                         },
