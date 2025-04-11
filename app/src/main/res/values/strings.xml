@@ -163,5 +163,8 @@
     <string name="trending_up_icon">Trending Up Icon</string>
     <string name="delete_report_title">Are you sure you want to delete your report?</string>
     <string name="delete_report_description">This action is irreversible, and your report’s data will be permanently lost.</string>
+    <string name="verify_report_title">Are you sure you want to verify this report?</string>
+    <string name="verify_report_description">Once verified, this report will be tagged as verified for all users.</string>
+    <string name="report_verified">Report Verified</string>
 
 </resources>

@@ -304,12 +304,14 @@ fun ReportViewScreen(
     }
 
     val report = storedReports.find { it.id == reportId } ?: return
+    var reportStatus by remember { mutableStateOf(report.status) } //This allows to change verification icon
+    //val reportStatus = report.status
     val starIcon = if (report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline
     val starIconDescription = if (report.isHighPriority)
         stringResource(id = R.string.star_icon_prioritized) else stringResource(id = R.string.star_icon_not_prioritized)
     val tint =
         if (report.isHighPriority) MaterialTheme.colorScheme.primary else LocalContentColor.current
-    val reportStatus = report.status
+
 
     val state = rememberCarouselState { report.images.count() }
     val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
@@ -321,11 +323,12 @@ fun ReportViewScreen(
 
     var isCreator = userId == report.userId
     var showDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var showVerifyDialogle by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
 
     val menuItems =
-        if (isCreator) {
+        if (!isCreator) {
             listOf(
                 MenuAction.Simple(
                     stringResource(id = R.string.edit),
@@ -351,7 +354,7 @@ fun ReportViewScreen(
                     showDeleteDialogVisible = true
                 }
             )
-        } else if (isAdmin) {
+        } else if (true) {
             listOf(
                 MenuAction.Simple(
                     stringResource(id = R.string.verify),
@@ -362,7 +365,7 @@ fun ReportViewScreen(
                         )
                     }
                 ) {
-                    // show you sure dialog into toast
+                    showVerifyDialogle = true
                 },
                 MenuAction.Simple(
                     stringResource(id = R.string.reject),
@@ -525,7 +528,7 @@ fun ReportViewScreen(
             )
         }
 
-        val report_deleted = stringResource(id = R.string.report_deleted)
+        val reportDeleted = stringResource(id = R.string.report_deleted)
 
         if(showDeleteDialogVisible){
             GenericDialog(
@@ -533,12 +536,29 @@ fun ReportViewScreen(
                 message = stringResource(id = R.string.delete_report_description),
                 onClose = { showDeleteDialogVisible = false },
                 onExit = {
-                    Toast.makeText(context, report_deleted, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, reportDeleted, Toast.LENGTH_LONG).show()
                     showDeleteDialogVisible = false
                     navigateBack()
                 },
                 onCloseText = stringResource(id = R.string.cancel),
                 onExitText = stringResource(id = R.string.delete)
+            )
+        }
+
+        val reportVerified = stringResource(id = R.string.report_verified)
+
+        if(showVerifyDialogle){
+            GenericDialog(
+                title = stringResource(id = R.string.verify_report_title),
+                message = stringResource(id = R.string.verify_report_description),
+                onClose = { showVerifyDialogle = false },
+                onExit = {
+                    Toast.makeText(context, reportVerified, Toast.LENGTH_LONG).show()
+                    showVerifyDialogle = false
+                    reportStatus = ReportStatus.VERIFIED
+                },
+                onCloseText =stringResource(id = R.string.cancel),
+                onExitText = stringResource(id = R.string.verify)
             )
         }
     }
