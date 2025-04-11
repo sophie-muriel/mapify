@@ -175,4 +175,9 @@
     <string name="report_already_rejected">This report has already been rejected</string>
     <string name="report_boosted">Report boosted</string>
     <string name="report_already_boosted">You already boosted this report</string>
+
+    <string name="me_message">Me</string>
+    <string name="write_a_message">Write a message</string>
+    <string name="delete_a_message">Delete a message</string>
+    <string name="delete_a_message_confirmation">"Are you sure you want to delete this conversation? This action is irreversible.</string>
 </resources>

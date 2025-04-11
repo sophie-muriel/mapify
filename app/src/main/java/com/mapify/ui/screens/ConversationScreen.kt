@@ -143,11 +143,11 @@ fun ConversationScreen(
     val menuItems =
         listOf(
             MenuAction.Simple(
-                "Delete",
+                stringResource(id = R.string.delete),
                 {
                     Icon(
                         Icons.Default.Delete,
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.delete_icon),
                         tint = MaterialTheme.colorScheme.error
                     )
                 }
@@ -208,7 +208,7 @@ fun ConversationScreen(
                 items(messages.reversed()) { msg ->
                     ChatBubble(
                         message = msg,
-                        isMe = msg.sender == "Me",
+                        isMe = msg.sender == stringResource(id = R.string.me_message),
                         senderName = msg.sender,
                         profileImageUrl = conversation.recipient.profileImageUrl
                     )
@@ -226,7 +226,7 @@ fun ConversationScreen(
                     onValueChange = { messageText = it },
                     placeholder = {
                         Text(
-                            text = "Write a message...",
+                            text = stringResource(id = R.string.write_a_message),
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 1
                         )
@@ -242,13 +242,14 @@ fun ConversationScreen(
                     shape = MaterialTheme.shapes.large,
                     textStyle = MaterialTheme.typography.bodyMedium,
                 )
+                val me = stringResource(id = R.string.me_message)
                 IconButton(
                     onClick = {
                         if (messageText.text.isNotBlank()) {
                             messages.add(
                                 Message(
                                     id = "${messages.size + 1}",
-                                    sender = "Me",
+                                    sender = me,
                                     content = messageText.text,
                                     timestamp = LocalDateTime.now()
                                 )
@@ -262,7 +263,7 @@ fun ConversationScreen(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
-                        contentDescription = "Send",
+                        contentDescription = stringResource(id = R.string.send),
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
@@ -271,11 +272,11 @@ fun ConversationScreen(
     }
     if (showDeleteDialog) {
         GenericDialog(
-            title = "Delete message",
-            message = "Are you sure you want to delete this conversation? This action is irreversible.",
-            onCloseText = "Cancel",
+            title = stringResource(id = R.string.delete_a_message),
+            message = stringResource(id = R.string.delete_a_message_confirmation),
+            onCloseText = stringResource(id = R.string.cancel),
             onClose = { showDeleteDialog = false },
-            onExitText = "Delete",
+            onExitText = stringResource(id = R.string.delete),
             onExit = {
                 conversationsList = conversationsList.filterNot { it.id == conversation.id }
                 showDeleteDialog = false
