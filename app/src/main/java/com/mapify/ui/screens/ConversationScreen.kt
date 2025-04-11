@@ -1,6 +1,7 @@
 package com.mapify.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.CheckBox
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -193,16 +196,15 @@ fun ConversationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = Spacing.Sides),
+                .padding(horizontal = Spacing.Large),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Top
         ) {
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth()
-                    .padding(horizontal = Spacing.Sides),
-                verticalArrangement = Arrangement.spacedBy(Spacing.Small),
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(Spacing.Large),
                 reverseLayout = true
             ) {
                 items(messages.reversed()) { msg ->
@@ -300,19 +302,35 @@ fun ChatBubble(
 
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
-        horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start
+            .fillMaxWidth(),
+        horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        if (!isMe) {
+            Icon(
+                modifier = Modifier
+                    .height(36.dp)
+                    .width(36.dp).offset((-5).dp),
+                imageVector = Icons.Outlined.AccountCircle,
+                contentDescription = null
+            )
+            Spacer(modifier = Modifier.width(2.dp))
+        }
+
         Column(
             horizontalAlignment = if (isMe) Alignment.End else Alignment.Start
         ) {
             Surface(
-                shape = RoundedCornerShape(24.dp),
+                shape = RoundedCornerShape(
+                    topStart = 24.dp,
+                    topEnd = 24.dp,
+                    bottomStart = if (isMe) 24.dp else 6.dp,
+                    bottomEnd = if (isMe) 6.dp else 24.dp),
                 color = bubbleColor,
                 tonalElevation = 2.dp,
                 modifier = Modifier
-                    .widthIn(max = 280.dp)
+                    .widthIn(max = 280.dp),
+                shadowElevation = 2.dp
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp)
