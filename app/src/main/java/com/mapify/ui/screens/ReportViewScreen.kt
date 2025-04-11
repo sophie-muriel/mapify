@@ -323,22 +323,22 @@ fun ReportViewScreen(
         if (isCreator) {
             listOf(
                 MenuAction.Simple(
-                    "Edit",
+                    stringResource(id = R.string.edit),
                     {
                         Icon(
                             Icons.Default.Edit,
-                            contentDescription = null,
+                            contentDescription = stringResource(id = R.string.edit_icon_description),
                         )
                     }
                 ) {
                     // navigate to edit
                 },
                 MenuAction.Simple(
-                    "Delete",
+                    stringResource(id = R.string.delete),
                     {
                         Icon(
                             Icons.Default.Delete,
-                            contentDescription = null,
+                            contentDescription = stringResource(id = R.string.delete_icon),
                             tint = MaterialTheme.colorScheme.error
                         )
                     }
@@ -349,22 +349,22 @@ fun ReportViewScreen(
         } else if (isAdmin) {
             listOf(
                 MenuAction.Simple(
-                    "Verify",
+                    stringResource(id = R.string.verify),
                     {
                         Icon(
                             Icons.Default.CheckCircle,
-                            contentDescription = null,
+                            contentDescription = stringResource(id = R.string.check_circle_icon),
                         )
                     }
                 ) {
                     // show you sure dialog into toast
                 },
                 MenuAction.Simple(
-                    "Reject",
+                    stringResource(id = R.string.reject),
                     {
                         Icon(
                             Icons.Default.Unpublished,
-                            contentDescription = null,
+                            contentDescription = stringResource(id = R.string.unpublished_icon),
                             tint = MaterialTheme.colorScheme.error
                         )
                     }
@@ -372,11 +372,11 @@ fun ReportViewScreen(
                     // show dialog with text fields
                 },
                 MenuAction.Simple(
-                    "Delete",
+                    stringResource(id = R.string.delete),
                     {
                         Icon(
                             Icons.Default.Delete,
-                            contentDescription = null,
+                            contentDescription = stringResource(id = R.string.delete_icon),
                             tint = MaterialTheme.colorScheme.error
                         )
                     }
@@ -387,11 +387,11 @@ fun ReportViewScreen(
         } else {
             listOf(
                 MenuAction.Simple(
-                    "Boost priority",
+                    stringResource(id = R.string.boost_priority),
                     {
                         Icon(
                             Icons.AutoMirrored.Filled.TrendingUp,
-                            contentDescription = null,
+                            contentDescription = stringResource(id = R.string.trending_up_icon),
                         )
                     }
                 ) {
