@@ -54,43 +54,13 @@ fun SimpleTopBar(
                 contentAlignment = contentAlignment
             ) {
                 if (isSearch) {
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = onSearchQueryChange,
-                        placeholder = {
-                            Text(
-                                text = text,
-                                style = MaterialTheme.typography.bodyMedium,
-                                maxLines = 1
-                            )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp)
-                            .padding(end = Spacing.Sides),
-                        singleLine = true,
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = stringResource(id = R.string.search_icon)
-                            )
-                        },
-                        shape = MaterialTheme.shapes.large,
-                        textStyle = MaterialTheme.typography.bodyMedium,
-                    )
+                    SearchBar(text, searchQuery, onSearchQueryChange)
                 } else {
                     Text(
                         text = text,
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = if (secondAction && secondActionIconVector != null) {
-                            if (contentAlignment == Alignment.CenterStart) {
-                                Modifier
-                            } else {
-                                Modifier.offset(x = 24.dp)
-                            }
-                        } else {
-                            Modifier
-                        }
+                        modifier = if (secondAction && secondActionIconVector != null && contentAlignment != Alignment.CenterStart)
+                            Modifier.offset(x = 24.dp) else Modifier
                     )
                 }
             }
@@ -113,24 +83,49 @@ fun SimpleTopBar(
                             tint = tint
                         )
                     }
-                    secondActionContent?.let {
-                        it()
-                    } ?: run {
-                        if (secondAction && secondActionIconVector != null) {
-                            IconButton(onClick = secondOnClickAction) {
-                                Icon(
-                                    imageVector = secondActionIconVector,
-                                    contentDescription = secondActionIconDescription,
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    IconButton(onClick = {}, enabled = false) {
-                        Box(modifier = Modifier) {}
+                }
+                secondActionContent?.invoke()
+                if (secondAction && secondActionIconVector != null && secondActionContent == null) {
+                    IconButton(onClick = secondOnClickAction) {
+                        Icon(
+                            imageVector = secondActionIconVector,
+                            contentDescription = secondActionIconDescription
+                        )
                     }
                 }
             }
         }
+    )
+}
+
+@Composable
+private fun SearchBar(
+    placeholderText: String,
+    query: String,
+    onQueryChange: (String) -> Unit
+) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        placeholder = {
+            Text(
+                text = placeholderText,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(52.dp)
+            .padding(horizontal = Spacing.Sides),
+        singleLine = true,
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = stringResource(id = R.string.search_icon)
+            )
+        },
+        shape = MaterialTheme.shapes.large,
+        textStyle = MaterialTheme.typography.bodyMedium,
     )
 }
