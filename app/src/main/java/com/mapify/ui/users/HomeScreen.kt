@@ -55,28 +55,59 @@ fun HomeScreen(
         topBar = {
             when (currentRoute) {
                 UserRouteTab.Home::class.qualifiedName -> {
-                    SimpleTopBar(alignment, stringResource(id = R.string.app_name),
-                        navIconVector, navIconDescription, onClickNavIcon, actions,
-                        settingsIconVector, settingsIconDescription, firstOnClickAction = { navigateToSettings() }
+                    SimpleTopBar(
+                        contentAlignment = alignment,
+                        text = stringResource(id = R.string.app_name),
+                        navIconVector = navIconVector,
+                        navIconDescription = navIconDescription,
+                        onClickNavIcon = onClickNavIcon,
+                        actions = actions,
+                        firstActionIconVector = settingsIconVector,
+                        firstActionIconDescription = settingsIconDescription,
+                        firstOnClickAction = { navigateToSettings() }
                     )
                 }
                 UserRouteTab.Explore::class.qualifiedName -> {
-                    SimpleTopBar(alignment, stringResource(id = R.string.explore_screen),
-                        navIconVector, navIconDescription, onClickNavIcon, actions,
-                        Icons.Filled.Search, stringResource(id = R.string.search_icon),
-                        { navigateToSearchFilters() }, true,settingsIconVector, settingsIconDescription, secondOnClickAction = { navigateToSettings() }
+                    SimpleTopBar(
+                        contentAlignment = alignment,
+                        text = stringResource(id = R.string.explore_screen),
+                        navIconVector = navIconVector,
+                        navIconDescription = navIconDescription,
+                        onClickNavIcon = onClickNavIcon,
+                        actions = actions,
+                        firstActionIconVector = Icons.Filled.Search,
+                        firstActionIconDescription = stringResource(id = R.string.search_icon),
+                        firstOnClickAction = { navigateToSearchFilters() },
+                        secondAction = true,
+                        secondActionIconVector = settingsIconVector,
+                        secondActionIconDescription = settingsIconDescription,
+                        secondOnClickAction = { navigateToSettings() }
                     )
                 }
                 UserRouteTab.Notifications::class.qualifiedName -> {
-                    SimpleTopBar(alignment, stringResource(id = R.string.notifications),
-                        navIconVector, navIconDescription, onClickNavIcon, actions,
-                        settingsIconVector, settingsIconDescription, firstOnClickAction = { navigateToSettings() }
+                    SimpleTopBar(
+                        contentAlignment = alignment,
+                        text = stringResource(id = R.string.notifications),
+                        navIconVector = navIconVector,
+                        navIconDescription = navIconDescription,
+                        onClickNavIcon = onClickNavIcon,
+                        actions = actions,
+                        firstActionIconVector = settingsIconVector,
+                        firstActionIconDescription = settingsIconDescription,
+                        firstOnClickAction = { navigateToSettings() }
                     )
                 }
                 UserRouteTab.Messages::class.qualifiedName -> {
-                    SimpleTopBar(alignment, stringResource(id = R.string.messages_label),
-                        navIconVector, navIconDescription, onClickNavIcon, actions,
-                        settingsIconVector, settingsIconDescription, firstOnClickAction = { navigateToSettings() }
+                    SimpleTopBar(
+                        contentAlignment = alignment,
+                        text = stringResource(id = R.string.messages_label),
+                        navIconVector = navIconVector,
+                        navIconDescription = navIconDescription,
+                        onClickNavIcon = onClickNavIcon,
+                        actions = actions,
+                        firstActionIconVector = settingsIconVector,
+                        firstActionIconDescription = settingsIconDescription,
+                        firstOnClickAction = { navigateToSettings() }
                     )
                 }
             }
