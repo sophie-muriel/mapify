@@ -588,6 +588,7 @@ fun ReportViewScreen(
                     Toast.makeText(context, rejectionMessageSend, Toast.LENGTH_SHORT).show()
                     showRejectionInputDialog = false
                     reportStatus = ReportStatus.PENDING_VERIFICATION
+                    report.rejectionDate = LocalDateTime.now()
                     rejectionMessage = ""
                     //TODO: here we will have to create an instance of message and save it in the database
                 },
