@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -36,7 +37,8 @@ fun NotificationsTab(
             location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
             status = ReportStatus.PENDING_VERIFICATION,
             userId = "1",
-            date = LocalDateTime.now()
+            date = LocalDateTime.now(),
+            rejectionDate = LocalDateTime.now().minusDays(1)
         ),
         Report(
             id = "2",
@@ -86,7 +88,8 @@ fun NotificationsTab(
             userId = "4",
             date = LocalDateTime.now().minusDays(1),
             isResolved = false,
-            priorityCounter = 3
+            priorityCounter = 3,
+            rejectionDate = LocalDateTime.now().minusDays(2)
         ),
         Report(
             id = "6",
@@ -102,6 +105,9 @@ fun NotificationsTab(
             priorityCounter = 15
         )
     )
+
+    var remainingDays = -1
+
 
     LazyColumn(
         modifier = Modifier
@@ -122,6 +128,7 @@ fun NotificationsTab(
             )
         }
         items(storedReports.sortedByDescending { it.date }) { report ->
+            remainingDays = report.remainingDaysToDeletion
             NotificationItem(
                 title = report.title,
                 status = if (report.status == ReportStatus.VERIFIED)
@@ -132,7 +139,7 @@ fun NotificationsTab(
                 statusMessage = if (report.status == ReportStatus.VERIFIED)
                     "Your report has been verified, congratulations!"
                 else
-                    "Your report has been rejected; modify it in 3 days or it will be deleted.",
+                    "Your report has been rejected; you have $remainingDays days to modify it or will be deleted.",
                 imageUrl = report.images.first(),
                 onClick = { navigateToReportView(report.id, report.status) },
                 statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
