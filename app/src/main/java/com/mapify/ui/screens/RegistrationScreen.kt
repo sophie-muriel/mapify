@@ -2,6 +2,7 @@ package com.mapify.ui.screens
 
 import android.util.Patterns
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -82,6 +83,12 @@ fun RegistrationScreen(
         passwordConfirmationTouched = false
     }
 
+    if (locationForm) {
+        BackHandler(enabled = true) {
+            locationForm = false
+        }
+    }
+
     Scaffold(
         modifier = Modifier
             .imePadding()
@@ -132,7 +139,8 @@ fun RegistrationScreen(
 
                 Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
             } else { // registration form part 2
-                Spacer(modifier = Modifier.height(Spacing.TopBottomScreen * 2))
+                Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
+
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -146,21 +154,22 @@ fun RegistrationScreen(
                             .fillMaxWidth(1f)
                             .aspectRatio(2f)
                     )
-
-                    Text(
-                        text = stringResource(id = R.string.enable_location_title_message),
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
                 }
 
-                Spacer(modifier = Modifier.height(Spacing.Inline * 2))
+                Text(
+                    text = stringResource(id = R.string.enable_location_title_message),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+
+                Spacer(modifier = Modifier.height(Spacing.Large))
 
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
-                            horizontal = Spacing.Sides * 2
+                            horizontal = Spacing.Sides * 2,
+                            vertical = if (locationShared) (Spacing.Large + 4.dp) else 0.dp
                         )
                         .align(Alignment.CenterHorizontally),
                     text = if (locationShared) stringResource(
@@ -170,7 +179,7 @@ fun RegistrationScreen(
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.height(Spacing.Inline))
+                Spacer(modifier = Modifier.height(Spacing.Large * 18.1f))
 
                 ConfirmLocationForm(
                     locationShared, onClickConfirmLocation = {
