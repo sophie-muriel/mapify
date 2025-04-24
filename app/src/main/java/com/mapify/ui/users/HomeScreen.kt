@@ -17,7 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mapify.R
-import com.mapify.model.Conversation
 import com.mapify.model.ReportStatus
 import com.mapify.ui.users.navigation.UserNavigation
 import com.mapify.ui.components.BottomNavigationBar
@@ -121,16 +120,16 @@ fun HomeScreen(
             when (currentRoute) {
                 UserRouteTab.Home::class.qualifiedName, UserRouteTab.Explore::class.qualifiedName -> {
                     CreateFAB(
-                        { navigateToCreateReport() },
-                        Icons.Filled.Add,
-                        stringResource(id = R.string.add_icon_description)
+                        onClick = { navigateToCreateReport() },
+                        icon = Icons.Filled.Add,
+                        iconDescription = stringResource(id = R.string.add_icon_description)
                     )
                 }
                 UserRouteTab.Messages::class.qualifiedName -> {
                     CreateFAB(
-                        { navigateToSearchContact() },
-                        Icons.Filled.Mail,
-                        stringResource(id = R.string.messages_icon)
+                        onClick = { navigateToSearchContact() },
+                        icon = Icons.Filled.Mail,
+                        iconDescription = stringResource(id = R.string.messages_icon)
                     )
                 }
             }
