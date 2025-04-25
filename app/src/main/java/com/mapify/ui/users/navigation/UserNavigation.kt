@@ -28,8 +28,17 @@ fun UserNavigation(
         navController = navController,
         startDestination = UserRouteTab.Home
     ) {
-        composable<UserRouteTab.Home> { HomeTab(isAdmin = isAdmin, navigateToDetail = navigateToDetail) }
-        composable<UserRouteTab.Explore> { ExploreTab(navigateToDetail = navigateToDetail) }
+        composable<UserRouteTab.Home> {
+            HomeTab(
+                isAdmin = isAdmin,
+                navigateToDetail = navigateToDetail
+            )
+        }
+        composable<UserRouteTab.Explore> {
+            ExploreTab(
+                navigateToDetail = navigateToDetail
+            )
+        }
         composable<UserRouteTab.Notifications> {
             NotificationsTab(
                 navigateToReportView = navigateToReportView
