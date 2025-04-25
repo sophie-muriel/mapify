@@ -150,23 +150,3 @@ fun MessagesTab(
         }
     }
 }
-
-fun formatMessageDate(date: LocalDateTime): String {
-    val now = LocalDate.now()
-    val messageDate = date.toLocalDate()
-    return when {
-        messageDate.isEqual(now) -> {
-            val formatter = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH)
-            date.format(formatter)
-        }
-
-        messageDate.isEqual(now.minusDays(1)) -> {
-            "Yesterday"
-        }
-
-        else -> {
-            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH)
-            date.format(formatter)
-        }
-    }
-}
