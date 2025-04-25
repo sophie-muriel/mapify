@@ -26,7 +26,7 @@ import coil.compose.AsyncImage
 import com.mapify.R
 import com.mapify.model.Conversation
 import com.mapify.ui.theme.Spacing
-import com.mapify.ui.users.tabs.formatMessageDate
+import com.mapify.ui.users.tabs.formatNotificationOrMessageDate
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -41,7 +41,7 @@ fun ConversationItem(
     var showDeleteDialog by remember { mutableStateOf(false) }
     val lastMessage = conversation.messages.maxByOrNull { it.timestamp }
     val lastMessageContent = lastMessage?.content ?: ""
-    val time = lastMessage?.timestamp?.let { formatMessageDate(it) } ?: ""
+    val time = lastMessage?.timestamp?.let { formatNotificationOrMessageDate(it) } ?: ""
     Box(
         modifier = Modifier
             .fillMaxWidth()
