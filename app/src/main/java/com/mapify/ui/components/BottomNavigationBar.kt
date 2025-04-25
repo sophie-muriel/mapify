@@ -2,19 +2,11 @@ package com.mapify.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.QuestionAnswer
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.QuestionAnswer
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -22,71 +14,78 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.mapify.R
 import com.mapify.ui.users.navigation.UserRouteTab
-import androidx.compose.runtime.getValue
 
 @Composable
 fun BottomNavigationBar(
     navController: NavHostController
 ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
 
-    val list = listOf<UserNavigationBar>(
-        UserNavigationBar(
-            icon = Icons.Outlined.Home,
-            iconDescription = stringResource(id = R.string.home_icon),
-            route = UserRouteTab.Home,
-            iconSelected = Icons.Filled.Home
-        ),
-        UserNavigationBar(
-            icon = Icons.Outlined.Search,
-            iconDescription = stringResource(id = R.string.search_icon),
-            route = UserRouteTab.Explore,
-            iconSelected = Icons.Filled.Search
-        ),
-        UserNavigationBar(
-            icon = Icons.Outlined.Notifications,
-            iconDescription = stringResource(id = R.string.notifications_icon),
-            route = UserRouteTab.Notifications,
-            iconSelected = Icons.Filled.Notifications
-        ),
-        UserNavigationBar(
-            icon = Icons.Outlined.QuestionAnswer,
-            iconDescription = stringResource(id = R.string.messages_icon),
-            route = UserRouteTab.Messages,
-            iconSelected = Icons.Filled.QuestionAnswer
-        ),
-    )
-
-    NavigationBar(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
-
-        list.forEach {
-            val isSelected = currentDestination?.route == it.route::class.qualifiedName
+    NavigationBar(modifier = Modifier.fillMaxWidth()) {
+        bottomNavItems().forEach { item ->
+            val selected = currentDestination?.route == item.route::class.qualifiedName
             NavigationBarItem(
+                selected = selected,
                 onClick = {
-                    navController.navigate(it.route){
-                        popUpTo(navController.graph.startDestinationId){
-                            saveState = true
-                        }
+                    navController.navigate(item.route) {
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
                     }
                 },
                 icon = {
                     Icon(
-                        imageVector = if (isSelected) it.iconSelected else it.icon,
-                        contentDescription = it.iconDescription,
+                        imageVector = if (selected) item.iconSelected else item.icon,
+                        contentDescription = item.iconDescription,
                         tint = MaterialTheme.colorScheme.primary
                     )
-                },
-                selected = isSelected
+                }
             )
         }
     }
 }
+
+@Composable
+private fun bottomNavItems(): List<UserNavigationBar> = listOf(
+    navItem(
+        route = UserRouteTab.Home,
+        outlinedIcon = Icons.Outlined.Home,
+        filledIcon = Icons.Filled.Home,
+        labelRes = R.string.home_icon
+    ),
+    navItem(
+        route = UserRouteTab.Explore,
+        outlinedIcon = Icons.Outlined.Search,
+        filledIcon = Icons.Filled.Search,
+        labelRes = R.string.search_icon
+    ),
+    navItem(
+        route = UserRouteTab.Notifications,
+        outlinedIcon = Icons.Outlined.Notifications,
+        filledIcon = Icons.Filled.Notifications,
+        labelRes = R.string.notifications_icon
+    ),
+    navItem(
+        route = UserRouteTab.Messages,
+        outlinedIcon = Icons.Outlined.QuestionAnswer,
+        filledIcon = Icons.Filled.QuestionAnswer,
+        labelRes = R.string.messages_icon
+    )
+)
+
+@Composable
+private fun navItem(
+    route: UserRouteTab,
+    outlinedIcon: ImageVector,
+    filledIcon: ImageVector,
+    labelRes: Int
+) = UserNavigationBar(
+    route = route,
+    icon = outlinedIcon,
+    iconSelected = filledIcon,
+    iconDescription = stringResource(id = labelRes)
+)
 
 data class UserNavigationBar(
     val route: UserRouteTab,
