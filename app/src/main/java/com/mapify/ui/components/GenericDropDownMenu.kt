@@ -2,14 +2,7 @@ package com.mapify.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.mapify.ui.theme.Spacing
@@ -29,16 +22,12 @@ fun GenericDropDownMenu(
     onDismissRequest: () -> Unit,
     leadingIcon: (@Composable () -> Unit)? = null
 ) {
-
-    //var isExpanded by rememberSaveable { mutableStateOf(false) }
-    //var isTouched by rememberSaveable { mutableStateOf(false) }
-
     ExposedDropdownMenuBox(
+        expanded = isExpanded,
+        onExpandedChange = onExpandedChange,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(
-                horizontal = Spacing.Sides, vertical = Spacing.Small
-            ), expanded = isExpanded, onExpandedChange = onExpandedChange
+            .padding(horizontal = Spacing.Sides, vertical = Spacing.Small)
     ) {
         OutlinedTextField(
             modifier = Modifier
@@ -50,7 +39,8 @@ fun GenericDropDownMenu(
             textStyle = MaterialTheme.typography.bodyMedium,
             placeholder = {
                 Text(
-                    text = "Select a $placeholder", style = MaterialTheme.typography.bodyMedium
+                    text = "Select a $placeholder",
+                    style = MaterialTheme.typography.bodyMedium
                 )
             },
             leadingIcon = leadingIcon,
@@ -65,19 +55,22 @@ fun GenericDropDownMenu(
                         color = MaterialTheme.colorScheme.error
                     )
                 }
-            })
-
+            }
+        )
         ExposedDropdownMenu(
-            expanded = isExpanded, onDismissRequest = onDismissRequest
+            expanded = isExpanded,
+            onDismissRequest = onDismissRequest
         ) {
             items.forEach { item ->
-                DropdownMenuItem(text = {
-                    Text(
-                        text = item, style = MaterialTheme.typography.bodyMedium
-                    )
-                }, onClick = {
-                    onValueChange(item)
-                })
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = item,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
+                    onClick = { onValueChange(item) }
+                )
             }
         }
     }
