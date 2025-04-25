@@ -60,12 +60,12 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             SimpleTopBar(
-                Alignment.CenterStart,
-                stringResource(id = R.string.settings_screen),
-                Icons.AutoMirrored.Filled.ArrowBack,
-                stringResource(id = R.string.back_arrow_icon),
+                contentAlignment = Alignment.CenterStart,
+                text = stringResource(id = R.string.settings_screen),
+                navIconVector = Icons.AutoMirrored.Filled.ArrowBack,
+                navIconDescription = stringResource(id = R.string.back_arrow_icon),
                 onClickNavIcon = { navigateBack() },
-                false
+                actions = false
             )
         }) { padding ->
         Column(
