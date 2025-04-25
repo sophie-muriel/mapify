@@ -145,7 +145,7 @@ fun NotificationsTab(
                 NotificationItem(
                     title = stringResource(id = R.string.report_deleted),
                     status = stringResource(id = R.string.deleted),
-                    supportingText = formatNotificationDate(LocalDateTime.now()),
+                    supportingText = formatNotificationOrMessageDate(LocalDateTime.now()),
                     statusMessage = stringResource(id = R.string.report_deleted_message),
                     onClick = {
                         exitDialogVisible = true
@@ -160,7 +160,7 @@ fun NotificationsTab(
                         stringResource(id = R.string.verified)
                     else
                         stringResource(id = R.string.rejected),
-                    supportingText = formatNotificationDate(report.date),
+                    supportingText = formatNotificationOrMessageDate(report.date),
                     statusMessage = if (report.status == ReportStatus.VERIFIED)
                         stringResource(id = R.string.report_verified_message)
                     else
@@ -189,16 +189,16 @@ fun NotificationsTab(
 }
 
 @Composable
-fun formatNotificationDate(date: LocalDateTime): String {
+fun formatNotificationOrMessageDate(date: LocalDateTime): String {
     val now = LocalDate.now()
-    val messageDate = date.toLocalDate()
+    val notificationOrMessageDate = date.toLocalDate()
     return when {
-        messageDate.isEqual(now) -> {
+        notificationOrMessageDate.isEqual(now) -> {
             val formatter = DateTimeFormatter.ofPattern("hh:mm a", Locale("es", "CO"))
             date.format(formatter)
         }
 
-        messageDate.isEqual(now.minusDays(1)) -> {
+        notificationOrMessageDate.isEqual(now.minusDays(1)) -> {
             stringResource(id = R.string.yesterday)
         }
 
