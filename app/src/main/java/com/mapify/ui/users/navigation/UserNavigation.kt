@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.mapify.model.Conversation
 import com.mapify.model.ReportStatus
 import com.mapify.ui.screens.SearchContactScreen
 import com.mapify.ui.users.tabs.ExploreTab
@@ -29,7 +28,7 @@ fun UserNavigation(
         navController = navController,
         startDestination = UserRouteTab.Home
     ) {
-        composable<UserRouteTab.Home> { HomeTab(isAdmin = isAdmin) }
+        composable<UserRouteTab.Home> { HomeTab(isAdmin = isAdmin, navigateToDetail = navigateToDetail) }
         composable<UserRouteTab.Explore> { ExploreTab(navigateToDetail = navigateToDetail) }
         composable<UserRouteTab.Notifications> {
             NotificationsTab(
