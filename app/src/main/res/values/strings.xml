@@ -149,7 +149,8 @@
     <string name="leave_a_comment">Leave a comment…</string>
     <string name="send_icon">Send Icon</string>
     <string name="report_deleted">Report deleted</string>
-    <string name="report_deleted_message">Your report has been rejected due to the following reasons:</string>
+    <string name="report_deleted_message">Your report has been removed due to a serious and irreversible violation of our community rules.</string>
+    <string name="deleted">Deleted</string>
 
     <string name="mark_as_read">Mark as read</string>
     <string name="mark_as_unread">Mark as unread</string>
@@ -180,4 +181,7 @@
     <string name="write_a_message">Write a message</string>
     <string name="delete_a_message">Delete a message</string>
     <string name="delete_a_message_confirmation">"Are you sure you want to delete this conversation? This action is irreversible.</string>
+
+    <string name="report_verified_message">Your report has been verified, congratulations!</string>
+    <string name="report_rejected_days_remaining">Your report has been rejected; you have %s days to modify it or will be deleted.</string>
 </resources>
