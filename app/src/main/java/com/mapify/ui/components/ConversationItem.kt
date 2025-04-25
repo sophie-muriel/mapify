@@ -46,7 +46,6 @@ fun ConversationItem(
         modifier = Modifier
             .fillMaxWidth()
             .height(70.dp)
-            .clip(RoundedCornerShape(16.dp))
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = { expanded = true }
