@@ -188,6 +188,7 @@ fun NotificationsTab(
     }
 }
 
+@Composable
 fun formatNotificationDate(date: LocalDateTime): String {
     val now = LocalDate.now()
     val messageDate = date.toLocalDate()
@@ -198,7 +199,7 @@ fun formatNotificationDate(date: LocalDateTime): String {
         }
 
         messageDate.isEqual(now.minusDays(1)) -> {
-            "Yesterday"
+            stringResource(id = R.string.yesterday)
         }
 
         else -> {
