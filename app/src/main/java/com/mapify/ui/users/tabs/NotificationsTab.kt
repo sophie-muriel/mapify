@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -90,8 +89,7 @@ fun NotificationsTab(
             date = LocalDateTime.now().minusDays(1),
             isResolved = false,
             priorityCounter = 3,
-            rejectionDate = LocalDateTime.now().minusDays(2),
-            isDeletedManually = true
+            rejectionDate = LocalDateTime.now().minusDays(2)
         ),
         Report(
             id = "6",
@@ -104,7 +102,8 @@ fun NotificationsTab(
             userId = "5",
             date = LocalDateTime.now().minusMinutes(45),
             isResolved = true,
-            priorityCounter = 15
+            priorityCounter = 15,
+            isDeletedManually = true
         ),
         Report(
             id = "1",
@@ -144,10 +143,10 @@ fun NotificationsTab(
         items(storedReports.sortedByDescending { it.date }) { report ->
             if(report.isDeleted){
                 NotificationItem(
-                    title = "Report deleted",
-                    status = "Deleted",
+                    title = stringResource(id = R.string.report_deleted),
+                    status = stringResource(id = R.string.deleted),
                     supportingText = formatNotificationDate(LocalDateTime.now()),
-                    statusMessage = "Your report 'title' has been removed by an admin.",
+                    statusMessage = stringResource(id = R.string.report_deleted_message),
                     onClick = {
                         exitDialogVisible = true
                     },
@@ -163,9 +162,9 @@ fun NotificationsTab(
                         stringResource(id = R.string.rejected),
                     supportingText = formatNotificationDate(report.date),
                     statusMessage = if (report.status == ReportStatus.VERIFIED)
-                        "Your report has been verified, congratulations!"
+                        stringResource(id = R.string.report_verified_message)
                     else
-                        "Your report has been rejected; you have $remainingDays days to modify it or will be deleted.",
+                        stringResource(id = R.string.report_rejected_days_remaining, remainingDays),
                     imageUrl = report.images.first(),
                     onClick = { navigateToReportView(report.id, report.status) },
                     statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
