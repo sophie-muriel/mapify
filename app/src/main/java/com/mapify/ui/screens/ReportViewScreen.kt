@@ -537,10 +537,12 @@ fun ReportViewScreen(
 
         if(showDeleteDialogVisible){
             GenericDialog(
-                title = stringResource(id = R.string.delete_report_title),
+                title = if(isCreator) stringResource(id = R.string.delete_report_title, stringResource(id = R.string.your))
+                else stringResource(id = R.string.delete_report_title, stringResource(id = R.string.this_)),
                 message = stringResource(id = R.string.delete_report_description),
                 onClose = { showDeleteDialogVisible = false },
                 onExit = {
+                    report.isDeletedManually = true
                     Toast.makeText(context, reportDeleted, Toast.LENGTH_SHORT).show()
                     showDeleteDialogVisible = false
                     navigateBack()
