@@ -30,7 +30,10 @@ fun HomeTab(
         mutableStateOf(R.drawable.red_marker)
     }
 
-    val marker = rememberIconImage(key = markerResourceId, painter = painterResource(markerResourceId))
+    val marker = rememberIconImage(
+        key = markerResourceId,
+        painter = painterResource(markerResourceId)
+    )
 
     MapboxMap(
         modifier = Modifier.fillMaxSize(),
