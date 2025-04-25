@@ -96,10 +96,12 @@ fun ExploreTab(
         verticalArrangement = Arrangement.spacedBy(Spacing.Inline),
     ) {
         items(storedReports) {
-            ReportCard(
-                report = it,
-                navigateToDetail = navigateToDetail
-            )
+            if(!it.isDeleted){
+                ReportCard(
+                    report = it,
+                    navigateToDetail = navigateToDetail
+                )
+            }
         }
     }
 }
