@@ -161,7 +161,10 @@ fun ReportCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         Icon(
-                            imageVector = if (report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline,
+                            imageVector = if (report.isHighPriority)
+                                Icons.Filled.Star
+                            else
+                                Icons.Filled.StarOutline,
                             contentDescription = stringResource(id = R.string.star_icon),
                             modifier = Modifier
                                 .padding(end = Spacing.Small * 3)
