@@ -38,7 +38,8 @@ fun NotificationsTab(
             status = ReportStatus.PENDING_VERIFICATION,
             userId = "1",
             date = LocalDateTime.now(),
-            rejectionDate = LocalDateTime.now().minusDays(1)
+            rejectionDate = LocalDateTime.now().minusDays(1),
+            isDeletedManually = true
         ),
         Report(
             id = "2",
@@ -89,7 +90,8 @@ fun NotificationsTab(
             date = LocalDateTime.now().minusDays(1),
             isResolved = false,
             priorityCounter = 3,
-            rejectionDate = LocalDateTime.now().minusDays(2)
+            rejectionDate = LocalDateTime.now().minusDays(2),
+            isDeletedManually = true
         ),
         Report(
             id = "6",
@@ -103,11 +105,35 @@ fun NotificationsTab(
             date = LocalDateTime.now().minusMinutes(45),
             isResolved = true,
             priorityCounter = 15
+        ),
+        Report(
+            id = "1",
+            title = "Report 1",
+            category = Category.SECURITY,
+            description = "This is a report",
+            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s"),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
+            status = ReportStatus.PENDING_VERIFICATION,
+            userId = "1",
+            date = LocalDateTime.now(),
+            rejectionDate = LocalDateTime.now().minusDays(1)
+        ),
+        Report(
+            id = "2",
+            title = "Report 2",
+            category = Category.PETS,
+            description = "This is a test report...",
+            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHtshKCjboh0e9X3dP5l-igYWWA4C8-nSaw&s"),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
+            status = ReportStatus.VERIFIED,
+            userId = "1",
+            date = LocalDateTime.now(),
+            isResolved = true,
+            priorityCounter = 25
         )
     )
 
     var remainingDays = -1
-
 
     LazyColumn(
         modifier = Modifier
@@ -115,47 +141,36 @@ fun NotificationsTab(
             .padding(horizontal = Spacing.Sides),
         verticalArrangement = Arrangement.spacedBy(Spacing.Large)
     ) {
-        item {
-            NotificationItem(
-                title = "Report deleted",
-                status = "Deleted",
-                supportingText = formatNotificationDate(LocalDateTime.now()),
-                statusMessage = "Your report 'title' has been removed by an admin.",
-                onClick = {
-                    exitDialogVisible = true
-                },
-                statusColor = MaterialTheme.colorScheme.error
-            )
-        }
         items(storedReports.sortedByDescending { it.date }) { report ->
-            remainingDays = report.remainingDaysToDeletion
-            NotificationItem(
-                title = report.title,
-                status = if (report.status == ReportStatus.VERIFIED)
-                    stringResource(id = R.string.verified)
-                else
-                    stringResource(id = R.string.rejected),
-                supportingText = formatNotificationDate(report.date),
-                statusMessage = if (report.status == ReportStatus.VERIFIED)
-                    "Your report has been verified, congratulations!"
-                else
-                    "Your report has been rejected; you have $remainingDays days to modify it or will be deleted.",
-                imageUrl = report.images.first(),
-                onClick = { navigateToReportView(report.id, report.status) },
-                statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-            )
-        }
-        item {
-            NotificationItem(
-                title = "Report deleted",
-                status = "Deleted",
-                supportingText = formatNotificationDate(LocalDateTime.now().minusDays(2)),
-                statusMessage = "Your report 'title 2' has been removed by an admin.",
-                onClick = {
-                    exitDialogVisible = true
-                },
-                statusColor = MaterialTheme.colorScheme.error
-            )
+            if(report.isDeleted){
+                NotificationItem(
+                    title = "Report deleted",
+                    status = "Deleted",
+                    supportingText = formatNotificationDate(LocalDateTime.now()),
+                    statusMessage = "Your report 'title' has been removed by an admin.",
+                    onClick = {
+                        exitDialogVisible = true
+                    },
+                    statusColor = MaterialTheme.colorScheme.error
+                )
+            }else{
+                remainingDays = report.remainingDaysToDeletion
+                NotificationItem(
+                    title = report.title,
+                    status = if (report.status == ReportStatus.VERIFIED)
+                        stringResource(id = R.string.verified)
+                    else
+                        stringResource(id = R.string.rejected),
+                    supportingText = formatNotificationDate(report.date),
+                    statusMessage = if (report.status == ReportStatus.VERIFIED)
+                        "Your report has been verified, congratulations!"
+                    else
+                        "Your report has been rejected; you have $remainingDays days to modify it or will be deleted.",
+                    imageUrl = report.images.first(),
+                    onClick = { navigateToReportView(report.id, report.status) },
+                    statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                )
+            }
         }
         item {
             Spacer(modifier = Modifier.height(Spacing.Large))
