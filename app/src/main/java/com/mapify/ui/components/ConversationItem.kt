@@ -1,11 +1,8 @@
 package com.mapify.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MarkChatRead
@@ -14,16 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.mapify.R
 import com.mapify.model.Conversation
 import com.mapify.ui.theme.Spacing
 import com.mapify.ui.users.tabs.formatNotificationOrMessageDate
@@ -109,44 +99,11 @@ private fun MessageUserAvatar(imageUrl: String?, name: String) {
             .height(70.dp),
         contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape)
-        ) {
-            MessageUserIcon(imageUrl, name)
-        }
-    }
-}
-
-@Composable
-fun MessageUserIcon(
-    profileImageUrl: String? = null,
-    fullName: String
-) {
-    if (!profileImageUrl.isNullOrBlank()) {
-        AsyncImage(
-            modifier = Modifier.fillMaxSize(),
-            model = profileImageUrl,
-            contentDescription = stringResource(id = R.string.report_image),
-            contentScale = ContentScale.Crop
+        ProfileIcon(
+            imageUrl = imageUrl,
+            fallbackText = name,
+            size = 50.dp
         )
-    } else {
-        val fallbackColor = MaterialTheme.colorScheme.primaryContainer
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(fallbackColor, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = fullName.firstOrNull()?.uppercase() ?: "?",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-        }
     }
 }
 
@@ -172,7 +129,7 @@ private fun ConversationTextSection(
                 text = name,
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
             )
             Text(
                 text = time,
@@ -194,19 +151,19 @@ private fun ConversationTextSection(
                 Text(
                     text = content,
                     style = MaterialTheme.typography.bodySmall.copy(
-                        fontWeight = if (!isRead) FontWeight.Bold else FontWeight.Normal,
+                        fontWeight = if (!isRead) androidx.compose.ui.text.font.FontWeight.Bold else androidx.compose.ui.text.font.FontWeight.Normal,
                         color = if (!isRead) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline,
                         lineHeight = 16.sp
                     ),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
             }
             if (!isRead) {
                 Text(
                     text = "\u2B24", // Bullet unicode
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                     modifier = Modifier
                         .padding(start = 4.dp)
                         .align(Alignment.CenterVertically)
