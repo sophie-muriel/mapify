@@ -103,8 +103,8 @@ fun LoginScreen(
 
             // text form
             LoginForm(
-                email,
-                password,
+                email = email,
+                password = password,
                 onValueChangeEmail = { email = it },
                 onValueChangePassword = { password = it },
                 onClickLogin = {
@@ -132,7 +132,7 @@ fun LoginScreen(
                         resetFields()
                     }, 100)
                 },
-                recoveryEmail,
+                recoveryEmail = recoveryEmail,
                 onValueChangeRecoveryEmail = {
                     recoveryEmail = it
                     recoveryEmailTouched = true
@@ -142,11 +142,10 @@ fun LoginScreen(
                         context, context.getString(R.string.recovery_email_sent), Toast.LENGTH_SHORT
                     ).show()
                 },
-                recoveryEmailError,
+                recoveryEmailError = recoveryEmailError,
                 resetRecoveryFields = {
                     resetRecoveryFields()
                 }
-
             )
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
@@ -240,9 +239,7 @@ fun LoginForm(
 
         Spacer(modifier = Modifier.padding(Spacing.Inline))
 
-        TextButton(
-            onClick = onClickRegistration
-        ) {
+        TextButton(onClick = onClickRegistration) {
             Text(
                 text = stringResource(id = R.string.register_account),
                 style = MaterialTheme.typography.labelSmall
