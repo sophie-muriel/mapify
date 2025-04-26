@@ -29,8 +29,8 @@ import com.mapify.model.Role
 import com.mapify.model.User
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
-import com.mapify.ui.components.MessageUserIcon
 import com.mapify.ui.components.MinimalDropdownMenu
+import com.mapify.ui.components.ProfileIcon
 import com.mapify.ui.theme.Spacing
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -313,13 +313,11 @@ fun ChatBubble(
         verticalAlignment = Alignment.Bottom
     ) {
         if (!isMe) {
-            Box(
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape)
-            ) {
-                MessageUserIcon(profileImageUrl, senderName)
-            }
+            ProfileIcon(
+                imageUrl = profileImageUrl,
+                fallbackText = senderName,
+                size = 50.dp
+            )
             Spacer(modifier = Modifier.width(6.dp))
         }
 

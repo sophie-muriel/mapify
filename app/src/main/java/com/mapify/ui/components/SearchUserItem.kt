@@ -1,15 +1,12 @@
 package com.mapify.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.mapify.ui.theme.Spacing
 
@@ -26,22 +23,13 @@ fun SearchUserItem(
             .padding(vertical = Spacing.Small),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .padding(end = Spacing.Inline)
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = fullName.firstOrNull()?.uppercase() ?: "?",
-                style = MaterialTheme.typography.titleSmall.copy(
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-                )
-            )
-        }
+        ProfileIcon(
+            imageUrl = null,
+            fallbackText = fullName,
+            size = 40.dp
+        )
+
+        Spacer(modifier = Modifier.width(Spacing.Inline))
 
         Column {
             Text(
