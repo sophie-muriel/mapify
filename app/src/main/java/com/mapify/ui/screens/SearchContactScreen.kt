@@ -143,12 +143,12 @@ fun SearchContactScreen(
         modifier = Modifier.padding(Spacing.Inline),
         topBar = {
             SimpleTopBar(
-                Alignment.CenterStart,
-                stringResource(id = R.string.search_for_user),
-                Icons.AutoMirrored.Filled.ArrowBack,
-                stringResource(id = R.string.back_arrow_icon),
+                contentAlignment = Alignment.CenterStart,
+                text = stringResource(id = R.string.search_for_user),
+                navIconVector = Icons.AutoMirrored.Filled.ArrowBack,
+                navIconDescription = stringResource(id = R.string.back_arrow_icon),
                 onClickNavIcon = navigateBack,
-                false,
+                actions = false,
                 isSearch = true,
                 searchQuery = searchQuery,
                 onSearchQueryChange = { searchQuery = it }
@@ -165,18 +165,14 @@ fun SearchContactScreen(
         ) {
             Spacer(modifier = Modifier.height(Spacing.Large))
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(Spacing.Inline)
-            ) {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(Spacing.Inline)) {
                 if (searchQuery.isBlank()) {
                     items(recentSearches) { email ->
                         val conversation = conversationsList.find { it.recipient.email == email }
                         if (conversation != null) {
                             RecentSearchItem(
                                 email = email,
-                                onClick = {
-                                    onUserSelected(conversation.id)
-                                }
+                                onClick = { onUserSelected(conversation.id) }
                             )
                         }
                     }
