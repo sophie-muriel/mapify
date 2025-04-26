@@ -213,7 +213,7 @@ fun RecentSearchItem(
         )
         Icon(
             imageVector = Icons.Default.History,
-            contentDescription = "Search recent"
+            contentDescription = stringResource(id = R.string.recent_search_icon)
         )
     }
 }
