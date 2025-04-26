@@ -24,12 +24,12 @@ fun ReportLocationScreen(
     Scaffold(
         topBar = {
             SimpleTopBar(
-                Alignment.CenterStart,
-                stringResource(id = R.string.report_location),
-                Icons.AutoMirrored.Filled.ArrowBack,
-                stringResource(id = R.string.back_arrow_icon),
+                contentAlignment = Alignment.CenterStart,
+                text = stringResource(id = R.string.report_location),
+                navIconVector = Icons.AutoMirrored.Filled.ArrowBack,
+                navIconDescription = stringResource(id = R.string.back_arrow_icon),
                 onClickNavIcon = { navigateBack() },
-                false
+                actions = false
             )
         }) { padding ->
         Column(
