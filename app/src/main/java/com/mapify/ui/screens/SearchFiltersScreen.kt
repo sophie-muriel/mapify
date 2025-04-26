@@ -84,12 +84,12 @@ fun SearchFiltersScreen(
     Scaffold(
         topBar = {
             SimpleTopBar(
-                Alignment.CenterStart,
-                stringResource(id = R.string.search_filters),
-                Icons.AutoMirrored.Filled.ArrowBack,
-                stringResource(id = R.string.back_arrow_icon),
+                contentAlignment = Alignment.CenterStart,
+                text = stringResource(id = R.string.search_filters),
+                navIconVector = Icons.AutoMirrored.Filled.ArrowBack,
+                navIconDescription = stringResource(id = R.string.back_arrow_icon),
                 onClickNavIcon = { navigateBack() },
-                false
+                actions = false
             )
         }) { padding ->
         Column(
@@ -299,11 +299,13 @@ fun FilterRow(
     onStatusChange: (Boolean) -> Unit,
     isSwitch: Boolean
 ){
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = Spacing.Sides, end = 48.dp),
+            .padding(
+                start = Spacing.Sides,
+                end = 48.dp
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
@@ -332,9 +334,7 @@ fun FilterRow(
                 onCheckedChange = onStatusChange
             )
         }else{
-            IconButton(
-                onClick = { onStatusChange(!status) }
-            ) {
+            IconButton(onClick = { onStatusChange(!status) }) {
                 Icon(
                 imageVector = Icons.Filled.PlayArrow,
                 contentDescription = stringResource(id = R.string.play_arrow_icon),
@@ -377,16 +377,13 @@ fun DatePickerForFilter(
             Spacer(modifier = Modifier.height(Spacing.Sides))
         },
         dismissButton = {
-            TextButton(
-                onClick = onClickCancel
-            ) {
+            TextButton(onClick = onClickCancel) {
                 Text(
                     text = stringResource(id = R.string.cancel),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
-
     ){
         DatePicker(
             state = datePickerState,
@@ -402,8 +399,7 @@ fun DistanceSelectionDialog(
     onSliderPositionChange: (Float) -> Unit,
     onCancel: () -> Unit
 ) {
-    Dialog(
-        onDismissRequest = { onCancel() }) {
+    Dialog(onDismissRequest = { onCancel() }) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -412,14 +408,13 @@ fun DistanceSelectionDialog(
         ) {
             Spacer(modifier = Modifier.height(Spacing.Sides))
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ){
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)){
                 Text(
                     text = stringResource(id = R.string.select_distance),
                     textAlign = TextAlign.Left,
                     modifier = Modifier.padding(
-                        horizontal = Spacing.Sides, vertical = Spacing.Small
+                        horizontal = Spacing.Sides,
+                        vertical = Spacing.Small
                     ),
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -427,7 +422,8 @@ fun DistanceSelectionDialog(
                     text = stringResource(id = R.string.distance_km),
                     textAlign = TextAlign.Left,
                     modifier = Modifier.padding(
-                        horizontal = Spacing.Sides, vertical = Spacing.Small
+                        horizontal = Spacing.Sides,
+                        vertical = Spacing.Small
                     ),
                     style = MaterialTheme.typography.headlineMedium
                 )
@@ -453,20 +449,15 @@ fun DistanceSelectionDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(
-                            horizontal = Spacing.Sides
-                        ), horizontalArrangement = Arrangement.End,
+                        .padding(horizontal = Spacing.Sides),
+                    horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.weight(1f)
-                    ){
+                    Row(modifier = Modifier.weight(1f)){
                         Text(text = sliderPosition.toString().dropLast(2) + " KM")
                     }
 
-                    TextButton(
-                        onClick = onCancel
-                    ) {
+                    TextButton(onClick = onCancel) {
                         Text(
                             text = stringResource(id = R.string.cancel),
                             style = MaterialTheme.typography.bodyMedium
@@ -495,7 +486,6 @@ fun DistanceSelectionDialog(
 
             Spacer(modifier = Modifier.height(Spacing.Sides))
         }
-
     }
 }
 
@@ -547,6 +537,5 @@ fun Buttons(
             )
         }
     }
-
 }
 
