@@ -134,9 +134,9 @@ fun ProfileScreen(
                     passwordTouched = false
                     editMode = !editMode
                 },
-                nameError,
-                emailError,
-                passwordError
+                nameError = nameError,
+                emailError = emailError,
+                passwordError = passwordError
             )
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen / 2))
