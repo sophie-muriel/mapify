@@ -335,8 +335,8 @@ fun ReportViewScreen(
         if (isCreator) {
             listOf(
                 MenuAction.Simple(
-                    stringResource(id = R.string.edit),
-                    {
+                    label = stringResource(id = R.string.edit),
+                    icon = {
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = stringResource(id = R.string.edit_icon_description),
@@ -346,8 +346,8 @@ fun ReportViewScreen(
                     navigateToReportEdit?.let { it(reportId) }
                 },
                 MenuAction.Simple(
-                    stringResource(id = R.string.delete),
-                    {
+                    label = stringResource(id = R.string.delete),
+                    icon = {
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = stringResource(id = R.string.delete_icon),
@@ -361,8 +361,8 @@ fun ReportViewScreen(
         } else if (isAdmin) {
             listOf(
                 MenuAction.Simple(
-                    stringResource(id = R.string.verify),
-                    {
+                    label = stringResource(id = R.string.verify),
+                    icon = {
                         Icon(
                             Icons.Default.CheckCircle,
                             contentDescription = stringResource(id = R.string.check_circle_icon),
@@ -372,8 +372,8 @@ fun ReportViewScreen(
                     showVerifyDialogle = true
                 },
                 MenuAction.Simple(
-                    stringResource(id = R.string.reject),
-                    {
+                    label = stringResource(id = R.string.reject),
+                    icon = {
                         Icon(
                             Icons.Default.Unpublished,
                             contentDescription = stringResource(id = R.string.unpublished_icon),
@@ -384,8 +384,8 @@ fun ReportViewScreen(
                     showRejectionInputDialog = true
                 },
                 MenuAction.Simple(
-                    stringResource(id = R.string.delete),
-                    {
+                    label = stringResource(id = R.string.delete),
+                    icon = {
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = stringResource(id = R.string.delete_icon),
@@ -399,8 +399,8 @@ fun ReportViewScreen(
         } else {
             listOf(
                 MenuAction.Simple(
-                    stringResource(id = R.string.boost_priority),
-                    {
+                    label = stringResource(id = R.string.boost_priority),
+                    icon = {
                         Icon(
                             Icons.AutoMirrored.Filled.TrendingUp,
                             contentDescription = stringResource(id = R.string.trending_up_icon),
@@ -416,19 +416,17 @@ fun ReportViewScreen(
     Scaffold(
         topBar = {
             SimpleTopBar(
-                Alignment.CenterStart,
-                stringResource(id = R.string.report_view),
-                Icons.AutoMirrored.Filled.ArrowBack,
-                stringResource(id = R.string.back_arrow_icon),
+                contentAlignment = Alignment.CenterStart,
+                text = stringResource(id = R.string.report_view),
+                navIconVector = Icons.AutoMirrored.Filled.ArrowBack,
+                navIconDescription = stringResource(id = R.string.back_arrow_icon),
                 onClickNavIcon = { navigateBack() },
-                true,
+                actions = true,
                 firstActionIconVector = starIcon,
-                starIconDescription,
-                {},
+                firstActionIconDescription = starIconDescription,
+                firstOnClickAction = {},
                 secondAction = true,
-                secondActionContent = {
-                    MinimalDropdownMenu(menuItems)
-                },
+                secondActionContent = { MinimalDropdownMenu(menuItems) },
                 tint = tint
             )
         },
@@ -537,8 +535,10 @@ fun ReportViewScreen(
 
         if(showDeleteDialogVisible){
             GenericDialog(
-                title = if(isCreator) stringResource(id = R.string.delete_report_title, stringResource(id = R.string.your))
-                else stringResource(id = R.string.delete_report_title, stringResource(id = R.string.this_)),
+                title = if(isCreator)
+                    stringResource(id = R.string.delete_report_title, stringResource(id = R.string.your))
+                else
+                    stringResource(id = R.string.delete_report_title, stringResource(id = R.string.this_)),
                 message = stringResource(id = R.string.delete_report_description),
                 onClose = { showDeleteDialogVisible = false },
                 onExit = {
@@ -644,9 +644,7 @@ fun DescriptionText(
                 .verticalScroll(scrollState)
         ) {
             Row {
-                Text(
-                    text = text
-                )
+                Text(text = text)
             }
         }
 
@@ -733,9 +731,7 @@ fun Comments(
                         }
                     },
                     supportingContent = {
-                        Text(
-                            text = comment.content
-                        )
+                        Text(text = comment.content)
                     },
                     leadingContent = {
                         Icon(
