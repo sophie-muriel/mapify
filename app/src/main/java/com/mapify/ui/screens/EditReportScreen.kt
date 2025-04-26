@@ -232,10 +232,10 @@ fun EditReportScreen(
     Scaffold(
         topBar = {
             SimpleTopBar(
-                Alignment.CenterStart,
-                stringResource(id = R.string.edit_report),
-                Icons.AutoMirrored.Filled.ArrowBack,
-                stringResource(id = R.string.back_arrow_icon),
+                contentAlignment = Alignment.CenterStart,
+                text = stringResource(id = R.string.edit_report),
+                navIconVector = Icons.AutoMirrored.Filled.ArrowBack,
+                navIconDescription = stringResource(id = R.string.back_arrow_icon),
                 onClickNavIcon = {
                     if (titleTouched || dropDownTouched || descriptionTouched || photoTouchedList.any { it }) {
                         exitDialogVisible = true
@@ -243,7 +243,7 @@ fun EditReportScreen(
                         navigateBack()
                     }
                 },
-                false
+                actions = false
             )
         },
         contentWindowInsets = WindowInsets.systemBars,
