@@ -12,6 +12,8 @@ import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
+import com.mapbox.maps.extension.compose.rememberMapState
+import com.mapbox.maps.plugin.gestures.generated.GesturesSettings
 import com.mapify.R
 
 @Composable
@@ -23,6 +25,7 @@ fun HomeTab(
         setCameraOptions {
             zoom(8.0)
             center(Point.fromLngLat(-75.6491181, 4.4687891))
+            pitch(45.0)
         }
     }
 
@@ -38,6 +41,9 @@ fun HomeTab(
     MapboxMap(
         modifier = Modifier.fillMaxSize(),
         mapViewportState = mapViewportState,
+        mapState = rememberMapState {
+            gesturesSettings = GesturesSettings { pitchEnabled = true }
+        }
     ){
         PointAnnotation(
             point = Point.fromLngLat(-75.6491181, 4.4687891)
