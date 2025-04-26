@@ -110,37 +110,51 @@ fun RegistrationScreen(
 
                 Spacer(modifier = Modifier.height(Spacing.Large * 2.8f))
 
-                RegistrationForm(name, onValueChangeName = {
-                    name = it
-                    nameTouched = true
-                }, nameError, email, onValueChangeEmail = {
-                    email = it
-                    emailTouched = true
-                }, emailError, password, onValueChangePassword = {
-                    password = it
-                    passwordTouched = true
-                }, passwordError, passwordConfirmation, onValueChangePasswordConfirmation = {
-                    passwordConfirmation = it
-                    passwordConfirmationTouched = true
-                }, passwordConfirmationError, onClickRegister = {
-                    if (email != "root") {
-                        locationForm = true
-                    } else {
-                        Toast.makeText(
-                            context, context.getString(R.string.email_taken), Toast.LENGTH_SHORT
-                        ).show()
+                RegistrationForm(
+                    name = name,
+                    onValueChangeName = {
+                        name = it
+                        nameTouched = true
+                    },
+                    nameError = nameError,
+                    email = email,
+                    onValueChangeEmail = {
+                        email = it
+                        emailTouched = true
+                    },
+                    emailError = emailError,
+                    password = password,
+                    onValueChangePassword = {
+                        password = it
+                        passwordTouched = true
+                    },
+                    passwordError = passwordError,
+                    passwordConfirmation = passwordConfirmation,
+                    onValueChangePasswordConfirmation = {
+                        passwordConfirmation = it
+                        passwordConfirmationTouched = true
+                    },
+                    passwordConfirmationError = passwordConfirmationError,
+                    onClickRegister = {
+                        if (email != "root") {
+                            locationForm = true
+                        } else {
+                            Toast.makeText(
+                                context, context.getString(R.string.email_taken), Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
+                    navigateToLogin = {
+                        navigateBack()
+                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                            resetFields()
+                        }, 100)
                     }
-                }, navigateToLogin = {
-                    navigateBack()
-                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                        resetFields()
-                    }, 100)
-                })
+                )
 
                 Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
             } else { // registration form part 2
                 Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
-
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -172,9 +186,10 @@ fun RegistrationScreen(
                             vertical = if (locationShared) (Spacing.Large + 4.dp) else 0.dp
                         )
                         .align(Alignment.CenterHorizontally),
-                    text = if (locationShared) stringResource(
-                        id = R.string.location_enabled, location
-                    ) else stringResource(id = R.string.enable_location_access_message),
+                    text = if (locationShared)
+                        stringResource(id = R.string.location_enabled, location)
+                    else
+                        stringResource(id = R.string.enable_location_access_message),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )
@@ -182,7 +197,8 @@ fun RegistrationScreen(
                 Spacer(modifier = Modifier.height(Spacing.Large * 18.1f))
 
                 ConfirmLocationForm(
-                    locationShared, onClickConfirmLocation = {
+                    locationShared = locationShared,
+                    onClickConfirmLocation = {
                         if (locationShared) {
                             Toast.makeText(
                                 context,
@@ -308,10 +324,13 @@ fun RegistrationForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    start = 24.dp, end = 24.dp
+                    start = 24.dp,
+                    end = 24.dp
                 )
                 .height(40.dp),
-            enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && passwordConfirmation.isNotEmpty() && !emailError && !passwordError && !passwordConfirmationError,
+            enabled = name.isNotEmpty() && email.isNotEmpty()
+                    && password.isNotEmpty() && passwordConfirmation.isNotEmpty()
+                    && !emailError && !passwordError && !passwordConfirmationError,
             onClick = onClickRegister,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -326,9 +345,7 @@ fun RegistrationForm(
 
         Spacer(modifier = Modifier.padding(Spacing.Inline))
 
-        TextButton(
-            onClick = navigateToLogin
-        ) {
+        TextButton(onClick = navigateToLogin) {
             Text(
                 text = stringResource(id = R.string.login_account),
                 style = MaterialTheme.typography.labelSmall
@@ -351,9 +368,7 @@ fun ConfirmLocationForm(
         Button(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    horizontal = Spacing.Sides
-                )
+                .padding(horizontal = Spacing.Sides)
                 .height(40.dp),
             enabled = true,
             onClick = onClickConfirmLocation,
@@ -363,9 +378,10 @@ fun ConfirmLocationForm(
             ),
         ) {
             Text(
-                text = if (locationShared) stringResource(id = R.string.finish_registration) else stringResource(
-                    id = R.string.enable_location_access
-                ), style = MaterialTheme.typography.bodyMedium
+                text = if (locationShared)
+                    stringResource(id = R.string.finish_registration)
+                else stringResource(id = R.string.enable_location_access),
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -373,10 +389,12 @@ fun ConfirmLocationForm(
     Spacer(modifier = Modifier.padding(Spacing.Inline))
 
     TextButton(
-        onClick = {}, enabled = false
+        onClick = {},
+        enabled = false
     ) {
         Text(
-            text = "", style = MaterialTheme.typography.labelSmall
+            text = "",
+            style = MaterialTheme.typography.labelSmall
         )
     }
 
