@@ -151,14 +151,14 @@ fun CreateReportScreen(
     Scaffold(
         topBar = {
             SimpleTopBar(
-                Alignment.CenterStart,
-                stringResource(id = R.string.create_report),
-                Icons.AutoMirrored.Filled.ArrowBack,
-                stringResource(id = R.string.back_arrow_icon),
+                contentAlignment = Alignment.CenterStart,
+                text = stringResource(id = R.string.create_report),
+                navIconVector = Icons.AutoMirrored.Filled.ArrowBack,
+                navIconDescription = stringResource(id = R.string.back_arrow_icon),
                 onClickNavIcon = {
                     exitDialogVisible = true
                 },
-                false
+                actions = false
             )
         },
         modifier = Modifier
