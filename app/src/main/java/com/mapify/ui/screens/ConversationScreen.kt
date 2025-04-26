@@ -184,9 +184,7 @@ fun ConversationScreen(
                         )
                     }
                 },
-                actions = {
-                    MinimalDropdownMenu(menuItems)
-                }
+                actions = { MinimalDropdownMenu(menuItems) }
             )
         },
         modifier = Modifier
@@ -222,7 +220,10 @@ fun ConversationScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = Spacing.Small, vertical = Spacing.Large),
+                    .padding(
+                        horizontal = Spacing.Small,
+                        vertical = Spacing.Large
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
@@ -296,10 +297,14 @@ fun ChatBubble(
     senderName: String,
     profileImageUrl: String? = null
 ) {
-    val bubbleColor =
-        if (isMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
-    val textColor =
-        if (isMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+    val bubbleColor = if (isMe)
+            MaterialTheme.colorScheme.primary
+        else
+            MaterialTheme.colorScheme.surfaceVariant
+    val textColor = if (isMe)
+            MaterialTheme.colorScheme.onPrimary
+        else
+            MaterialTheme.colorScheme.onSurface
 
     Row(
         modifier = Modifier
