@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,9 +12,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import coil.compose.AsyncImage
+import com.mapbox.geojson.Point
+import com.mapbox.maps.extension.compose.MapboxMap
+import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import com.mapify.R
 import com.mapify.ui.components.SimpleTopBar
 
@@ -21,6 +24,15 @@ import com.mapify.ui.components.SimpleTopBar
 fun ReportLocationScreen(
     navigateBack: () -> Unit
 ) {
+    val context = LocalContext.current
+    val mapViewportState = rememberMapViewportState {
+        setCameraOptions {
+            zoom(8.0)
+            center(Point.fromLngLat(-75.6491181, 4.4687891))
+            pitch(45.0)
+        }
+    }
+
     Scaffold(
         topBar = {
             SimpleTopBar(
@@ -39,18 +51,14 @@ fun ReportLocationScreen(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Top
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                AsyncImage(
-                    model = "https://i.redd.it/tol9eauarmm61.jpg",
-                    contentDescription = "Static map",
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentScale = ContentScale.FillBounds
-                )
-            }
+            MapboxMap(
+                modifier = Modifier.fillMaxSize(),
+                mapViewportState = mapViewportState,
+                onMapClickListener = { point ->
+                    Toast.makeText(context, "Click en ${point.latitude()}, ${point.longitude()}", Toast.LENGTH_SHORT).show()
+                    true
+                }
+            )
         }
     }
 }
