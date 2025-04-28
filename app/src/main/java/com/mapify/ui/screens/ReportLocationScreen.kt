@@ -10,13 +10,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.mapbox.geojson.Point
 import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
+import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
+import com.mapbox.maps.extension.compose.annotation.rememberIconImage
 import com.mapify.R
 import com.mapify.ui.components.SimpleTopBar
 
@@ -32,6 +39,16 @@ fun ReportLocationScreen(
             pitch(45.0)
         }
     }
+    var clickedPoint by remember { mutableStateOf<Point?>(null) }
+
+    val markerResourceId by remember {
+        mutableStateOf(R.drawable.red_marker)
+    }
+
+    val marker = rememberIconImage(
+        key = markerResourceId,
+        painter = painterResource(markerResourceId)
+    )
 
     Scaffold(
         topBar = {
@@ -55,10 +72,19 @@ fun ReportLocationScreen(
                 modifier = Modifier.fillMaxSize(),
                 mapViewportState = mapViewportState,
                 onMapClickListener = { point ->
-                    Toast.makeText(context, "Click en ${point.latitude()}, ${point.longitude()}", Toast.LENGTH_SHORT).show()
+                    clickedPoint = point
                     true
                 }
-            )
+            ){
+                clickedPoint?.let {
+                    PointAnnotation(
+                        point = clickedPoint!!
+                    ){
+                        iconImage = marker
+                    }
+                }
+
+            }
         }
     }
 }
