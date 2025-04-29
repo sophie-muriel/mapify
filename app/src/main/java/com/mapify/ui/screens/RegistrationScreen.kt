@@ -43,12 +43,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mapify.R
+import com.mapify.model.Location
+import com.mapify.model.Role
+import com.mapify.model.User
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.LogoTitle
 import com.mapify.ui.theme.Spacing
+import com.mapify.viewmodel.UsersViewModel
+import java.util.UUID
 
 @Composable
 fun RegistrationScreen(
+    usersViewModel: UsersViewModel,
     navigateBack: () -> Unit
 ) {
     var name by rememberSaveable { mutableStateOf("") }
@@ -62,7 +68,9 @@ fun RegistrationScreen(
 
     var locationShared by rememberSaveable { mutableStateOf(false) }
     var locationForm by rememberSaveable { mutableStateOf(false) }
-    val location = "Colombia" // fixed for now, change when location access is explained in class
+    val location = Location( //TODO: dynamic change
+        latitude = 43230.2, longitude = 753948.8, country = "Colombia", city = "Armenia"
+    )
 
     val context = LocalContext.current
 
@@ -101,11 +109,9 @@ fun RegistrationScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // registration form first part
             if (!locationForm) {
                 Spacer(modifier = Modifier.height(Spacing.TopBottomScreen + 15.dp))
 
-                // logo + name
                 LogoTitle(3.5f)
 
                 Spacer(modifier = Modifier.height(Spacing.Large * 2.8f))
@@ -136,7 +142,7 @@ fun RegistrationScreen(
                     },
                     passwordConfirmationError = passwordConfirmationError,
                     onClickRegister = {
-                        if (email != "root") {
+                        if (email != "root") { //TODO: validate correctly with ViewModel
                             locationForm = true
                         } else {
                             Toast.makeText(
@@ -153,7 +159,7 @@ fun RegistrationScreen(
                 )
 
                 Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
-            } else { // registration form part 2
+            } else {
                 Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
 
                 Column(
@@ -200,6 +206,16 @@ fun RegistrationScreen(
                     locationShared = locationShared,
                     onClickConfirmLocation = {
                         if (locationShared) {
+                            usersViewModel.create(
+                                User(
+                                    id = UUID.randomUUID().toString(),
+                                    fullName = name,
+                                    email = email,
+                                    password = password,
+                                    role = Role.CLIENT,
+                                    registrationLocation = location
+                                )
+                            )
                             Toast.makeText(
                                 context,
                                 context.getString(R.string.registration_successful),
