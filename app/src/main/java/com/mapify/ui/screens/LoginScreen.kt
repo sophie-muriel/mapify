@@ -35,10 +35,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.mapify.R
+import com.mapify.model.Role
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.LogoTitle
 import com.mapify.ui.theme.Spacing
+import com.mapify.utils.SharedPreferencesUtils
+import com.mapify.viewmodel.UsersViewModel
 
 @Composable
 fun SetSoftInputModePan() {
@@ -60,6 +63,7 @@ fun SetSoftInputModePan() {
 
 @Composable
 fun LoginScreen(
+    usersViewModel: UsersViewModel,
     navigateToRegistration: () -> Unit,
     navigateToHome: (Boolean, String) -> Unit
 ) {
@@ -96,34 +100,33 @@ fun LoginScreen(
         ) {
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
 
-            // logo + name
             LogoTitle(2f)
 
             Spacer(modifier = Modifier.height(Spacing.Large * 7.8f))
 
-            // text form
             LoginForm(
                 email = email,
                 password = password,
                 onValueChangeEmail = { email = it },
                 onValueChangePassword = { password = it },
                 onClickLogin = {
-                    if (email == "root" && password == "root") {
-                        navigateToHome(false, "1")
-                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                            resetFields()
-                        }, 200)
-                    } else if (email == "admin" && password == "admin") {
-                        navigateToHome(true, "2")
-                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                            resetFields()
-                        }, 200)
-                    } else {
+                    val user = usersViewModel.login(email, password)
+
+                    if (user == null){
                         Toast.makeText(
                             context,
                             context.getString(R.string.incorrect_credentials),
                             Toast.LENGTH_SHORT
                         ).show()
+                    } else {
+                        navigateToHome(
+                            user.role == Role.ADMIN,
+                            user.id
+                        )
+                        SharedPreferencesUtils.savePreference(context, user.id, user.role)
+                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                            resetFields()
+                        }, 200)
                     }
                 },
                 onClickRegistration = {
