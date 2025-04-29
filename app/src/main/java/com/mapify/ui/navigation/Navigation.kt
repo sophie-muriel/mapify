@@ -4,6 +4,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -20,21 +21,31 @@ import com.mapify.ui.screens.SearchContactScreen
 import com.mapify.ui.screens.SettingsScreen
 import com.mapify.ui.screens.SearchFiltersScreen
 import com.mapify.ui.users.HomeScreen
+import com.mapify.utils.SharedPreferencesUtils
+import com.mapify.viewmodel.UsersViewModel
 
 @Composable
-fun Navigation() {
+fun Navigation(
+    usersViewModel: UsersViewModel
+) {
 
+    val context = LocalContext.current
     val navController = rememberNavController()
+    val user = SharedPreferencesUtils.getPreference(context)
+
+    val startDestination: RouteScreen = if (user.isNotEmpty()) RouteScreen.Home else RouteScreen.Login
+
     val isAdmin = rememberSaveable { mutableStateOf(false) }
     val userId = rememberSaveable { mutableStateOf("1") }
 
     Surface {
         NavHost(
             navController = navController,
-            startDestination = RouteScreen.Login
+            startDestination = startDestination
         ) {
             composable<RouteScreen.Login> {
                 LoginScreen(
+                    usersViewModel = usersViewModel,
                     navigateToRegistration = {
                         navController.navigate(RouteScreen.Registration)
                     },
@@ -52,6 +63,7 @@ fun Navigation() {
             }
             composable<RouteScreen.Registration> {
                 RegistrationScreen(
+                    usersViewModel = usersViewModel,
                     navigateBack = {
                         navController.popBackStack()
                     }
