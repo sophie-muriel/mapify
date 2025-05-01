@@ -2,20 +2,12 @@ package com.mapify.ui.screens
 
 import android.util.Patterns
 import androidx.activity.compose.BackHandler
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,46 +21,43 @@ import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.ui.theme.Spacing
+import androidx.compose.runtime.saveable.rememberSaveable
 
 @Composable
 fun ProfileScreen(
     navigateBack: () -> Unit,
     isAdmin: Boolean
 ) {
-    val user = User(
-        id = if (isAdmin) "2" else "1",
-        fullName = if (isAdmin) "Administrator" else "Average User",
-        email = if (isAdmin) "admin" else "root",
-        password = if (isAdmin) "admin" else "root",
-        role = if (isAdmin) Role.ADMIN else Role.CLIENT,
-        registrationLocation = Location(
-            latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
-        ),
-    )
+    val user = remember {
+        User(
+            id = if (isAdmin) "2" else "1",
+            fullName = if (isAdmin) "Administrator" else "Average User",
+            email = if (isAdmin) "admin" else "root",
+            password = if (isAdmin) "admin" else "root",
+            role = if (isAdmin) Role.ADMIN else Role.CLIENT,
+            registrationLocation = Location(43230.1, 753948.7, "Colombia", "Armenia")
+        )
+    }
 
     var name by rememberSaveable { mutableStateOf(user.fullName) }
-    var nameTouched by rememberSaveable { mutableStateOf(false) }
     var email by rememberSaveable { mutableStateOf(user.email) }
-    var emailTouched by rememberSaveable { mutableStateOf(false) }
     var password by rememberSaveable { mutableStateOf(user.password) }
+    var nameTouched by rememberSaveable { mutableStateOf(false) }
+    var emailTouched by rememberSaveable { mutableStateOf(false) }
     var passwordTouched by rememberSaveable { mutableStateOf(false) }
-
-    val nameError = nameTouched && name.isBlank()
-    val emailError =
-        emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
-    val passwordError = passwordTouched && password.length < 6
-
     var editMode by rememberSaveable { mutableStateOf(false) }
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
 
-    if ((nameTouched || emailTouched || passwordTouched) && editMode) {
-        BackHandler(enabled = true) {
-            exitDialogVisible = true
-        }
-    } else if (editMode){
-        BackHandler(enabled = true) {
-            editMode = false
-        }
+    val nameError = nameTouched && name.isBlank()
+    val emailError = emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
+    val passwordError = passwordTouched && password.length < 6
+
+    BackHandler(enabled = editMode && (nameTouched || emailTouched || passwordTouched)) {
+        exitDialogVisible = true
+    }
+
+    BackHandler(enabled = editMode && !(nameTouched || emailTouched || passwordTouched)) {
+        editMode = false
     }
 
     Scaffold(
@@ -98,41 +87,39 @@ fun ProfileScreen(
                     }
                 }
             )
-        }) { padding ->
+        }
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen / 2))
 
             ProfileContent(
-                oldName = name,
-                oldEmail = email,
-                oldPassword = password,
+                name = name,
+                email = email,
+                password = password,
                 location = user.registrationLocation.toString(),
                 isEditMode = editMode,
                 onValueChangeName = {
-                    name = it
-                    nameTouched = true
+                    name = it; nameTouched = true
                 },
                 onValueChangeEmail = {
-                    email = it
-                    emailTouched = true
+                    email = it; emailTouched = true
                 },
                 onValueChangePassword = {
-                    password = it
-                    passwordTouched = true
+                    password = it; passwordTouched = true
                 },
                 onClickEdit = {
                     user.fullName = name
-                    nameTouched = false
                     user.email = email
-                    emailTouched = false
                     user.password = password
+                    nameTouched = false
+                    emailTouched = false
                     passwordTouched = false
-                    editMode = !editMode
+                    editMode = false
                 },
                 nameError = nameError,
                 emailError = emailError,
@@ -147,19 +134,16 @@ fun ProfileScreen(
         GenericDialog(
             title = stringResource(id = R.string.exit_profile_edit),
             message = stringResource(id = R.string.exit_profile_edit_description),
-            onClose = {
-                exitDialogVisible = false
-            },
+            onClose = { exitDialogVisible = false },
             onExit = {
-                if (!editMode) {
-                    exitDialogVisible = false
-                    navigateBack()
-                } else {
-                    exitDialogVisible = false
-                    editMode = false
+                exitDialogVisible = false
+                if (editMode) {
                     name = user.fullName
                     email = user.email
                     password = user.password
+                    editMode = false
+                } else {
+                    navigateBack()
                 }
             },
             onCloseText = stringResource(id = R.string.cancel),
@@ -170,9 +154,9 @@ fun ProfileScreen(
 
 @Composable
 fun ProfileContent(
-    oldName: String,
-    oldEmail: String,
-    oldPassword: String,
+    name: String,
+    email: String,
+    password: String,
     location: String,
     isEditMode: Boolean,
     onValueChangeName: (String) -> Unit,
@@ -193,83 +177,63 @@ fun ProfileContent(
             Icon(
                 imageVector = Icons.Outlined.AccountCircle,
                 contentDescription = stringResource(id = R.string.name_icon_description),
-                modifier = Modifier
-                    .size(100.dp)
-                    .padding(bottom = Spacing.Inline),
+                modifier = Modifier.size(100.dp).padding(bottom = Spacing.Inline),
                 tint = MaterialTheme.colorScheme.primary
             )
-
             Text(
-                text = stringResource(id = R.string.profile_greeting, oldName),
+                text = stringResource(id = R.string.profile_greeting, name),
                 style = MaterialTheme.typography.headlineSmall
             )
-
             Spacer(modifier = Modifier.height(Spacing.Inline * 2))
         } else {
-            Spacer(Modifier.height(100.dp))
-
+            Spacer(modifier = Modifier.height(100.dp))
             Text(
                 text = stringResource(id = R.string.edit_profile_label),
                 style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = Spacing.Sides),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.Sides),
                 textAlign = TextAlign.Start
             )
-
-            Spacer(Modifier.padding(Spacing.Inline))
+            Spacer(modifier = Modifier.padding(Spacing.Inline))
         }
 
         GenericTextField(
-            value = oldName,
+            value = name,
             supportingText = stringResource(id = R.string.name_supporting_text),
             label = stringResource(id = R.string.name_label),
             onValueChange = onValueChangeName,
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.AccountCircle,
-                    contentDescription = stringResource(id = R.string.name_icon_description),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
             isError = nameError,
             readOnly = !isEditMode,
-            isSingleLine = true
+            isSingleLine = true,
+            leadingIcon = {
+                Icon(Icons.Outlined.AccountCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            }
         )
 
         GenericTextField(
-            value = oldEmail,
+            value = email,
             supportingText = stringResource(id = R.string.email_supporting_text),
             label = stringResource(id = R.string.email_label),
             onValueChange = onValueChangeEmail,
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Email,
-                    contentDescription = stringResource(id = R.string.email_icon_description),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
             isError = emailError,
             readOnly = !isEditMode,
-            isSingleLine = true
+            isSingleLine = true,
+            leadingIcon = {
+                Icon(Icons.Outlined.Email, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            }
         )
 
         GenericTextField(
-            value = oldPassword,
+            value = password,
             supportingText = stringResource(id = R.string.password_supporting_text),
             label = stringResource(id = R.string.password_label),
             onValueChange = onValueChangePassword,
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Lock,
-                    contentDescription = stringResource(id = R.string.password_icon_description),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
             isError = passwordError,
             isPassword = true,
             readOnly = !isEditMode,
-            isSingleLine = true
+            isSingleLine = true,
+            leadingIcon = {
+                Icon(Icons.Outlined.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            }
         )
 
         GenericTextField(
@@ -277,31 +241,23 @@ fun ProfileContent(
             label = stringResource(id = R.string.location),
             onValueChange = {},
             isError = false,
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.LocationOn,
-                    contentDescription = stringResource(id = R.string.location_icon_description),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
             readOnly = true,
-            isSingleLine = true
+            isSingleLine = true,
+            leadingIcon = {
+                Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            }
         )
 
         if (isEditMode) {
             Spacer(modifier = Modifier.height(Spacing.Inline * 2))
-
             Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = Spacing.Sides)
-                    .height(40.dp),
-                enabled = oldName.isNotEmpty() && oldEmail.isNotEmpty() && oldPassword.isNotEmpty() && !emailError && !passwordError,
-                onClick = { onClickEdit() },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.Sides).height(40.dp),
+                enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && !emailError && !passwordError,
+                onClick = onClickEdit,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
+                )
             ) {
                 Text(
                     text = stringResource(id = R.string.save_changes_label),
