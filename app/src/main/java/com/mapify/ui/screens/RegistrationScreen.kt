@@ -1,8 +1,11 @@
 package com.mapify.ui.screens
 
+import android.content.pm.PackageManager
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,8 +33,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.mapify.R
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.LogoTitle
@@ -71,6 +77,23 @@ fun RegistrationScreen(
         emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
     val passwordError = passwordTouched && password.length < 6
     val passwordConfirmationError = passwordConfirmationTouched && passwordConfirmation != password
+
+    val permission = android.Manifest.permission.ACCESS_FINE_LOCATION
+
+    var hasPermission by remember {
+        mutableStateOf(ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasPermission = isGranted
+        if(hasPermission){
+            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+        }else{
+            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     fun resetFields() {
         name = ""
@@ -217,7 +240,18 @@ fun RegistrationScreen(
             }
         }
     }
+    if(locationShared){
+        LaunchedEffect(Unit) {
+            if(!hasPermission){
+                permissionLauncher.launch(permission)
+            }
+        }
+    }else{
+        locationShared = false
+    }
 }
+
+
 
 @Composable
 fun RegistrationForm(
