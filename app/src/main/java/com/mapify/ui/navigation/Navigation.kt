@@ -28,6 +28,9 @@ fun Navigation() {
     val isAdmin = rememberSaveable { mutableStateOf(false) }
     val userId = rememberSaveable { mutableStateOf("1") }
 
+    val latitude = rememberSaveable { mutableStateOf<Double?>(null) }
+    val longitude = rememberSaveable { mutableStateOf<Double?>(null) }
+
     Surface {
         NavHost(
             navController = navController,
@@ -65,7 +68,7 @@ fun Navigation() {
                         navController.navigate(RouteScreen.Profile)
                     },
                     navigateToCreateReport = {
-                        navController.navigate(RouteScreen.CreateReport)
+                        navController.navigate(RouteScreen.CreateReport())
                     },
                     navigateToDetail = {
                         navController.navigate(RouteScreen.ReportView(it))
@@ -94,7 +97,11 @@ fun Navigation() {
             }
             composable<RouteScreen.CreateReport> {
                 CreateReportScreen(
+                    latitude = latitude.value,
+                    longitude = longitude.value,
                     navigateBack = {
+                        latitude.value = null
+                        longitude.value = null
                         navController.popBackStack()
                     },
                     navigateToReportLocation = {
@@ -107,7 +114,9 @@ fun Navigation() {
             }
             composable<RouteScreen.ReportLocation> {
                 ReportLocationScreen(
-                    navigateBack = {
+                    navigateBack = { lat, lng ->
+                        latitude.value = lat
+                        longitude.value = lng
                         navController.popBackStack()
                     }
                 )
