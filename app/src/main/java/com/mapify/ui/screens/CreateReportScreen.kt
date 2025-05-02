@@ -210,7 +210,7 @@ fun CreateReportScreen(
                         descriptionTouched = true
                     },
                     descriptionError = descriptionError,
-                    location = if (latitude != null && longitude != null) "Location has been set" else location,
+                    location = if (latitude != null && longitude != null) stringResource(id = R.string.location_set) else location,
                     onValueChangeLocation = {
                         location = it
                     },
