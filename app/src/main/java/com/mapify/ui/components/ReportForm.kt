@@ -47,7 +47,9 @@ fun ReportForm(
     switchCheckedOnClick: ((Boolean) -> Unit)? = null,
     onAddPhoto: () -> Unit,
     onRemovePhoto: (Int) -> Unit,
-    isLoading: Boolean
+    isLoading: Boolean,
+    latitude: Double? = null,
+    longitude: Double? = null
 ) {
     Column(
         modifier = Modifier
@@ -159,7 +161,7 @@ fun ReportForm(
         }
         Spacer(Modifier.height(Spacing.Large))
         val arePhotosValid = photos.isEmpty() || (photos.none { it.isBlank() } && photoErrors.all { !it })
-        val isButtonEnabled = !titleError && title.isNotBlank() && !dropDownError && !descriptionError && description.isNotBlank() && arePhotosValid && !isLoading
+        val isButtonEnabled = !titleError && title.isNotBlank() && !dropDownError && !descriptionError && description.isNotBlank() && arePhotosValid && !isLoading && (latitude != null && longitude != null)
         Button(
             modifier = Modifier
                 .fillMaxWidth()
