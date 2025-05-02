@@ -188,4 +188,6 @@
     <string name="report_rejected_days_remaining">Your report has been rejected; you have %s days to modify it or will be deleted.</string>
     <string name="yesterday">Yesterday</string>
     <string name="recent_search_icon">Recent Search Icon</string>
+
+    <string name="location_set">Location has been set</string>
 </resources>
