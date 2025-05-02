@@ -64,11 +64,13 @@ fun Map(
             mapViewportState.transitionToFollowPuckState()
         }
 
-        if(isClickable && clickedPoint != null){
-            PointAnnotation(
-                point = clickedPoint
-            ){
-                iconImage = marker
+        if(isClickable){
+            if(clickedPoint != null){
+                PointAnnotation(
+                    point = clickedPoint
+                ){
+                    iconImage = marker
+                }
             }
         }else{
             PointAnnotation(
