@@ -1,5 +1,7 @@
 package com.mapify.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +23,7 @@ import com.mapify.ui.screens.SettingsScreen
 import com.mapify.ui.screens.SearchFiltersScreen
 import com.mapify.ui.users.HomeScreen
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun Navigation() {
 
@@ -166,7 +169,13 @@ fun Navigation() {
             composable<RouteScreen.EditReport> { it ->
                 val args = it.toRoute<RouteScreen.EditReport>()
                 EditReportScreen(
-                    navigateBack = { navController.popBackStack() },
+                    latitude = latitude.value,
+                    longitude = longitude.value,
+                    navigateBack = {
+                        latitude.value = null
+                        longitude.value = null
+                        navController.popBackStack()
+                    },
                     navigateToReportLocation = { navController.navigate(RouteScreen.ReportLocation) },
                     reportId = args.reportId
                 )
