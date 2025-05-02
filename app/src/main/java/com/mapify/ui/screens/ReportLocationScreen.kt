@@ -1,8 +1,6 @@
 package com.mapify.ui.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,39 +14,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.mapbox.geojson.Point
-import com.mapbox.maps.extension.compose.MapboxMap
-import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
-import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
-import com.mapbox.maps.extension.compose.annotation.rememberIconImage
 import com.mapify.R
+import com.mapify.ui.components.Map
 import com.mapify.ui.components.SimpleTopBar
 
 @Composable
 fun ReportLocationScreen(
     navigateBack: () -> Unit
 ) {
-    val context = LocalContext.current
-    val mapViewportState = rememberMapViewportState {
-        setCameraOptions {
-            zoom(8.0)
-            center(Point.fromLngLat(-75.6491181, 4.4687891))
-            pitch(45.0)
-        }
-    }
+
     var clickedPoint by remember { mutableStateOf<Point?>(null) }
-
-    val markerResourceId by remember {
-        mutableStateOf(R.drawable.red_marker)
-    }
-
-    val marker = rememberIconImage(
-        key = markerResourceId,
-        painter = painterResource(markerResourceId)
-    )
 
     Scaffold(
         topBar = {
@@ -68,23 +45,15 @@ fun ReportLocationScreen(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Top
         ) {
-            MapboxMap(
-                modifier = Modifier.fillMaxSize(),
-                mapViewportState = mapViewportState,
+            Map(
+                navigateToDetail = {  },
+                isClickable = true,
                 onMapClickListener = { point ->
                     clickedPoint = point
                     true
-                }
-            ){
-                clickedPoint?.let {
-                    PointAnnotation(
-                        point = clickedPoint!!
-                    ){
-                        iconImage = marker
-                    }
-                }
-
-            }
+                },
+                clickedPoint = clickedPoint
+            )
         }
     }
 }
