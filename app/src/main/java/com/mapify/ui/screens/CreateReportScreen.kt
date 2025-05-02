@@ -1,6 +1,9 @@
 package com.mapify.ui.screens
 
+import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,9 +38,11 @@ import com.mapify.model.User
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.utils.isImageValid
+import getLocationName
 import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun CreateReportScreen(
     navigateBack: () -> Unit,
@@ -63,7 +68,7 @@ fun CreateReportScreen(
     var descriptionTouched by rememberSaveable { mutableStateOf(false) }
     val descriptionError = descriptionTouched && (description.isBlank() || description.length < 10)
 
-    var location by rememberSaveable { mutableStateOf("Location") }
+    var location by rememberSaveable { mutableStateOf("") }
     val locationError = false
 
     var photos by rememberSaveable { mutableStateOf(listOf("")) }
@@ -225,7 +230,9 @@ fun CreateReportScreen(
                     onValueChangePhotos = onValueChangePhotos,
                     onAddPhoto = onAddPhoto,
                     onRemovePhoto = onRemovePhoto,
-                    isLoading = isValidating
+                    isLoading = isValidating,
+                    latitude = latitude,
+                    longitude = longitude
                 )
             }
         }
@@ -247,7 +254,17 @@ fun CreateReportScreen(
         )
     }
 
+    var city = ""
+    var country = ""
+
     if (publishReportVisible) {
+        LaunchedEffect(Unit) {
+            if(latitude != null && longitude != null){
+                val locationName = getLocationName(context, latitude, longitude)
+                city = locationName.first ?: ""
+                country = locationName.second ?: ""
+            }
+        }
         GenericDialog(
             title = stringResource(id = R.string.publish_report),
             message = stringResource(id = R.string.publish_report_description),
@@ -260,7 +277,7 @@ fun CreateReportScreen(
                     title = title,
                     category = Category.entries.find { it.displayName == dropDownValue }!!,
                     description = description,
-                    location = null, //TODO: This must be changed here and in Report model erase the "?"
+                    location = Location(latitude = latitude!!, longitude = longitude!!, country = country, city = city),
                     images = photos,
                     id = reportsIdCounter.toString(),
                     status = ReportStatus.NOT_VERIFIED,
