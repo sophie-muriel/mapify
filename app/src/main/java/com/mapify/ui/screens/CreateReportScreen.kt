@@ -42,7 +42,9 @@ import java.time.LocalDateTime
 fun CreateReportScreen(
     navigateBack: () -> Unit,
     navigateToReportLocation: () -> Unit,
-    navigateToReportView: (String) -> Unit
+    navigateToReportView: (String) -> Unit,
+    latitude: Double? = null,
+    longitude: Double? = null
 ) {
     val context = LocalContext.current
     var isValidating by remember { mutableStateOf(false) }
@@ -61,7 +63,7 @@ fun CreateReportScreen(
     var descriptionTouched by rememberSaveable { mutableStateOf(false) }
     val descriptionError = descriptionTouched && (description.isBlank() || description.length < 10)
 
-    var location by rememberSaveable { mutableStateOf("") }
+    var location by rememberSaveable { mutableStateOf("Location") }
     val locationError = false
 
     var photos by rememberSaveable { mutableStateOf(listOf("")) }
@@ -208,7 +210,7 @@ fun CreateReportScreen(
                         descriptionTouched = true
                     },
                     descriptionError = descriptionError,
-                    location = location,
+                    location = if (latitude != null && longitude != null) "Location has been set" else location,
                     onValueChangeLocation = {
                         location = it
                     },
