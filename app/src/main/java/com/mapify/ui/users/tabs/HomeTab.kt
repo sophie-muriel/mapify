@@ -36,6 +36,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.compose.runtime.DisposableEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.mapify.ui.components.Map
 
 @Composable
 fun HomeTab(
@@ -60,7 +62,7 @@ fun HomeTab(
         askedPermissionOnce = true
     }
 
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(lifecycleOwner) {
         val checkAndRequestLocationPermission = {
@@ -110,57 +112,10 @@ fun HomeTab(
         )
     }
 
-
-    val mapViewportState = rememberMapViewportState {
-        setCameraOptions {
-            zoom(8.0)
-            center(Point.fromLngLat(-75.6491181, 4.4687891))
-            pitch(45.0)
-        }
-    }
-
-    val markerResourceId by remember {
-        mutableStateOf(R.drawable.red_marker)
-    }
-
-    val marker = rememberIconImage(
-        key = markerResourceId,
-        painter = painterResource(markerResourceId)
-    )
-
     if(hasPermission){
-        MapboxMap(
-            modifier = Modifier.fillMaxSize(),
-            mapViewportState = mapViewportState,
-            mapState = rememberMapState {
-                gesturesSettings = GesturesSettings { pitchEnabled = true }
-            }
-        ){
-            MapEffect(Unit) { mapView ->
-                mapView.location.updateSettings {
-                    locationPuck = createDefault2DPuck(withBearing = true)
-                    enabled = true
-                    puckBearing = PuckBearing.COURSE
-                    puckBearingEnabled = true
-                }
-
-                mapViewportState.transitionToFollowPuckState()
-            }
-            PointAnnotation(
-                point = Point.fromLngLat(-75.6491181, 4.4687891)
-            ){
-                iconImage = marker
-                interactionsState.onClicked {
-                    navigateToDetail("1")
-                    true
-                }
-            }
-            PointAnnotation(
-                point = Point.fromLngLat(-75.575741, 4.600110)
-            ){
-                iconImage = marker
-            }
-        }
+        Map(
+            navigateToDetail = navigateToDetail
+        )
     }else if(askedPermissionOnce){
         Text(
             text = "Disabled map due to no location permission"
