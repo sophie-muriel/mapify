@@ -151,8 +151,23 @@ fun CreateReportScreen(
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
     var publishReportVisible by rememberSaveable { mutableStateOf(false) }
 
+    var city by remember { mutableStateOf("") }
+    var country by remember { mutableStateOf("") }
+    var locationVisible by rememberSaveable { mutableStateOf("") }
+    var locationNotVisible: Location? = null
+
     BackHandler(enabled = true) {
         exitDialogVisible = true
+    }
+
+    LaunchedEffect(Unit) {
+        if(latitude != null && longitude != null){
+            val locationName = getLocationName(context, latitude, longitude)
+            city = locationName.first ?: ""
+            country = locationName.second ?: ""
+            locationNotVisible = Location(latitude = latitude, longitude = longitude, country = country, city = city)
+            locationVisible = locationNotVisible.toString()
+        }
     }
 
     Scaffold(
@@ -215,7 +230,7 @@ fun CreateReportScreen(
                         descriptionTouched = true
                     },
                     descriptionError = descriptionError,
-                    location = if (latitude != null && longitude != null) stringResource(id = R.string.location_set) else location,
+                    location = if (latitude != null && longitude != null) locationVisible else location,
                     onValueChangeLocation = {
                         location = it
                     },
@@ -254,17 +269,7 @@ fun CreateReportScreen(
         )
     }
 
-    var city = ""
-    var country = ""
-
     if (publishReportVisible) {
-        LaunchedEffect(Unit) {
-            if(latitude != null && longitude != null){
-                val locationName = getLocationName(context, latitude, longitude)
-                city = locationName.first ?: ""
-                country = locationName.second ?: ""
-            }
-        }
         GenericDialog(
             title = stringResource(id = R.string.publish_report),
             message = stringResource(id = R.string.publish_report_description),
@@ -277,7 +282,7 @@ fun CreateReportScreen(
                     title = title,
                     category = Category.entries.find { it.displayName == dropDownValue }!!,
                     description = description,
-                    location = Location(latitude = latitude!!, longitude = longitude!!, country = country, city = city),
+                    location = locationNotVisible,
                     images = photos,
                     id = reportsIdCounter.toString(),
                     status = ReportStatus.NOT_VERIFIED,
