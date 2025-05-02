@@ -1,6 +1,8 @@
 package com.mapify.ui.screens
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -32,14 +34,18 @@ import com.mapify.model.Location
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.utils.isImageValid
+import getLocationName
 import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun EditReportScreen(
     navigateBack: () -> Unit,
     navigateToReportLocation: () -> Unit,
-    reportId: String
+    reportId: String,
+    latitude: Double? = null,
+    longitude: Double? = null
 ) {
     val context = LocalContext.current
     var isValidating by remember { mutableStateOf(false) }
@@ -193,6 +199,21 @@ fun EditReportScreen(
         }
     }
 
+    var city by remember { mutableStateOf("") }
+    var country by remember { mutableStateOf("") }
+    var locationVisible by rememberSaveable { mutableStateOf("") }
+    var locationNotVisible: Location? = null
+
+    LaunchedEffect(Unit) {
+        if(latitude != null && longitude != null){
+            val locationName = getLocationName(context, latitude, longitude)
+            city = locationName.first ?: ""
+            country = locationName.second ?: ""
+            locationNotVisible = Location(latitude = latitude, longitude = longitude, country = country, city = city)
+            locationVisible = locationNotVisible.toString()
+        }
+    }
+
     val onAddPhoto = {
         photos = photos + ""
         photoTouchedList = photoTouchedList + false
@@ -293,7 +314,7 @@ fun EditReportScreen(
                         descriptionTouched = true
                     },
                     descriptionError = descriptionError,
-                    location = report.location.toString(),
+                    location = if (latitude != null && longitude != null) locationVisible else report.location.toString(),
                     onValueChangeLocation = { },
                     locationError = locationError,
                     navigateToReportLocation = navigateToReportLocation,
@@ -310,7 +331,10 @@ fun EditReportScreen(
                     switchCheckedOnClick = {
                         switchChecked = it
                     },
-                    isLoading = isValidating
+                    isLoading = isValidating,
+                    latitude = latitude,
+                    longitude = longitude,
+                    isEditing = true
                 )
             }
         }
@@ -344,6 +368,7 @@ fun EditReportScreen(
                 report.category = Category.entries.first { it.displayName == dropDownValue }
                 report.description = description
                 report.isResolved = switchChecked
+                report.location = locationNotVisible
                 report.images = photos
                 if ((titleTouched || dropDownTouched || descriptionTouched || photoTouchedList.any { it }) && report.rejectionDate != null) {
                     report.rejectionDate = null
