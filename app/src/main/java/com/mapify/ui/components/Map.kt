@@ -10,13 +10,12 @@ import androidx.compose.ui.res.painterResource
 import com.mapbox.geojson.Point
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
-import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
-import com.mapbox.maps.extension.compose.annotation.IconImage
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
 import com.mapbox.maps.extension.compose.rememberMapState
 import com.mapbox.maps.plugin.PuckBearing
+import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.generated.GesturesSettings
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
@@ -24,7 +23,10 @@ import com.mapify.R
 
 @Composable
 fun Map(
-    navigateToDetail: (String) -> Unit
+    navigateToDetail: (String) -> Unit,
+    isClickable: Boolean = false,
+    onMapClickListener: OnMapClickListener? = null,
+    clickedPoint: Point? = null
 ){
     val mapViewportState = rememberMapViewportState {
         setCameraOptions {
@@ -48,7 +50,8 @@ fun Map(
         mapViewportState = mapViewportState,
         mapState = rememberMapState {
             gesturesSettings = GesturesSettings { pitchEnabled = true }
-        }
+        },
+        onMapClickListener = onMapClickListener
     ){
         MapEffect(Unit) { mapView ->
             mapView.location.updateSettings {
@@ -61,19 +64,27 @@ fun Map(
             mapViewportState.transitionToFollowPuckState()
         }
 
-        PointAnnotation(
-            point = Point.fromLngLat(-75.6491181, 4.4687891)
-        ){
-            iconImage = marker
-            interactionsState.onClicked {
-                navigateToDetail("1")
-                true
+        if(isClickable && clickedPoint != null){
+            PointAnnotation(
+                point = clickedPoint
+            ){
+                iconImage = marker
             }
-        }
-        PointAnnotation(
-            point = Point.fromLngLat(-75.575741, 4.600110)
-        ){
-            iconImage = marker
+        }else{
+            PointAnnotation(
+                point = Point.fromLngLat(-75.6730958, 4.5326466)
+            ){
+                iconImage = marker
+                interactionsState.onClicked {
+                    navigateToDetail("1")
+                    true
+                }
+            }
+            PointAnnotation(
+                point = Point.fromLngLat(-75.6636135, 4.5482888)
+            ){
+                iconImage = marker
+            }
         }
     }
 }
