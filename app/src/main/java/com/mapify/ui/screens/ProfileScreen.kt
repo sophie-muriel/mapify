@@ -10,38 +10,46 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mapify.R
-import com.mapify.model.Location
-import com.mapify.model.Role
-import com.mapify.model.User
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.ui.theme.Spacing
+import com.mapify.utils.SharedPreferencesUtils
+import com.mapify.viewmodel.UsersViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.mapify.model.User
 
 @Composable
 fun ProfileScreen(
-    navigateBack: () -> Unit,
-    isAdmin: Boolean
+    usersViewModel: UsersViewModel,
+    navigateBack: () -> Unit
 ) {
-    val user = remember {
-        User(
-            id = if (isAdmin) "2" else "1",
-            fullName = if (isAdmin) "Administrator" else "Average User",
-            email = if (isAdmin) "admin" else "root",
-            password = if (isAdmin) "admin" else "root",
-            role = if (isAdmin) Role.ADMIN else Role.CLIENT,
-            registrationLocation = Location(43230.1, 753948.7, "Colombia", "Armenia")
-        )
+    val context = LocalContext.current
+    val userId = SharedPreferencesUtils.getPreference(context)["userId"] ?: return
+
+    LaunchedEffect(userId) {
+        usersViewModel.loadCurrentUser(userId)
     }
 
-    var name by rememberSaveable { mutableStateOf(user.fullName) }
-    var email by rememberSaveable { mutableStateOf(user.email) }
-    var password by rememberSaveable { mutableStateOf(user.password) }
+    val user by usersViewModel.currentUser.collectAsState()
+
+    var name by rememberSaveable { mutableStateOf(user?.fullName ?: "") }
+    var email by rememberSaveable { mutableStateOf(user?.email ?: "") }
+    var password by rememberSaveable { mutableStateOf(user?.password ?: "") }
+
+    LaunchedEffect(user) {
+        user?.let {
+            name = it.fullName
+            email = it.email
+            password = it.password
+        }
+    }
+
     var nameTouched by rememberSaveable { mutableStateOf(false) }
     var emailTouched by rememberSaveable { mutableStateOf(false) }
     var passwordTouched by rememberSaveable { mutableStateOf(false) }
@@ -58,6 +66,18 @@ fun ProfileScreen(
 
     BackHandler(enabled = editMode && !(nameTouched || emailTouched || passwordTouched)) {
         editMode = false
+    }
+
+    if (user == null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
     }
 
     Scaffold(
@@ -101,21 +121,28 @@ fun ProfileScreen(
                 name = name,
                 email = email,
                 password = password,
-                location = user.registrationLocation.toString(),
+                location = user?.registrationLocation?.toString() ?: "",
                 isEditMode = editMode,
-                onValueChangeName = {
-                    name = it; nameTouched = true
-                },
-                onValueChangeEmail = {
-                    email = it; emailTouched = true
-                },
-                onValueChangePassword = {
-                    password = it; passwordTouched = true
-                },
+                onValueChangeName = { name = it; nameTouched = true },
+                onValueChangeEmail = { email = it; emailTouched = true },
+                onValueChangePassword = { password = it; passwordTouched = true },
                 onClickEdit = {
-                    user.fullName = name
-                    user.email = email
-                    user.password = password
+                    user?.let {
+                        val updatedUser = User(
+                            id = it.id,
+                            fullName = name,
+                            email = email,
+                            password = password,
+                            role = it.role,
+                            registrationLocation = it.registrationLocation
+                        )
+                        usersViewModel.edit(updatedUser = updatedUser, userId = it.id)
+                    }
+                    nameTouched = false
+                    emailTouched = false
+                    passwordTouched = false
+                    editMode = false
+
                     nameTouched = false
                     emailTouched = false
                     passwordTouched = false
@@ -138,9 +165,9 @@ fun ProfileScreen(
             onExit = {
                 exitDialogVisible = false
                 if (editMode) {
-                    name = user.fullName
-                    email = user.email
-                    password = user.password
+                    name = user?.fullName ?: ""
+                    email = user?.email ?: ""
+                    password = user?.password ?: ""
                     editMode = false
                 } else {
                     navigateBack()
