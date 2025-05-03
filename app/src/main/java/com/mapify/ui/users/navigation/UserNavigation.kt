@@ -13,15 +13,16 @@ import com.mapify.ui.users.tabs.ExploreTab
 import com.mapify.ui.users.tabs.HomeTab
 import com.mapify.ui.users.tabs.MessagesTab
 import com.mapify.ui.users.tabs.NotificationsTab
+import com.mapify.viewmodel.UsersViewModel
 
 @Composable
 fun UserNavigation(
     padding: PaddingValues,
     navController: NavHostController,
     navigateToDetail: (String) -> Unit,
-    isAdmin: Boolean,
     navigateToReportView: (String, ReportStatus) -> Unit,
-    navigateToConversation: (String) -> Unit
+    navigateToConversation: (String) -> Unit,
+    usersViewModel: UsersViewModel
 ) {
     NavHost(
         modifier = Modifier.padding(padding),
@@ -30,7 +31,6 @@ fun UserNavigation(
     ) {
         composable<UserRouteTab.Home> {
             HomeTab(
-                isAdmin = isAdmin,
                 navigateToDetail = navigateToDetail
             )
         }
@@ -46,7 +46,8 @@ fun UserNavigation(
         }
         composable<UserRouteTab.Messages> {
             MessagesTab(
-                navigateToConversation = navigateToConversation
+                navigateToConversation = navigateToConversation,
+                usersViewModel = usersViewModel
             )
         }
         composable("SearchContact") {
@@ -54,7 +55,8 @@ fun UserNavigation(
                 navigateBack = { navController.popBackStack() },
                 onUserSelected = { username ->
                     navController.navigate("Conversation/$username")
-                }
+                },
+                usersViewModel = usersViewModel
             )
         }
     }
