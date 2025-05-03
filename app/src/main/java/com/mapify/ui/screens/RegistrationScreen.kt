@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.content.pm.PackageManager
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
