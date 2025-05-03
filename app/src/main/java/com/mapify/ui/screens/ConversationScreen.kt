@@ -1,7 +1,6 @@
 package com.mapify.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,8 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.CheckBox
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,95 +40,19 @@ fun ConversationScreen(
     navigateBack: () -> Unit
 ) {
     val allUsers = listOf(
-        User(
-            id = "69",
-            fullName = "Barry McCoquiner",
-            email = "barry.mccoquiner@example.com",
-            password = "sizedoesntmatter",
-            role = Role.CLIENT,
-            registrationLocation = Location(0.0, 0.0, "USA", "City"),
-            profileImageUrl = null
-        ),
-        User(
-            id = "70",
-            fullName = "John Smith",
-            email = "john.smith@example.com",
-            password = "mockPassword2",
-            role = Role.CLIENT,
-            registrationLocation = Location(0.0, 0.0, "USA", "City"),
-            profileImageUrl = null
-        ),
-        User(
-            id = "72",
-            fullName = "Alice Johnson",
-            email = "alice.johnson@example.com",
-            password = "mockPassword3",
-            role = Role.CLIENT,
-            registrationLocation = Location(0.0, 0.0, "USA", "City"),
-            profileImageUrl = null
-        ),
-        User(
-            id = "73",
-            fullName = "Mike Cox",
-            email = "mike.cox@example.com",
-            password = "mockPassword4",
-            role = Role.CLIENT,
-            registrationLocation = Location(0.0, 0.0, "USA", "City"),
-            profileImageUrl = null
-        ),
-        User(
-            id = "74",
-            fullName = "Hugh Jass",
-            email = "hugh.jass@example.com",
-            password = "mockPassword5",
-            role = Role.CLIENT,
-            registrationLocation = Location(0.0, 0.0, "USA", "City"),
-            profileImageUrl = null
-        )
+        User("69", "Barry McCoquiner", "barry.mccoquiner@example.com", "sizedoesntmatter", Role.CLIENT, Location(0.0, 0.0, "USA", "City"), null),
+        User("70", "John Smith", "john.smith@example.com", "mockPassword2", Role.CLIENT, Location(0.0, 0.0, "USA", "City"), null),
+        User("72", "Alice Johnson", "alice.johnson@example.com", "mockPassword3", Role.CLIENT, Location(0.0, 0.0, "USA", "City"), null),
+        User("73", "Mike Cox", "mike.cox@example.com", "mockPassword4", Role.CLIENT, Location(0.0, 0.0, "USA", "City"), null),
+        User("74", "Hugh Jass", "hugh.jass@example.com", "mockPassword5", Role.CLIENT, Location(0.0, 0.0, "USA", "City"), null)
     )
 
     var conversationsList by remember {
         mutableStateOf(
             listOf(
-                Conversation(
-                    id = "1",
-                    recipient = allUsers[0],
-                    messages = listOf(
-                        Message(
-                            id = "msg1",
-                            sender = allUsers[0].fullName,
-                            content = "Hi, just checking if there are any updates on the report.",
-                            timestamp = LocalDateTime.now().minusMinutes(5)
-                        )
-                    ),
-                    isRead = false
-                ),
-                Conversation(
-                    id = "2",
-                    recipient = allUsers[1],
-                    messages = listOf(
-                        Message(
-                            id = "msg2",
-                            sender = allUsers[1].fullName,
-                            content = "Thanks for your response.",
-                            timestamp = LocalDateTime.now().minusHours(2)
-                        )
-                    ),
-                    isRead = true
-                ),
-                Conversation(
-                    id = "conv3",
-                    recipient = allUsers[2],
-                    messages = listOf(
-                        Message(
-                            id = "msg3",
-                            sender = allUsers[2].fullName,
-                            content = "Could you take a look at the file I sent you?",
-                            timestamp = LocalDateTime.now().minusDays(5)
-                        )
-                    ),
-                    isRead = false
-                )
+                Conversation("1", allUsers[0], listOf(Message("msg1", allUsers[0].fullName, "Hi, just checking if there are any updates on the report.", LocalDateTime.now().minusMinutes(5))), false),
+                Conversation("2", allUsers[1], listOf(Message("msg2", allUsers[1].fullName, "Thanks for your response.", LocalDateTime.now().minusHours(2))), true),
+                Conversation("conv3", allUsers[2], listOf(Message("msg3", allUsers[2].fullName, "Could you take a look at the file I sent you?", LocalDateTime.now().minusDays(5))), false)
             )
         )
     }
@@ -145,21 +66,20 @@ fun ConversationScreen(
 
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    val menuItems =
-        listOf(
-            MenuAction.Simple(
-                stringResource(id = R.string.delete),
-                {
-                    Icon(
-                        Icons.Default.Delete,
-                        contentDescription = stringResource(id = R.string.delete_icon),
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
-            ) {
-                showDeleteDialog = true
+    val menuItems = listOf(
+        MenuAction.Simple(
+            stringResource(id = R.string.delete),
+            {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = stringResource(id = R.string.delete_icon),
+                    tint = MaterialTheme.colorScheme.error
+                )
             }
-        )
+        ) {
+            showDeleteDialog = true
+        }
+    )
 
     Scaffold(
         topBar = {
@@ -220,10 +140,7 @@ fun ConversationScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(
-                        horizontal = Spacing.Small,
-                        vertical = Spacing.Large
-                    ),
+                    .padding(horizontal = Spacing.Small, vertical = Spacing.Large),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
@@ -297,18 +214,11 @@ fun ChatBubble(
     senderName: String,
     profileImageUrl: String? = null
 ) {
-    val bubbleColor = if (isMe)
-            MaterialTheme.colorScheme.primary
-        else
-            MaterialTheme.colorScheme.surfaceVariant
-    val textColor = if (isMe)
-            MaterialTheme.colorScheme.onPrimary
-        else
-            MaterialTheme.colorScheme.onSurface
+    val bubbleColor = if (isMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+    val textColor = if (isMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start,
         verticalAlignment = Alignment.Bottom
     ) {
@@ -321,19 +231,17 @@ fun ChatBubble(
             Spacer(modifier = Modifier.width(6.dp))
         }
 
-        Column(
-            horizontalAlignment = if (isMe) Alignment.End else Alignment.Start
-        ) {
+        Column(horizontalAlignment = if (isMe) Alignment.End else Alignment.Start) {
             Surface(
                 shape = RoundedCornerShape(
                     topStart = 24.dp,
                     topEnd = 24.dp,
                     bottomStart = if (isMe) 24.dp else 6.dp,
-                    bottomEnd = if (isMe) 6.dp else 24.dp),
+                    bottomEnd = if (isMe) 6.dp else 24.dp
+                ),
                 color = bubbleColor,
                 tonalElevation = 2.dp,
-                modifier = Modifier
-                    .widthIn(max = 250.dp),
+                modifier = Modifier.widthIn(max = 250.dp),
                 shadowElevation = 2.dp
             ) {
                 Box(modifier = Modifier.padding(12.dp)) {

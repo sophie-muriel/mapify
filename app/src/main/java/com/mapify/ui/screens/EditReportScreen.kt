@@ -11,32 +11,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.mapify.R
-import com.mapify.ui.components.ReportForm
-import com.mapify.model.Report
-import com.mapify.model.ReportStatus
-import com.mapify.model.Category
-import com.mapify.model.Location
+import com.mapify.model.*
 import com.mapify.ui.components.GenericDialog
+import com.mapify.ui.components.ReportForm
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.utils.isImageValid
 import getLocationName
 import kotlinx.coroutines.delay
 import java.time.LocalDateTime
+import androidx.compose.runtime.saveable.rememberSaveable
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -65,9 +58,7 @@ fun EditReportScreen(
                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s",
                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOvSWqWExnQHszC2ZfSLd-xZNC94pRxMO7ag&s"
             ),
-            location = Location(
-                latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
-            ),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
             status = ReportStatus.PENDING_VERIFICATION,
             userId = "1",
             date = LocalDateTime.now(),
@@ -83,9 +74,7 @@ fun EditReportScreen(
                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThXTf5MoQt2F4rJ9lnIRpA-fQ7zZNSRQwtkQ&s",
                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFSUC03tbmiZ9hVh3ShKNIJmVyPVk4XIf16A&s"
             ),
-            location = Location(
-                latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
-            ),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
             status = ReportStatus.VERIFIED,
             userId = "1",
             date = LocalDateTime.now(),
@@ -100,9 +89,7 @@ fun EditReportScreen(
                     "Mauris eu sapien tincidunt, pulvinar leo a, tincidunt orci. In leo justo, hendrerit at convallis nec, semper in neque. Nunc " +
                     "at metus eros. Aliquam erat volutpat. Sed nec faucibus leo, quis cursus nisl.",
             images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
-            location = Location(
-                latitude = 43230.1, longitude = 753948.7, country = "Colombia", city = "Armenia"
-            ),
+            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
             status = ReportStatus.VERIFIED,
             userId = "2",
             date = LocalDateTime.now(),
@@ -154,7 +141,6 @@ fun EditReportScreen(
     val report = storedReports.find { it.id == reportId } ?: return
 
     var switchChecked by rememberSaveable { mutableStateOf(report.isResolved) }
-
     var title by rememberSaveable { mutableStateOf(report.title) }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
     val titleError = titleTouched && title.isBlank()
@@ -178,24 +164,19 @@ fun EditReportScreen(
     LaunchedEffect(photos, photoTouchedList) {
         isValidating = true
         delay(100)
-        val validated = photos.mapIndexed { i, url ->
+        photoErrors = photos.mapIndexed { i, url ->
             val touched = photoTouchedList.getOrElse(i) { false }
-            if (touched) !isImageValid(context, url) else false
+            touched && !isImageValid(context, url)
         }
-        photoErrors = validated
         isValidating = false
     }
 
     LaunchedEffect(photos.size) {
         if (photoTouchedList.size != photos.size) {
-            photoTouchedList = List(photos.size) { i ->
-                photoTouchedList.getOrElse(i) { false }
-            }
+            photoTouchedList = List(photos.size) { i -> photoTouchedList.getOrElse(i) { false } }
         }
         if (photoErrors.size != photos.size) {
-            photoErrors = List(photos.size) { i ->
-                photoErrors.getOrElse(i) { false }
-            }
+            photoErrors = List(photos.size) { i -> photoErrors.getOrElse(i) { false } }
         }
     }
 
@@ -233,9 +214,7 @@ fun EditReportScreen(
         photos = updatedList
         photoTouchedList = photoTouchedList.toMutableList().also {
             if (changedIndex in updatedList.indices) {
-                while (it.size < updatedList.size) {
-                    it.add(false)
-                }
+                while (it.size < updatedList.size) it.add(false)
                 it[changedIndex] = true
             }
         }
@@ -245,9 +224,7 @@ fun EditReportScreen(
     var saveReportVisible by rememberSaveable { mutableStateOf(false) }
 
     if (titleTouched || dropDownTouched || descriptionTouched || photoTouchedList.any { it }) {
-        BackHandler(enabled = true) {
-            exitDialogVisible = true
-        }
+        BackHandler { exitDialogVisible = true }
     }
 
     Scaffold(
@@ -260,9 +237,7 @@ fun EditReportScreen(
                 onClickNavIcon = {
                     if (titleTouched || dropDownTouched || descriptionTouched || photoTouchedList.any { it }) {
                         exitDialogVisible = true
-                    } else {
-                        navigateBack()
-                    }
+                    } else navigateBack()
                 },
                 actions = false
             )
@@ -282,7 +257,6 @@ fun EditReportScreen(
                     .imePadding(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 ReportForm(
                     title = title,
                     onValueChangeTitle = {
@@ -305,9 +279,7 @@ fun EditReportScreen(
                         dropDownTouched = true
                     },
                     isTouched = dropDownTouched,
-                    onDismissRequest = {
-                        dropDownExpanded = false
-                    },
+                    onDismissRequest = { dropDownExpanded = false },
                     description = description,
                     onValueChangeDescription = {
                         description = it
@@ -339,13 +311,12 @@ fun EditReportScreen(
             }
         }
     }
+
     if (exitDialogVisible) {
         GenericDialog(
             title = stringResource(id = R.string.exit_report_editing),
             message = stringResource(id = R.string.exit_report_editing_description),
-            onClose = {
-                exitDialogVisible = false
-            },
+            onClose = { exitDialogVisible = false },
             onExit = {
                 exitDialogVisible = false
                 navigateBack()
@@ -359,9 +330,7 @@ fun EditReportScreen(
         GenericDialog(
             title = stringResource(id = R.string.edit_report_title),
             message = stringResource(id = R.string.edit_report_description),
-            onClose = {
-                saveReportVisible = false
-            },
+            onClose = { saveReportVisible = false },
             onExit = {
                 saveReportVisible = false
                 report.title = title

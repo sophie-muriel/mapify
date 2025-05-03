@@ -4,18 +4,25 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.core.view.WindowCompat
 import com.mapify.ui.navigation.Navigation
 import com.mapify.ui.theme.MapifyTheme
+import com.mapify.viewmodel.UsersViewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val usersViewModel: UsersViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MapifyTheme {
-                Navigation()
+                Navigation(
+                    usersViewModel= usersViewModel
+                )
             }
         }
     }
