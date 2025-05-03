@@ -67,7 +67,9 @@ fun RegistrationScreen(
 
     var locationShared by rememberSaveable { mutableStateOf(false) }
     var locationForm by rememberSaveable { mutableStateOf(false) }
-    val location = Location(43230.2, 753948.8, "Colombia", "Armenia")
+    val location = Location( //TODO: dynamic change
+        latitude = 43230.2, longitude = 753948.8, country = "Colombia", city = "Armenia"
+    )
 
     val context = LocalContext.current
 
@@ -155,7 +157,7 @@ fun RegistrationScreen(
                     },
                     passwordConfirmationError = passwordConfirmationError,
                     onClickRegister = {
-                        if (email != "root") {
+                        if(usersViewModel.find(email) == null){
                             locationForm = true
                         } else {
                             Toast.makeText(context, context.getString(R.string.email_taken), Toast.LENGTH_SHORT).show()
@@ -211,25 +213,34 @@ fun RegistrationScreen(
 
                 Spacer(modifier = Modifier.height(Spacing.Large * 18.1f))
 
-                ConfirmLocationForm(locationShared) {
-                    if (locationShared) {
-                        usersViewModel.create(
-                            User(
-                                id = UUID.randomUUID().toString(),
-                                fullName = name,
-                                email = email,
-                                password = password,
-                                role = Role.CLIENT,
-                                registrationLocation = location
+                ConfirmLocationForm(
+                    locationShared = locationShared,
+                    onClickConfirmLocation = {
+                        if (locationShared) {
+                            usersViewModel.create(
+                                User(
+                                    id = UUID.randomUUID().toString(),
+                                    fullName = name,
+                                    email = email,
+                                    password = password,
+                                    role = Role.CLIENT,
+                                    registrationLocation = location
+                                )
                             )
-                        )
-                        Toast.makeText(context, context.getString(R.string.registration_successful), Toast.LENGTH_SHORT).show()
-                        navigateBack()
-                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ resetFields() }, 100)
-                    } else {
-                        locationShared = true
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.registration_successful),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            navigateBack()
+                            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                                resetFields()
+                            }, 100)
+                        } else {
+                            locationShared = true
+                        }
                     }
-                }
+                )
             }
         }
     }
