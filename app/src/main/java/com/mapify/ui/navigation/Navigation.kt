@@ -38,9 +38,6 @@ fun Navigation(
 
     val startDestination: RouteScreen = if (user.isNotEmpty()) RouteScreen.Home else RouteScreen.Login
 
-    val isAdmin = rememberSaveable { mutableStateOf(false) }
-    val userId = rememberSaveable { mutableStateOf("1") }
-
     val latitude = rememberSaveable { mutableStateOf<Double?>(null) }
     val longitude = rememberSaveable { mutableStateOf<Double?>(null) }
 
@@ -55,9 +52,7 @@ fun Navigation(
                     navigateToRegistration = {
                         navController.navigate(RouteScreen.Registration)
                     },
-                    navigateToHome = { adminValue, userIdValue ->
-                        isAdmin.value = adminValue
-                        userId.value = userIdValue
+                    navigateToHome = {
                         navController.navigate(RouteScreen.Home) {
                             popUpTo(0) {
                                 inclusive = true
@@ -77,8 +72,6 @@ fun Navigation(
             }
             composable<RouteScreen.Home> {
                 HomeScreen(
-                    isAdmin = isAdmin.value,
-                    userId = userId.value,
                     navigateToProfile = {
                         navController.navigate(RouteScreen.Profile)
                     },
@@ -107,11 +100,13 @@ fun Navigation(
                     },
                     navigateToSearchContact = {
                         navController.navigate(RouteScreen.SearchContact)
-                    }
+                    },
+                    usersViewModel = usersViewModel
                 )
             }
             composable<RouteScreen.CreateReport> {
                 CreateReportScreen(
+                    usersViewModel = usersViewModel,
                     latitude = latitude.value,
                     longitude = longitude.value,
                     navigateBack = {
@@ -150,16 +145,15 @@ fun Navigation(
                     navigateToReportLocation = {
                         navController.navigate(RouteScreen.ReportLocation)
                     },
-                    isAdmin = isAdmin.value,
-                    userId = userId.value
+                    usersViewModel = usersViewModel
                 )
             }
             composable<RouteScreen.Profile> {
                 ProfileScreen(
+                    usersViewModel = usersViewModel,
                     navigateBack = {
                         navController.popBackStack()
-                    },
-                    isAdmin = isAdmin.value
+                    }
                 )
             }
             composable<RouteScreen.Settings> {
@@ -197,12 +191,14 @@ fun Navigation(
                     navigateBack = { navController.popBackStack() },
                     onUserSelected = { conversationId ->
                         navController.navigate(RouteScreen.Conversation(conversationId))
-                    }
+                    },
+                    usersViewModel = usersViewModel
                 )
             }
             composable<RouteScreen.Conversation> { backStackEntry ->
                 val args = backStackEntry.toRoute<RouteScreen.Conversation>()
                 ConversationScreen(
+                    usersViewModel = usersViewModel,
                     conversationId = args.conversationId,
                     navigateBack = {
                         navController.popBackStack()
