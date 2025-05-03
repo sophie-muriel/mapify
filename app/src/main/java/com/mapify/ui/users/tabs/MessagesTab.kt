@@ -1,5 +1,6 @@
 package com.mapify.ui.users.tabs
 
+import HandleLocationPermission
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -7,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.mapify.model.*
 import com.mapify.ui.components.ConversationItem
+import com.mapify.ui.components.Map
 import com.mapify.ui.theme.Spacing
 import java.time.LocalDateTime
 
@@ -109,41 +111,45 @@ fun MessagesTab(
         )
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Spacing.Sides),
-        verticalArrangement = Arrangement.spacedBy(Spacing.Large)
-    ) {
-        items(conversationsList, key = { it.id }) { conversation ->
-            ConversationItem(
-                conversation = conversation,
-                onClick = {
-                    conversationsList = conversationsList.map {
-                        if (it.id == conversation.id) {
-                            it.copy(isRead = true)
-                        } else it
-                    }
-                    navigateToConversation(conversation.id)
-                },
-                onMarkRead = {
-                    conversationsList = conversationsList.map {
-                        if (it.id == conversation.id) {
-                            it.copy(isRead = true)
-                        } else it
-                    }
-                },
-                onMarkUnread = {
-                    conversationsList = conversationsList.map {
-                        if (it.id == conversation.id) {
-                            it.copy(isRead = false)
-                        } else it
-                    }
-                },
-                onDelete = {
-                    conversationsList = conversationsList.filterNot { it.id == conversation.id }
+    HandleLocationPermission(
+        onPermissionGranted = {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = Spacing.Sides),
+                verticalArrangement = Arrangement.spacedBy(Spacing.Large)
+            ) {
+                items(conversationsList, key = { it.id }) { conversation ->
+                    ConversationItem(
+                        conversation = conversation,
+                        onClick = {
+                            conversationsList = conversationsList.map {
+                                if (it.id == conversation.id) {
+                                    it.copy(isRead = true)
+                                } else it
+                            }
+                            navigateToConversation(conversation.id)
+                        },
+                        onMarkRead = {
+                            conversationsList = conversationsList.map {
+                                if (it.id == conversation.id) {
+                                    it.copy(isRead = true)
+                                } else it
+                            }
+                        },
+                        onMarkUnread = {
+                            conversationsList = conversationsList.map {
+                                if (it.id == conversation.id) {
+                                    it.copy(isRead = false)
+                                } else it
+                            }
+                        },
+                        onDelete = {
+                            conversationsList = conversationsList.filterNot { it.id == conversation.id }
+                        }
+                    )
                 }
-            )
+            }
         }
-    }
+    )
 }
