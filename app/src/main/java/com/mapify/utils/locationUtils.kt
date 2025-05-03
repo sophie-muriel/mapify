@@ -6,6 +6,21 @@ import androidx.annotation.RequiresApi
 import java.util.Locale
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.mapify.ui.components.GenericDialog
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 suspend fun getLocationName(
@@ -32,4 +47,77 @@ suspend fun getLocationName(
             cont.resume(Pair(null, null))
         }
     })
+}
+
+@Composable
+fun HandleLocationPermission(
+    onPermissionGranted: @Composable () -> Unit,
+    permissionRationaleTitle: String = "Location permission required",
+    permissionRationaleMessage: String = "This app requires location permission to function. Please enable it in settings."
+) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val permission = Manifest.permission.ACCESS_FINE_LOCATION
+
+    var hasPermission by remember {
+        mutableStateOf(ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
+    }
+
+    var showPermissionDialog by remember { mutableStateOf(false) }
+    var askedPermissionOnce by remember { mutableStateOf(false) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasPermission = isGranted
+        askedPermissionOnce = true
+        if (!isGranted) {
+            showPermissionDialog = true
+        }
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _: LifecycleOwner, event: Lifecycle.Event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                val granted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+                hasPermission = granted
+                if (!granted && !askedPermissionOnce) {
+                    permissionLauncher.launch(permission)
+                } else if (!granted) {
+                    showPermissionDialog = true
+                }
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    if (hasPermission) {
+        onPermissionGranted()
+    } else {
+        onPermissionGranted.invoke()
+    }
+
+    if (showPermissionDialog) {
+        GenericDialog(
+            title = permissionRationaleTitle,
+            message = permissionRationaleMessage,
+            onExitText = "Go to settings",
+            onExit = {
+                showPermissionDialog = false
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                }
+                context.startActivity(intent)
+            },
+            onCloseText = "Cancel",
+            onClose = {
+                showPermissionDialog = false
+                permissionLauncher.launch(permission)
+            }
+        )
+    }
 }
