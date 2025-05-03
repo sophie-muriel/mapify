@@ -28,7 +28,6 @@ import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.IndeterminateCheckBox
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Star
@@ -80,26 +79,25 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Unpublished
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.TextFieldValue
 import com.mapify.model.Comment
-import com.mapify.model.Message
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
-import kotlinx.coroutines.delay
+import com.mapify.utils.SharedPreferencesUtils
+import com.mapify.viewmodel.UsersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,9 +107,20 @@ fun ReportViewScreen(
     navigateBack: () -> Unit,
     navigateToReportEdit: ((String) -> Unit)? = null,
     navigateToReportLocation: () -> Unit,
-    isAdmin: Boolean,
-    userId: String
+    usersViewModel: UsersViewModel
 ) {
+    val context = LocalContext.current
+
+    val userId = SharedPreferencesUtils.getPreference(context)["userId"] ?: return
+
+    LaunchedEffect(userId) {
+        usersViewModel.loadCurrentUser(userId)
+    }
+
+    val users by usersViewModel.users.collectAsState()
+
+    val isAdmin = SharedPreferencesUtils.getPreference(context)["role"] == Role.ADMIN.toString()
+
     if (reportStatusP != null && navigateToReportEdit != null) {
         var exitDialogVisible by rememberSaveable { mutableStateOf(true) }
 
@@ -232,49 +241,6 @@ fun ReportViewScreen(
         )
     )
 
-    val storedUsers = listOf(
-        User(
-            id = "1",
-            fullName = "First User",
-            email = "first@mail.com",
-            password = "ThisIsATestPass",
-            role = Role.CLIENT,
-            registrationLocation = Location(
-                latitude = 43230.1,
-                longitude = 753948.7,
-                country = "Colombia",
-                city = "Armenia"
-            )
-        ),
-        User(
-            id = "2",
-            fullName = "Second User",
-            email = "second@mail.com",
-            password = "ThisIsATestPass",
-            role = Role.CLIENT,
-            registrationLocation = Location(
-                latitude = 43230.1,
-                longitude = 753948.7,
-                country = "Colombia",
-                city = "Armenia"
-            )
-        ),
-        User(
-            id = "3",
-            fullName = "Test commenter",
-            email = "second@mail.com",
-            password = "ThisIsATestPass",
-            role = Role.CLIENT,
-            registrationLocation = Location(
-                latitude = 43230.1,
-                longitude = 753948.7,
-                country = "Colombia",
-                city = "Armenia"
-            )
-        )
-
-    )
-
     var storedComments by remember {
         mutableStateOf(
             listOf<Comment>(
@@ -323,13 +289,11 @@ fun ReportViewScreen(
 
     var isCreator = userId == report.userId
     var showDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
-    var showVerifyDialogle by rememberSaveable { mutableStateOf(false) }
+    var showVerifyDialog by rememberSaveable { mutableStateOf(false) }
     var showRejectionInputDialog by rememberSaveable { mutableStateOf(false) }
     var rejectionMessage by remember { mutableStateOf("") }
     var boostCounter by rememberSaveable { mutableIntStateOf(0) } //One to one database table is needed for this
     var showBoostToast by rememberSaveable { mutableStateOf(false) }
-
-    val context = LocalContext.current
 
     val menuItems =
         if (isCreator) {
@@ -369,7 +333,7 @@ fun ReportViewScreen(
                         )
                     }
                 ) {
-                    showVerifyDialogle = true
+                    showVerifyDialog = true
                 },
                 MenuAction.Simple(
                     label = stringResource(id = R.string.reject),
@@ -490,7 +454,7 @@ fun ReportViewScreen(
                 ItemDetailReport(
                     icon = Icons.Default.Person,
                     iconDescription = stringResource(id = R.string.person_icon),
-                    text = storedUsers.find { it.id == report.userId }?.fullName ?: ""
+                    text = users.find { it.id == report.userId }?.fullName ?: ""
                 )
 
                 ItemDetailReport(
@@ -519,7 +483,7 @@ fun ReportViewScreen(
                     var newComment = Comment(
                         id = commentCounter.toString(),
                         content = comment,
-                        userId = "3", //ToDo: when we have proper user navigation we can use currentUser.Id
+                        userId = userId,
                         reportId = reportId,
                         date = LocalDateTime.now()
                     )
@@ -527,7 +491,8 @@ fun ReportViewScreen(
                     storedComments = storedComments + newComment
                     comment = ""
                 },
-                users = storedUsers,
+                users = users,
+                userId = userId
             )
         }
 
@@ -555,22 +520,22 @@ fun ReportViewScreen(
         val reportVerified = stringResource(id = R.string.report_verified)
         val reportVerifiedMessage = stringResource(id = R.string.report_already_verified)
 
-        if(showVerifyDialogle && reportStatus != ReportStatus.VERIFIED){
+        if(showVerifyDialog && reportStatus != ReportStatus.VERIFIED){
             GenericDialog(
                 title = stringResource(id = R.string.verify_report_title),
                 message = stringResource(id = R.string.verify_report_description),
-                onClose = { showVerifyDialogle = false },
+                onClose = { showVerifyDialog = false },
                 onExit = {
                     Toast.makeText(context, reportVerified, Toast.LENGTH_SHORT).show()
-                    showVerifyDialogle = false
+                    showVerifyDialog = false
                     reportStatus = ReportStatus.VERIFIED
                 },
                 onCloseText =stringResource(id = R.string.cancel),
                 onExitText = stringResource(id = R.string.verify)
             )
-        }else if(showVerifyDialogle && reportStatus == ReportStatus.VERIFIED){
+        }else if(showVerifyDialog && reportStatus == ReportStatus.VERIFIED){
             Toast.makeText(context, reportVerifiedMessage, Toast.LENGTH_SHORT).show()
-            showVerifyDialogle = false
+            showVerifyDialog = false
         }
 
         val rejectionMessageSend = stringResource(id = R.string.rejection_message_send)
@@ -696,7 +661,8 @@ fun Comments(
     users: List<User>,
     comment: String,
     onCommentChange: (String) -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    userId: String
 ) {
 
     ModalBottomSheet(
@@ -721,7 +687,7 @@ fun Comments(
                                 text = users.find { it.id == comment.userId }?.fullName ?: "",
                                 style = MaterialTheme.typography.titleSmall
                             )
-                            if (comment.userId == "3") { //ToDo: when we have proper user navigation we can use currentUser.Id
+                            if (comment.userId == userId) {
                                 Text(
                                     text = stringResource(id = R.string.me),
                                     style = MaterialTheme.typography.bodySmall,
