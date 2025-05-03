@@ -1,5 +1,6 @@
 package com.mapify.ui.users.tabs
 
+import HandleLocationPermission
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,6 +39,7 @@ import com.mapify.model.Category
 import com.mapify.model.Location
 import com.mapify.model.Report
 import com.mapify.model.ReportStatus
+import com.mapify.ui.components.Map
 import com.mapify.ui.theme.Spacing
 import java.time.LocalDateTime
 
@@ -89,21 +91,25 @@ fun ExploreTab(
         ),
     )
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Spacing.Sides),
-        verticalArrangement = Arrangement.spacedBy(Spacing.Large),
-    ) {
-        items(storedReports) {
-            if(!it.isDeleted){
-                ReportCard(
-                    report = it,
-                    navigateToDetail = navigateToDetail
-                )
+    HandleLocationPermission(
+        onPermissionGranted = {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = Spacing.Sides),
+                verticalArrangement = Arrangement.spacedBy(Spacing.Large),
+            ) {
+                items(storedReports) {
+                    if(!it.isDeleted){
+                        ReportCard(
+                            report = it,
+                            navigateToDetail = navigateToDetail
+                        )
+                    }
+                }
             }
         }
-    }
+    )
 }
 
 @Composable
