@@ -1,5 +1,6 @@
 package com.mapify.ui.users.tabs
 
+import HandleLocationPermission
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -134,58 +135,63 @@ fun NotificationsTab(
 
     var remainingDays = -1
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Spacing.Sides),
-        verticalArrangement = Arrangement.spacedBy(Spacing.Large)
-    ) {
-        items(storedReports.sortedByDescending { it.date }) { report ->
-            if(report.isDeleted){
-                NotificationItem(
+    HandleLocationPermission(
+        onPermissionGranted = {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = Spacing.Sides),
+                verticalArrangement = Arrangement.spacedBy(Spacing.Large)
+            ) {
+                items(storedReports.sortedByDescending { it.date }) { report ->
+                    if(report.isDeleted){
+                        NotificationItem(
+                            title = stringResource(id = R.string.report_deleted),
+                            status = stringResource(id = R.string.deleted),
+                            supportingText = formatNotificationOrMessageDate(LocalDateTime.now()),
+                            statusMessage = stringResource(id = R.string.report_deleted_message),
+                            onClick = {
+                                exitDialogVisible = true
+                            },
+                            statusColor = MaterialTheme.colorScheme.error
+                        )
+                    }else{
+                        remainingDays = report.remainingDaysToDeletion
+                        NotificationItem(
+                            title = report.title,
+                            status = if (report.status == ReportStatus.VERIFIED)
+                                stringResource(id = R.string.verified)
+                            else
+                                stringResource(id = R.string.rejected),
+                            supportingText = formatNotificationOrMessageDate(report.date),
+                            statusMessage = if (report.status == ReportStatus.VERIFIED)
+                                stringResource(id = R.string.report_verified_message)
+                            else
+                                stringResource(id = R.string.report_rejected_days_remaining, remainingDays),
+                            imageUrl = report.images.first(),
+                            onClick = { navigateToReportView(report.id, report.status) },
+                            statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+                item {
+                    Spacer(modifier = Modifier.height(Spacing.Large))
+                }
+            }
+
+            if (exitDialogVisible) {
+                GenericDialog(
                     title = stringResource(id = R.string.report_deleted),
-                    status = stringResource(id = R.string.deleted),
-                    supportingText = formatNotificationOrMessageDate(LocalDateTime.now()),
-                    statusMessage = stringResource(id = R.string.report_deleted_message),
-                    onClick = {
-                        exitDialogVisible = true
+                    message = stringResource(id = R.string.report_deleted_message),
+                    onExit = {
+                        exitDialogVisible = false
                     },
-                    statusColor = MaterialTheme.colorScheme.error
-                )
-            }else{
-                remainingDays = report.remainingDaysToDeletion
-                NotificationItem(
-                    title = report.title,
-                    status = if (report.status == ReportStatus.VERIFIED)
-                        stringResource(id = R.string.verified)
-                    else
-                        stringResource(id = R.string.rejected),
-                    supportingText = formatNotificationOrMessageDate(report.date),
-                    statusMessage = if (report.status == ReportStatus.VERIFIED)
-                        stringResource(id = R.string.report_verified_message)
-                    else
-                        stringResource(id = R.string.report_rejected_days_remaining, remainingDays),
-                    imageUrl = report.images.first(),
-                    onClick = { navigateToReportView(report.id, report.status) },
-                    statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    onExitText = stringResource(id = R.string.ok)
                 )
             }
         }
-        item {
-            Spacer(modifier = Modifier.height(Spacing.Large))
-        }
-    }
+    )
 
-    if (exitDialogVisible) {
-        GenericDialog(
-            title = stringResource(id = R.string.report_deleted),
-            message = stringResource(id = R.string.report_deleted_message),
-            onExit = {
-                exitDialogVisible = false
-            },
-            onExitText = stringResource(id = R.string.ok)
-        )
-    }
 }
 
 @Composable
