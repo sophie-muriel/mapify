@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -43,6 +44,7 @@ import com.mapify.ui.components.SimpleTopBar
 import com.mapify.R
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.theme.Spacing
+import com.mapify.utils.SharedPreferencesUtils
 
 @Composable
 fun SettingsScreen(
@@ -50,6 +52,7 @@ fun SettingsScreen(
     navigateToProfile: () -> Unit,
     navigateToLogin: () -> Unit
 ) {
+    val context = LocalContext.current
     val sendNotifications = remember { mutableStateOf(true) }
     val notificationVibration = remember { mutableStateOf(false) }
 
@@ -121,6 +124,7 @@ fun SettingsScreen(
             },
             onExit = {
                 logoutDialogVisible = false
+                SharedPreferencesUtils.clearPreference(context)
                 navigateToLogin()
             },
             onCloseText = stringResource(id = R.string.cancel),

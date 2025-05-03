@@ -1,23 +1,12 @@
 package com.mapify.ui.screens
 
-import android.content.pm.PackageManager
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -25,6 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -49,12 +40,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.mapify.R
+import com.mapify.model.Location
+import com.mapify.model.Role
+import com.mapify.model.User
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.LogoTitle
 import com.mapify.ui.theme.Spacing
+import com.mapify.viewmodel.UsersViewModel
+import java.util.UUID
+import androidx.compose.runtime.saveable.rememberSaveable
 
 @Composable
 fun RegistrationScreen(
+    usersViewModel: UsersViewModel,
     navigateBack: () -> Unit
 ) {
     var name by rememberSaveable { mutableStateOf("") }
@@ -68,13 +66,12 @@ fun RegistrationScreen(
 
     var locationShared by rememberSaveable { mutableStateOf(false) }
     var locationForm by rememberSaveable { mutableStateOf(false) }
-    val location = "Colombia" // fixed for now, change when location access is explained in class
+    val location = Location(43230.2, 753948.8, "Colombia", "Armenia")
 
     val context = LocalContext.current
 
     val nameError = nameTouched && name.isBlank()
-    val emailError =
-        emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
+    val emailError = emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
     val passwordError = passwordTouched && password.length < 6
     val passwordConfirmationError = passwordConfirmationTouched && passwordConfirmation != password
 
@@ -124,11 +121,9 @@ fun RegistrationScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // registration form first part
             if (!locationForm) {
                 Spacer(modifier = Modifier.height(Spacing.TopBottomScreen + 15.dp))
 
-                // logo + name
                 LogoTitle(3.5f)
 
                 Spacer(modifier = Modifier.height(Spacing.Large * 2.8f))
@@ -162,9 +157,7 @@ fun RegistrationScreen(
                         if (email != "root") {
                             locationForm = true
                         } else {
-                            Toast.makeText(
-                                context, context.getString(R.string.email_taken), Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(context, context.getString(R.string.email_taken), Toast.LENGTH_SHORT).show()
                         }
                     },
                     navigateToLogin = {
@@ -176,7 +169,7 @@ fun RegistrationScreen(
                 )
 
                 Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
-            } else { // registration form part 2
+            } else {
                 Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
 
                 Column(
@@ -185,11 +178,9 @@ fun RegistrationScreen(
                     modifier = Modifier.wrapContentHeight()
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.mapify_dark), // placeholder
+                        painter = painterResource(id = R.drawable.mapify_dark),
                         contentDescription = stringResource(id = R.string.location_icon_description),
-                        modifier = Modifier
-                            .fillMaxWidth(1f)
-                            .aspectRatio(2f)
+                        modifier = Modifier.fillMaxWidth().aspectRatio(2f)
                     )
                 }
 
@@ -219,24 +210,25 @@ fun RegistrationScreen(
 
                 Spacer(modifier = Modifier.height(Spacing.Large * 18.1f))
 
-                ConfirmLocationForm(
-                    locationShared = locationShared,
-                    onClickConfirmLocation = {
-                        if (locationShared) {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.registration_successful),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            navigateBack()
-                            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                                resetFields()
-                            }, 100)
-                        } else {
-                            locationShared = true
-                        }
+                ConfirmLocationForm(locationShared) {
+                    if (locationShared) {
+                        usersViewModel.create(
+                            User(
+                                id = UUID.randomUUID().toString(),
+                                fullName = name,
+                                email = email,
+                                password = password,
+                                role = Role.CLIENT,
+                                registrationLocation = location
+                            )
+                        )
+                        Toast.makeText(context, context.getString(R.string.registration_successful), Toast.LENGTH_SHORT).show()
+                        navigateBack()
+                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ resetFields() }, 100)
+                    } else {
+                        locationShared = true
                     }
-                )
+                }
             }
         }
     }
@@ -250,8 +242,6 @@ fun RegistrationScreen(
         locationShared = false
     }
 }
-
-
 
 @Composable
 fun RegistrationForm(
@@ -317,7 +307,6 @@ fun RegistrationForm(
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
-
 
         GenericTextField(
             value = password,
@@ -398,7 +387,6 @@ fun ConfirmLocationForm(
             .padding(horizontal = Spacing.Sides),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Button(
             modifier = Modifier
                 .fillMaxWidth()
