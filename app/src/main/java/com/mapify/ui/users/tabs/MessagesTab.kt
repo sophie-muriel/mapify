@@ -10,60 +10,16 @@ import com.mapify.model.*
 import com.mapify.ui.components.ConversationItem
 import com.mapify.ui.components.Map
 import com.mapify.ui.theme.Spacing
+import com.mapify.viewmodel.UsersViewModel
 import java.time.LocalDateTime
 
 @Composable
 fun MessagesTab(
-    navigateToConversation: (String) -> Unit
+    navigateToConversation: (String) -> Unit,
+    usersViewModel: UsersViewModel
 ) {
 
-    val allUsers = listOf(
-        User(
-            id = "69",
-            fullName = "Barry McCoquiner",
-            email = "barry.mccoquiner@example.com",
-            password = "sizedoesntmatter",
-            role = Role.CLIENT,
-            registrationLocation = Location(0.0, 0.0, "USA", "City"),
-            profileImageUrl = null
-        ),
-        User(
-            id = "70",
-            fullName = "John Smith",
-            email = "john.smith@example.com",
-            password = "mockPassword2",
-            role = Role.CLIENT,
-            registrationLocation = Location(0.0, 0.0, "USA", "City"),
-            profileImageUrl = null
-        ),
-        User(
-            id = "72",
-            fullName = "Alice Johnson",
-            email = "alice.johnson@example.com",
-            password = "mockPassword3",
-            role = Role.CLIENT,
-            registrationLocation = Location(0.0, 0.0, "USA", "City"),
-            profileImageUrl = null
-        ),
-        User(
-            id = "73",
-            fullName = "Mike Cox",
-            email = "mike.cox@example.com",
-            password = "mockPassword4",
-            role = Role.CLIENT,
-            registrationLocation = Location(0.0, 0.0, "USA", "City"),
-            profileImageUrl = null
-        ),
-        User(
-            id = "74",
-            fullName = "Hugh Jass",
-            email = "hugh.jass@example.com",
-            password = "mockPassword5",
-            role = Role.CLIENT,
-            registrationLocation = Location(0.0, 0.0, "USA", "City"),
-            profileImageUrl = null
-        )
-    )
+    val allUsers by usersViewModel.users.collectAsState()
 
     var conversationsList by remember {
         mutableStateOf(
