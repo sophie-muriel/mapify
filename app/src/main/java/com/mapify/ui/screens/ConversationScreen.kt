@@ -14,21 +14,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.model.Conversation
-import com.mapify.model.Location
 import com.mapify.model.Message
-import com.mapify.model.Role
-import com.mapify.model.User
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.components.ProfileIcon
 import com.mapify.ui.theme.Spacing
+import com.mapify.viewmodel.UsersViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -36,16 +33,11 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversationScreen(
+    usersViewModel: UsersViewModel,
     conversationId: String,
     navigateBack: () -> Unit
 ) {
-    val allUsers = listOf(
-        User("69", "Barry McCoquiner", "barry.mccoquiner@example.com", "sizedoesntmatter", Role.CLIENT, Location(0.0, 0.0, "USA", "City"), null),
-        User("70", "John Smith", "john.smith@example.com", "mockPassword2", Role.CLIENT, Location(0.0, 0.0, "USA", "City"), null),
-        User("72", "Alice Johnson", "alice.johnson@example.com", "mockPassword3", Role.CLIENT, Location(0.0, 0.0, "USA", "City"), null),
-        User("73", "Mike Cox", "mike.cox@example.com", "mockPassword4", Role.CLIENT, Location(0.0, 0.0, "USA", "City"), null),
-        User("74", "Hugh Jass", "hugh.jass@example.com", "mockPassword5", Role.CLIENT, Location(0.0, 0.0, "USA", "City"), null)
-    )
+    val allUsers by usersViewModel.users.collectAsState()
 
     var conversationsList by remember {
         mutableStateOf(
