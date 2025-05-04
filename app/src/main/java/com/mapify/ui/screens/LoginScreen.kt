@@ -18,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.mapify.R
-import com.mapify.model.Role
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.LogoTitle
@@ -47,7 +46,7 @@ fun SetSoftInputModePan() {
 fun LoginScreen(
     usersViewModel: UsersViewModel,
     navigateToRegistration: () -> Unit,
-    navigateToHome: (Boolean, String) -> Unit
+    navigateToHome: () -> Unit
 ) {
     SetSoftInputModePan()
     val context = LocalContext.current
@@ -88,9 +87,11 @@ fun LoginScreen(
                     if (user == null) {
                         Toast.makeText(context, R.string.incorrect_credentials, Toast.LENGTH_SHORT).show()
                     } else {
-                        navigateToHome(user.role == Role.ADMIN, user.id)
                         SharedPreferencesUtils.savePreference(context, user.id, user.role)
-                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ resetFields() }, 200)
+                        navigateToHome()
+                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                            resetFields()
+                        }, 200)
                     }
                 },
                 onClickRegistration = {
