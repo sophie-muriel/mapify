@@ -23,11 +23,11 @@ import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.CreateFAB
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.ui.users.navigation.UserRouteTab
+import com.mapify.utils.SharedPreferencesUtils
+import com.mapify.viewmodel.UsersViewModel
 
 @Composable
 fun HomeScreen(
-    isAdmin: Boolean,
-    userId: String,
     navigateToProfile: () -> Unit,
     navigateToCreateReport: () -> Unit,
     navigateToDetail: (String) -> Unit,
@@ -35,7 +35,8 @@ fun HomeScreen(
     navigateToConversation: (String) -> Unit,
     navigateToReportView: (String, ReportStatus) -> Unit,
     navigateToSearchFilters: () -> Unit,
-    navigateToSearchContact: () -> Unit
+    navigateToSearchContact: () -> Unit,
+    usersViewModel: UsersViewModel
 ) {
 
     val navController = rememberNavController()
@@ -139,9 +140,9 @@ fun HomeScreen(
             padding = padding,
             navController = navController,
             navigateToDetail = navigateToDetail,
-            isAdmin = isAdmin,
             navigateToReportView = navigateToReportView,
-            navigateToConversation = navigateToConversation
+            navigateToConversation = navigateToConversation,
+            usersViewModel = usersViewModel
         )
         Box(
             modifier = Modifier
