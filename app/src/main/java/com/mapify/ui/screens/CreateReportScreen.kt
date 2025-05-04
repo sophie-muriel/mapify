@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,10 +31,14 @@ import getLocationName
 import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.unit.dp
+import com.mapify.utils.SharedPreferencesUtils
+import com.mapify.viewmodel.UsersViewModel
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun CreateReportScreen(
+    usersViewModel: UsersViewModel,
     navigateBack: () -> Unit,
     navigateToReportLocation: () -> Unit,
     navigateToReportView: (String) -> Unit,
@@ -107,14 +112,14 @@ fun CreateReportScreen(
 
     val reportsList = remember { mutableStateListOf<Report>() }
     var reportsIdCounter by rememberSaveable { mutableIntStateOf(4) }
-    val embeddedUser = User(
-        id = "1",
-        fullName = "Embedded User",
-        email = "embedded@mail.com",
-        password = "ThisIsATestPass",
-        role = Role.CLIENT,
-        registrationLocation = Location(43230.1, 753948.7, "Colombia", "Armenia")
-    )
+
+    val userId = SharedPreferencesUtils.getPreference(context)["userId"] ?: return
+
+    LaunchedEffect(userId) {
+        usersViewModel.loadCurrentUser(userId)
+    }
+
+    val embeddedUser by usersViewModel.currentUser.collectAsState()
 
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
     var publishReportVisible by rememberSaveable { mutableStateOf(false) }
@@ -137,6 +142,18 @@ fun CreateReportScreen(
             locationNotVisible = Location(latitude = latitude, longitude = longitude, country = country, city = city)
             locationVisible = locationNotVisible.toString()
         }
+    }
+
+    if (embeddedUser == null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
     }
 
     Scaffold(
@@ -244,7 +261,7 @@ fun CreateReportScreen(
                     images = photos,
                     id = reportsIdCounter.toString(),
                     status = ReportStatus.NOT_VERIFIED,
-                    userId = embeddedUser.id,
+                    userId = embeddedUser?.id ?: "",
                     date = LocalDateTime.now()
                 )
                 reportsIdCounter++
