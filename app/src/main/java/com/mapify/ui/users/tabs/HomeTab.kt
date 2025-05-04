@@ -6,7 +6,6 @@ import com.mapify.ui.components.Map
 
 @Composable
 fun HomeTab(
-    isAdmin: Boolean,
     navigateToDetail: (String) -> Unit
 ) {
     HandleLocationPermission(
