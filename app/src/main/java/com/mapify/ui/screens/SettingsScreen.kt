@@ -45,14 +45,18 @@ import com.mapify.R
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.theme.Spacing
 import com.mapify.utils.SharedPreferencesUtils
+import com.mapify.viewmodel.UsersViewModel
 
 @Composable
 fun SettingsScreen(
     navigateBack: () -> Unit,
     navigateToProfile: () -> Unit,
-    navigateToLogin: () -> Unit
+    navigateToLogin: () -> Unit,
+    usersViewModel: UsersViewModel
 ) {
     val context = LocalContext.current
+    val userId = SharedPreferencesUtils.getPreference(context)["userId"] ?: return
+
     val sendNotifications = remember { mutableStateOf(true) }
     val notificationVibration = remember { mutableStateOf(false) }
 
@@ -152,6 +156,8 @@ fun SettingsScreen(
             message = stringResource(id = R.string.account_deleted_message),
             onExit = {
                 accountDeletedDialogVisible = false
+                usersViewModel.delete(userId)
+                SharedPreferencesUtils.clearPreference(context)
                 navigateToLogin()
             },
             onExitText = stringResource(id = R.string.ok)
