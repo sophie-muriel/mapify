@@ -164,7 +164,8 @@ fun Navigation(
                         navController.navigate(RouteScreen.Login) {
                             popUpTo(0) { inclusive = true }
                         }
-                    }
+                    },
+                    usersViewModel = usersViewModel
                 )
             }
             composable<RouteScreen.SearchFilters> {
