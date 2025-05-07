@@ -18,6 +18,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mapify.R
 import com.mapify.model.ReportStatus
+import com.mapify.model.User
 import com.mapify.ui.users.navigation.UserNavigation
 import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.CreateFAB

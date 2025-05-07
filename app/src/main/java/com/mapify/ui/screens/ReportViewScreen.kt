@@ -107,16 +107,10 @@ fun ReportViewScreen(
     navigateBack: () -> Unit,
     navigateToReportEdit: ((String) -> Unit)? = null,
     navigateToReportLocation: () -> Unit,
-    usersViewModel: UsersViewModel
+    usersViewModel: UsersViewModel,
+    user: User
 ) {
     val context = LocalContext.current
-
-    val userId = SharedPreferencesUtils.getPreference(context)["userId"] ?: return
-
-    LaunchedEffect(userId) {
-        usersViewModel.loadCurrentUser(userId)
-    }
-
     val users by usersViewModel.users.collectAsState()
 
     val isAdmin = SharedPreferencesUtils.getPreference(context)["role"] == Role.ADMIN.toString()
@@ -287,7 +281,7 @@ fun ReportViewScreen(
     val scrollState = rememberScrollState()
     var commentCounter by rememberSaveable { mutableIntStateOf(4) }
 
-    var isCreator = userId == report.userId
+    val isCreator = user?.id == report.userId
     var showDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
     var showVerifyDialog by rememberSaveable { mutableStateOf(false) }
     var showRejectionInputDialog by rememberSaveable { mutableStateOf(false) }
@@ -483,7 +477,7 @@ fun ReportViewScreen(
                     var newComment = Comment(
                         id = commentCounter.toString(),
                         content = comment,
-                        userId = userId,
+                        userId = user?.id ?: "",
                         reportId = reportId,
                         date = LocalDateTime.now()
                     )
@@ -492,7 +486,7 @@ fun ReportViewScreen(
                     comment = ""
                 },
                 users = users,
-                userId = userId
+                userId = user?.id ?: ""
             )
         }
 

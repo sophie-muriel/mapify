@@ -38,12 +38,12 @@ import com.mapify.viewmodel.UsersViewModel
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun CreateReportScreen(
-    usersViewModel: UsersViewModel,
     navigateBack: () -> Unit,
     navigateToReportLocation: () -> Unit,
     navigateToReportView: (String) -> Unit,
     latitude: Double? = null,
-    longitude: Double? = null
+    longitude: Double? = null,
+    user: User
 ) {
     val context = LocalContext.current
     var isValidating by remember { mutableStateOf(false) }
@@ -113,14 +113,6 @@ fun CreateReportScreen(
     val reportsList = remember { mutableStateListOf<Report>() }
     var reportsIdCounter by rememberSaveable { mutableIntStateOf(4) }
 
-    val userId = SharedPreferencesUtils.getPreference(context)["userId"] ?: return
-
-    LaunchedEffect(userId) {
-        usersViewModel.loadCurrentUser(userId)
-    }
-
-    val embeddedUser by usersViewModel.currentUser.collectAsState()
-
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
     var publishReportVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -142,18 +134,6 @@ fun CreateReportScreen(
             locationNotVisible = Location(latitude = latitude, longitude = longitude, country = country, city = city)
             locationVisible = locationNotVisible.toString()
         }
-    }
-
-    if (embeddedUser == null) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-        return
     }
 
     Scaffold(
@@ -261,7 +241,7 @@ fun CreateReportScreen(
                     images = photos,
                     id = reportsIdCounter.toString(),
                     status = ReportStatus.NOT_VERIFIED,
-                    userId = embeddedUser?.id ?: "",
+                    userId = user.id,
                     date = LocalDateTime.now()
                 )
                 reportsIdCounter++
