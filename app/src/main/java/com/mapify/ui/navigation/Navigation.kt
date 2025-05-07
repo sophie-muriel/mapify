@@ -1,6 +1,7 @@
 package com.mapify.ui.navigation
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -11,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.mapify.model.User
 import com.mapify.ui.screens.ConversationScreen
 import com.mapify.ui.screens.CreateReportScreen
 import com.mapify.ui.screens.EditReportScreen
@@ -31,12 +33,12 @@ import com.mapify.viewmodel.UsersViewModel
 fun Navigation(
     usersViewModel: UsersViewModel
 ) {
-
     val context = LocalContext.current
     val navController = rememberNavController()
-    val user = SharedPreferencesUtils.getPreference(context)
+    val user = usersViewModel.loadUser(context)
+    Log.d("Navigation", "User from SharedPreferences: ${user?.fullName}")
 
-    val startDestination: RouteScreen = if (user.isNotEmpty()) RouteScreen.Home else RouteScreen.Login
+    val startDestination: RouteScreen = if (user != null) RouteScreen.Home else RouteScreen.Login
 
     val latitude = rememberSaveable { mutableStateOf<Double?>(null) }
     val longitude = rememberSaveable { mutableStateOf<Double?>(null) }
@@ -106,7 +108,6 @@ fun Navigation(
             }
             composable<RouteScreen.CreateReport> {
                 CreateReportScreen(
-                    usersViewModel = usersViewModel,
                     latitude = latitude.value,
                     longitude = longitude.value,
                     navigateBack = {
@@ -119,7 +120,8 @@ fun Navigation(
                     },
                     navigateToReportView = {
                         navController.navigate(RouteScreen.ReportView(it))
-                    }
+                    },
+                    user = usersViewModel.loadUser(context)!!
                 )
             }
             composable<RouteScreen.ReportLocation> {
@@ -145,7 +147,8 @@ fun Navigation(
                     navigateToReportLocation = {
                         navController.navigate(RouteScreen.ReportLocation)
                     },
-                    usersViewModel = usersViewModel
+                    usersViewModel = usersViewModel,
+                    user = usersViewModel.loadUser(context)!!
                 )
             }
             composable<RouteScreen.Profile> {
@@ -153,7 +156,8 @@ fun Navigation(
                     usersViewModel = usersViewModel,
                     navigateBack = {
                         navController.popBackStack()
-                    }
+                    },
+                    user = usersViewModel.loadUser(context)!!
                 )
             }
             composable<RouteScreen.Settings> {
