@@ -1,7 +1,10 @@
 package com.mapify.viewmodel
 
 import android.content.Context
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.mapify.model.Location
 import com.mapify.model.Role
 import com.mapify.model.User
@@ -9,21 +12,25 @@ import com.mapify.utils.SharedPreferencesUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class UsersViewModel : ViewModel() {
 
+    private val _user = mutableStateOf<User?>(null)
+    val user: State<User?> get() = _user
+
     private val _users = MutableStateFlow(emptyList<User>())
     val users: StateFlow<List<User>> = _users.asStateFlow()
-    private val _currentUser = MutableStateFlow<User?>(null)
-    val currentUser: StateFlow<User?> = _currentUser
-
-    fun loadCurrentUser(userId: String) {
-        _currentUser.value = findById(userId)
-    }
 
     init {
         _users.value = getUsers()
+    }
+
+    fun loadUser(context: Context): User? {
+        val userId = SharedPreferencesUtils.getPreference(context)["userId"]
+        _user.value = userId?.let { findById(it) }
+        return _user.value
     }
 
     fun create(user: User) {
@@ -55,7 +62,7 @@ class UsersViewModel : ViewModel() {
     private fun getUsers(): List<User> {
         return listOf(
             User(
-                id = UUID.randomUUID().toString(),
+                id = "1",
                 fullName = "Admin",
                 email = "root",
                 password = "root",
@@ -65,7 +72,7 @@ class UsersViewModel : ViewModel() {
                 )
             ),
             User(
-                id = UUID.randomUUID().toString(),
+                id = "2",
                 fullName = "Average User",
                 email = "user",
                 password = "user",
@@ -75,7 +82,7 @@ class UsersViewModel : ViewModel() {
                 )
             ),
             User(
-                id = UUID.randomUUID().toString(),
+                id = "3",
                 fullName = "Barry McCoquiner",
                 email = "barry.mccoquiner@example.com",
                 password = "pass1",
@@ -84,7 +91,7 @@ class UsersViewModel : ViewModel() {
                 profileImageUrl = null
             ),
             User(
-                id = UUID.randomUUID().toString(),
+                id = "4",
                 fullName = "John Smith",
                 email = "john.smith@example.com",
                 password = "pass2",
@@ -93,7 +100,7 @@ class UsersViewModel : ViewModel() {
                 profileImageUrl = null
             ),
             User(
-                id = UUID.randomUUID().toString(),
+                id = "5",
                 fullName = "Alice Johnson",
                 email = "alice.johnson@example.com",
                 password = "pass3",
@@ -111,7 +118,7 @@ class UsersViewModel : ViewModel() {
                 profileImageUrl = null
             ),
             User(
-                id = UUID.randomUUID().toString(),
+                id = "6",
                 fullName = "Hugh Jass",
                 email = "hugh.jass@example.com",
                 password = "pass5",
