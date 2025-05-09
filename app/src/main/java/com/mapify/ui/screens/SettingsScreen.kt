@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.R
 import com.mapify.ui.components.GenericDialog
+import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
 import com.mapify.utils.SharedPreferencesUtils
 import com.mapify.viewmodel.UsersViewModel
@@ -51,9 +52,11 @@ import com.mapify.viewmodel.UsersViewModel
 fun SettingsScreen(
     navigateBack: () -> Unit,
     navigateToProfile: () -> Unit,
-    navigateToLogin: () -> Unit,
-    usersViewModel: UsersViewModel
+    navigateToLogin: () -> Unit
 ) {
+
+    val usersViewModel = LocalMainViewModel.current.usersViewModel
+
     val context = LocalContext.current
     val userId = SharedPreferencesUtils.getPreference(context)["userId"] ?: return
 
