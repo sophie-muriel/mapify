@@ -23,6 +23,7 @@ import com.mapify.ui.users.navigation.UserNavigation
 import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.CreateFAB
 import com.mapify.ui.components.SimpleTopBar
+import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.users.navigation.UserRouteTab
 import com.mapify.utils.SharedPreferencesUtils
 import com.mapify.viewmodel.UsersViewModel
@@ -36,10 +37,11 @@ fun HomeScreen(
     navigateToConversation: (String) -> Unit,
     navigateToReportView: (String, ReportStatus) -> Unit,
     navigateToSearchFilters: () -> Unit,
-    navigateToSearchContact: () -> Unit,
-    usersViewModel: UsersViewModel
+    navigateToSearchContact: () -> Unit
 ) {
 
+    val usersViewModel = LocalMainViewModel.current.usersViewModel
+    
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
     val currentRoute = navBackStackEntry?.destination?.route
