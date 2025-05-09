@@ -40,7 +40,7 @@ fun Navigation(
 ) {
     val context = LocalContext.current
     val navController = rememberNavController()
-    val user = LocalMainViewModel.current.usersViewModel.loadUser(context)
+    val user = mainViewModel.usersViewModel.loadUser(context)
     Log.d("Navigation", "User from SharedPreferences: ${user?.fullName}")
 
     val startDestination: RouteScreen = if (user != null) RouteScreen.Home else RouteScreen.Login
