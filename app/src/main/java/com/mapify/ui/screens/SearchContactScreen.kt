@@ -18,15 +18,18 @@ import com.mapify.model.Message
 import com.mapify.ui.theme.Spacing
 import com.mapify.ui.components.SearchUserItem
 import com.mapify.ui.components.SimpleTopBar
+import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.viewmodel.UsersViewModel
 import java.time.LocalDateTime
 
 @Composable
 fun SearchContactScreen(
     navigateBack: () -> Unit,
-    onUserSelected: (String) -> Unit,
-    usersViewModel: UsersViewModel
+    onUserSelected: (String) -> Unit
 ) {
+
+    val usersViewModel = LocalMainViewModel.current.usersViewModel
+
     var searchQuery by remember { mutableStateOf("") }
 
     val recentSearches = listOf(
