@@ -96,6 +96,7 @@ import com.mapify.model.Comment
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
+import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.utils.SharedPreferencesUtils
 import com.mapify.viewmodel.UsersViewModel
 
@@ -106,11 +107,14 @@ fun ReportViewScreen(
     reportStatusP: ReportStatus? = null,
     navigateBack: () -> Unit,
     navigateToReportEdit: ((String) -> Unit)? = null,
-    navigateToReportLocation: () -> Unit,
-    usersViewModel: UsersViewModel,
-    user: User
+    navigateToReportLocation: () -> Unit
 ) {
+
     val context = LocalContext.current
+
+    val usersViewModel = LocalMainViewModel.current.usersViewModel
+    val user = LocalMainViewModel.current.usersViewModel.loadUser(context)!!
+
     val users by usersViewModel.users.collectAsState()
 
     val isAdmin = SharedPreferencesUtils.getPreference(context)["role"] == Role.ADMIN.toString()
