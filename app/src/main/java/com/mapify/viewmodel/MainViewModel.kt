@@ -1,4 +1,7 @@
 package com.mapify.viewmodel
 
-class MainViewModel {
+class MainViewModel(
+    val usersViewModel: UsersViewModel,
+    val reportsViewModel: ReportsViewModel,
+) {
 }
