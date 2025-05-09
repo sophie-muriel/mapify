@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDateTime
 
-class ReportViewModel: ViewModel() {
+class ReportsViewModel: ViewModel() {
 
     private val _reports = MutableStateFlow(emptyList<Report>())
     val reports: StateFlow<List<Report>> = _reports.asStateFlow()
