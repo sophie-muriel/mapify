@@ -50,12 +50,15 @@ import com.mapify.ui.theme.Spacing
 import com.mapify.viewmodel.UsersViewModel
 import java.util.UUID
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.mapify.ui.navigation.LocalMainViewModel
 
 @Composable
 fun RegistrationScreen(
-    usersViewModel: UsersViewModel,
     navigateBack: () -> Unit
 ) {
+
+    val usersViewModel = LocalMainViewModel.current.usersViewModel
+
     var name by rememberSaveable { mutableStateOf("") }
     var nameTouched by rememberSaveable { mutableStateOf(false) }
     var email by rememberSaveable { mutableStateOf("") }
