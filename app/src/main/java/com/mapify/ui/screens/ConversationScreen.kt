@@ -39,7 +39,7 @@ fun ConversationScreen(
 ) {
 
     val usersViewModel = LocalMainViewModel.current.usersViewModel
-    
+
     val allUsers by usersViewModel.users.collectAsState()
 
     var conversationsList by remember {
