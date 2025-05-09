@@ -20,14 +20,19 @@ import com.mapify.ui.components.SimpleTopBar
 import com.mapify.ui.theme.Spacing
 import com.mapify.viewmodel.UsersViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalContext
 import com.mapify.model.User
+import com.mapify.ui.navigation.LocalMainViewModel
 
 @Composable
 fun ProfileScreen(
-    usersViewModel: UsersViewModel,
-    navigateBack: () -> Unit,
-    user: User
+    navigateBack: () -> Unit
 ) {
+
+    val context = LocalContext.current
+
+    val usersViewModel = LocalMainViewModel.current.usersViewModel
+    val user = LocalMainViewModel.current.usersViewModel.loadUser(context)!!
 
     var name by rememberSaveable { mutableStateOf(user.fullName) }
     var email by rememberSaveable { mutableStateOf(user.email) }
