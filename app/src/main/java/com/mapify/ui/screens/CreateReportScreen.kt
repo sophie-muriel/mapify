@@ -49,7 +49,7 @@ fun CreateReportScreen(
     val context = LocalContext.current
 
     val user = LocalMainViewModel.current.usersViewModel.loadUser(context)!!
-    
+
     var isValidating by remember { mutableStateOf(false) }
 
     var title by rememberSaveable { mutableStateOf("") }
