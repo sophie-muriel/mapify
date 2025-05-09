@@ -24,6 +24,7 @@ import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.components.ProfileIcon
+import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
 import com.mapify.viewmodel.UsersViewModel
 import java.time.LocalDateTime
@@ -33,10 +34,12 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversationScreen(
-    usersViewModel: UsersViewModel,
     conversationId: String,
     navigateBack: () -> Unit
 ) {
+
+    val usersViewModel = LocalMainViewModel.current.usersViewModel
+    
     val allUsers by usersViewModel.users.collectAsState()
 
     var conversationsList by remember {
