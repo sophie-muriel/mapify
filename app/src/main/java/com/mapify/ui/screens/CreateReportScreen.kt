@@ -32,6 +32,7 @@ import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.unit.dp
+import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.utils.SharedPreferencesUtils
 import com.mapify.viewmodel.UsersViewModel
 
@@ -42,10 +43,13 @@ fun CreateReportScreen(
     navigateToReportLocation: () -> Unit,
     navigateToReportView: (String) -> Unit,
     latitude: Double? = null,
-    longitude: Double? = null,
-    user: User
+    longitude: Double? = null
 ) {
+
     val context = LocalContext.current
+
+    val user = LocalMainViewModel.current.usersViewModel.loadUser(context)!!
+    
     var isValidating by remember { mutableStateOf(false) }
 
     var title by rememberSaveable { mutableStateOf("") }
