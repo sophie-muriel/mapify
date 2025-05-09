@@ -55,8 +55,7 @@ fun UserNavigation(
                 navigateBack = { navController.popBackStack() },
                 onUserSelected = { username ->
                     navController.navigate("Conversation/$username")
-                },
-                usersViewModel = usersViewModel
+                }
             )
         }
     }
