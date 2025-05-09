@@ -25,6 +25,7 @@ import com.mapify.ui.theme.Spacing
 import com.mapify.utils.SharedPreferencesUtils
 import com.mapify.viewmodel.UsersViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.mapify.ui.navigation.LocalMainViewModel
 
 @Composable
 fun SetSoftInputModePan() {
@@ -44,10 +45,12 @@ fun SetSoftInputModePan() {
 
 @Composable
 fun LoginScreen(
-    usersViewModel: UsersViewModel,
     navigateToRegistration: () -> Unit,
     navigateToHome: () -> Unit
 ) {
+
+    val usersViewModel = LocalMainViewModel.current.usersViewModel
+
     SetSoftInputModePan()
     val context = LocalContext.current
 
