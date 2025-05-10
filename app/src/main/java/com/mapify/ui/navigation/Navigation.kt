@@ -90,8 +90,8 @@ fun Navigation(
                         navigateToSettings = {
                             navController.navigate(RouteScreen.Settings)
                         },
-                        navigateToConversation = { conversationId ->
-                            navController.navigate(RouteScreen.Conversation(conversationId))
+                        navigateToConversation = { conversationId, isConversation ->
+                            navController.navigate(RouteScreen.Conversation(conversationId, isConversation))
                         },
                         navigateToReportView = { id, status ->
                             navController.navigate(
@@ -191,15 +191,16 @@ fun Navigation(
                 composable<RouteScreen.SearchContact> {
                     SearchContactScreen(
                         navigateBack = { navController.popBackStack() },
-                        onUserSelected = { conversationId ->
-                            navController.navigate(RouteScreen.Conversation(conversationId))
-                        }
+                        onUserSelected = { conversationId, isConversation ->
+                            navController.navigate(RouteScreen.Conversation(conversationId, isConversation))
+                        },
                     )
                 }
                 composable<RouteScreen.Conversation> { backStackEntry ->
                     val args = backStackEntry.toRoute<RouteScreen.Conversation>()
                     ConversationScreen(
-                        conversationId = args.conversationId,
+                        id = args.id,
+                        isConversation = args.isConversation,
                         navigateBack = {
                             navController.popBackStack()
                         }

@@ -16,6 +16,6 @@ sealed class RouteScreen {
     @Serializable data object SearchFilters : RouteScreen()
     @Serializable data class EditReport(val reportId: String, val latitude: Double? = null, val longitude: Double? = null) : RouteScreen()
     @Serializable data object SearchContact : RouteScreen()
-    @Serializable data class Conversation(val conversationId: String) : RouteScreen()
+    @Serializable data class Conversation(val id: String, val isConversation: Boolean) : RouteScreen()
 
 }
