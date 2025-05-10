@@ -1,17 +1,20 @@
 package com.mapify.ui.navigation
 
+import LocationPermissionWrapper
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.mapify.model.User
@@ -50,161 +53,168 @@ fun Navigation(
 
     Surface {
         CompositionLocalProvider(LocalMainViewModel provides mainViewModel) {
-            NavHost(
-                navController = navController,
-                startDestination = startDestination
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+
+            LocationPermissionWrapper(
+                currentRoute = currentRoute
             ) {
-                composable<RouteScreen.Login> {
-                    LoginScreen(
-                        navigateToRegistration = {
-                            navController.navigate(RouteScreen.Registration)
-                        },
-                        navigateToHome = {
-                            navController.navigate(RouteScreen.Home) {
-                                popUpTo(0) {
-                                    inclusive = true
+                NavHost(
+                    navController = navController,
+                    startDestination = startDestination
+                ) {
+                    composable<RouteScreen.Login> {
+                        LoginScreen(
+                            navigateToRegistration = {
+                                navController.navigate(RouteScreen.Registration)
+                            },
+                            navigateToHome = {
+                                navController.navigate(RouteScreen.Home) {
+                                    popUpTo(0) {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
                                 }
-                                launchSingleTop = true
                             }
-                        }
-                    )
-                }
-                composable<RouteScreen.Registration> {
-                    RegistrationScreen(
-                        navigateBack = {
-                            navController.popBackStack()
-                        }
-                    )
-                }
-                composable<RouteScreen.Home> {
-                    HomeScreen(
-                        navigateToProfile = {
-                            navController.navigate(RouteScreen.Profile)
-                        },
-                        navigateToCreateReport = {
-                            navController.navigate(RouteScreen.CreateReport())
-                        },
-                        navigateToDetail = {
-                            navController.navigate(RouteScreen.ReportView(it))
-                        },
-                        navigateToSettings = {
-                            navController.navigate(RouteScreen.Settings)
-                        },
-                        navigateToConversation = { conversationId, isConversation ->
-                            navController.navigate(RouteScreen.Conversation(conversationId, isConversation))
-                        },
-                        navigateToReportView = { id, status ->
-                            navController.navigate(
-                                RouteScreen.ReportView(
-                                    reportId = id,
-                                    reportStatus = status
+                        )
+                    }
+                    composable<RouteScreen.Registration> {
+                        RegistrationScreen(
+                            navigateBack = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+                    composable<RouteScreen.Home> {
+                        HomeScreen(
+                            navigateToProfile = {
+                                navController.navigate(RouteScreen.Profile)
+                            },
+                            navigateToCreateReport = {
+                                navController.navigate(RouteScreen.CreateReport())
+                            },
+                            navigateToDetail = {
+                                navController.navigate(RouteScreen.ReportView(it))
+                            },
+                            navigateToSettings = {
+                                navController.navigate(RouteScreen.Settings)
+                            },
+                            navigateToConversation = { conversationId, isConversation ->
+                                navController.navigate(RouteScreen.Conversation(conversationId, isConversation))
+                            },
+                            navigateToReportView = { id, status ->
+                                navController.navigate(
+                                    RouteScreen.ReportView(
+                                        reportId = id,
+                                        reportStatus = status
+                                    )
                                 )
-                            )
-                        },
-                        navigateToSearchFilters = {
-                            navController.navigate(RouteScreen.SearchFilters)
-                        },
-                        navigateToSearchContact = {
-                            navController.navigate(RouteScreen.SearchContact)
-                        }
-                    )
-                }
-                composable<RouteScreen.CreateReport> {
-                    CreateReportScreen(
-                        latitude = latitude.value,
-                        longitude = longitude.value,
-                        navigateBack = {
-                            latitude.value = null
-                            longitude.value = null
-                            navController.popBackStack()
-                        },
-                        navigateToReportLocation = {
-                            navController.navigate(RouteScreen.ReportLocation)
-                        },
-                        navigateToReportView = {
-                            navController.navigate(RouteScreen.ReportView(it))
-                        }
-                    )
-                }
-                composable<RouteScreen.ReportLocation> {
-                    ReportLocationScreen(
-                        navigateBack = { lat, lng ->
-                            latitude.value = lat
-                            longitude.value = lng
-                            navController.popBackStack()
-                        }
-                    )
-                }
-                composable<RouteScreen.ReportView> { it ->
-                    val args = it.toRoute<RouteScreen.ReportView>()
-                    ReportViewScreen(
-                        reportId = args.reportId,
-                        reportStatusP = args.reportStatus,
-                        navigateBack = {
-                            navController.popBackStack()
-                        },
-                        navigateToReportEdit = {
-                            navController.navigate(RouteScreen.EditReport(it))
-                        },
-                        navigateToReportLocation = {
-                            navController.navigate(RouteScreen.ReportLocation)
-                        }
-                    )
-                }
-                composable<RouteScreen.Profile> {
-                    ProfileScreen(
-                        navigateBack = {
-                            navController.popBackStack()
-                        }
-                    )
-                }
-                composable<RouteScreen.Settings> {
-                    SettingsScreen(
-                        navigateBack = { navController.popBackStack() },
-                        navigateToProfile = { navController.navigate(RouteScreen.Profile) },
-                        navigateToLogin = {
-                            navController.navigate(RouteScreen.Login) {
-                                popUpTo(0) { inclusive = true }
+                            },
+                            navigateToSearchFilters = {
+                                navController.navigate(RouteScreen.SearchFilters)
+                            },
+                            navigateToSearchContact = {
+                                navController.navigate(RouteScreen.SearchContact)
                             }
-                        }
-                    )
-                }
-                composable<RouteScreen.SearchFilters> {
-                    SearchFiltersScreen(
-                        navigateBack = { navController.popBackStack() },
-                    )
-                }
-                composable<RouteScreen.EditReport> { it ->
-                    val args = it.toRoute<RouteScreen.EditReport>()
-                    EditReportScreen(
-                        latitude = latitude.value,
-                        longitude = longitude.value,
-                        navigateBack = {
-                            latitude.value = null
-                            longitude.value = null
-                            navController.popBackStack()
-                        },
-                        navigateToReportLocation = { navController.navigate(RouteScreen.ReportLocation) },
-                        reportId = args.reportId
-                    )
-                }
-                composable<RouteScreen.SearchContact> {
-                    SearchContactScreen(
-                        navigateBack = { navController.popBackStack() },
-                        onUserSelected = { conversationId, isConversation ->
-                            navController.navigate(RouteScreen.Conversation(conversationId, isConversation))
-                        },
-                    )
-                }
-                composable<RouteScreen.Conversation> { backStackEntry ->
-                    val args = backStackEntry.toRoute<RouteScreen.Conversation>()
-                    ConversationScreen(
-                        id = args.id,
-                        isConversation = args.isConversation,
-                        navigateBack = {
-                            navController.popBackStack()
-                        }
-                    )
+                        )
+                    }
+                    composable<RouteScreen.CreateReport> {
+                        CreateReportScreen(
+                            latitude = latitude.value,
+                            longitude = longitude.value,
+                            navigateBack = {
+                                latitude.value = null
+                                longitude.value = null
+                                navController.popBackStack()
+                            },
+                            navigateToReportLocation = {
+                                navController.navigate(RouteScreen.ReportLocation)
+                            },
+                            navigateToReportView = {
+                                navController.navigate(RouteScreen.ReportView(it))
+                            }
+                        )
+                    }
+                    composable<RouteScreen.ReportLocation> {
+                        ReportLocationScreen(
+                            navigateBack = { lat, lng ->
+                                latitude.value = lat
+                                longitude.value = lng
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+                    composable<RouteScreen.ReportView> { it ->
+                        val args = it.toRoute<RouteScreen.ReportView>()
+                        ReportViewScreen(
+                            reportId = args.reportId,
+                            reportStatusP = args.reportStatus,
+                            navigateBack = {
+                                navController.popBackStack()
+                            },
+                            navigateToReportEdit = {
+                                navController.navigate(RouteScreen.EditReport(it))
+                            },
+                            navigateToReportLocation = {
+                                navController.navigate(RouteScreen.ReportLocation)
+                            }
+                        )
+                    }
+                    composable<RouteScreen.Profile> {
+                        ProfileScreen(
+                            navigateBack = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+                    composable<RouteScreen.Settings> {
+                        SettingsScreen(
+                            navigateBack = { navController.popBackStack() },
+                            navigateToProfile = { navController.navigate(RouteScreen.Profile) },
+                            navigateToLogin = {
+                                navController.navigate(RouteScreen.Login) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+                    composable<RouteScreen.SearchFilters> {
+                        SearchFiltersScreen(
+                            navigateBack = { navController.popBackStack() },
+                        )
+                    }
+                    composable<RouteScreen.EditReport> { it ->
+                        val args = it.toRoute<RouteScreen.EditReport>()
+                        EditReportScreen(
+                            latitude = latitude.value,
+                            longitude = longitude.value,
+                            navigateBack = {
+                                latitude.value = null
+                                longitude.value = null
+                                navController.popBackStack()
+                            },
+                            navigateToReportLocation = { navController.navigate(RouteScreen.ReportLocation) },
+                            reportId = args.reportId
+                        )
+                    }
+                    composable<RouteScreen.SearchContact> {
+                        SearchContactScreen(
+                            navigateBack = { navController.popBackStack() },
+                            onUserSelected = { conversationId, isConversation ->
+                                navController.navigate(RouteScreen.Conversation(conversationId, isConversation))
+                            },
+                        )
+                    }
+                    composable<RouteScreen.Conversation> { backStackEntry ->
+                        val args = backStackEntry.toRoute<RouteScreen.Conversation>()
+                        ConversationScreen(
+                            id = args.id,
+                            isConversation = args.isConversation,
+                            navigateBack = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
                 }
             }
         }
