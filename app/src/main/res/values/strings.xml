@@ -190,4 +190,7 @@
     <string name="recent_search_icon">Recent Search Icon</string>
 
     <string name="location_set">Location has been set</string>
+
+    <string name="location_access_permission_granted">Location access permission granted</string>
+    <string name="location_access_permission_denied">Location access permission denied</string>
 </resources>
