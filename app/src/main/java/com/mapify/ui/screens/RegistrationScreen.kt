@@ -15,8 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -47,9 +45,7 @@ import com.mapify.model.User
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.LogoTitle
 import com.mapify.ui.theme.Spacing
-import com.mapify.viewmodel.UsersViewModel
 import java.util.UUID
-import androidx.compose.runtime.saveable.rememberSaveable
 import com.mapify.ui.navigation.LocalMainViewModel
 
 @Composable
@@ -87,14 +83,17 @@ fun RegistrationScreen(
         mutableStateOf(ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
     }
 
+    val locationAccessPermissionGranted = stringResource(id = R.string.location_access_permission_granted)
+    val locationAccessPermissionDenied = stringResource(id = R.string.location_access_permission_denied)
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         hasPermission = isGranted
         if(hasPermission){
-            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, locationAccessPermissionGranted, Toast.LENGTH_SHORT).show()
         }else{
-            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, locationAccessPermissionDenied, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -247,14 +246,10 @@ fun RegistrationScreen(
             }
         }
     }
-    if(locationShared){
-        LaunchedEffect(Unit) {
-            if(!hasPermission){
-                permissionLauncher.launch(permission)
-            }
+    LaunchedEffect(locationForm, locationShared) {
+        if (locationForm && locationShared && !hasPermission) {
+            permissionLauncher.launch(permission)
         }
-    }else{
-        locationShared = false
     }
 }
 
