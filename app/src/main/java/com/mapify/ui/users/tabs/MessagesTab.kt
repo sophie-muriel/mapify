@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 
 @Composable
 fun MessagesTab(
-    navigateToConversation: (String) -> Unit,
+    navigateToConversation: (String, Boolean) -> Unit,
     usersViewModel: UsersViewModel
 ) {
 
@@ -84,7 +84,7 @@ fun MessagesTab(
                                     it.copy(isRead = true)
                                 } else it
                             }
-                            navigateToConversation(conversation.id)
+                            navigateToConversation(conversation.id, true)
                         },
                         onMarkRead = {
                             conversationsList = conversationsList.map {

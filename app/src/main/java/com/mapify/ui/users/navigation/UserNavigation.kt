@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.mapify.model.ReportStatus
+import com.mapify.ui.navigation.RouteScreen
 import com.mapify.ui.screens.SearchContactScreen
 import com.mapify.ui.users.tabs.ExploreTab
 import com.mapify.ui.users.tabs.HomeTab
@@ -21,7 +22,7 @@ fun UserNavigation(
     navController: NavHostController,
     navigateToDetail: (String) -> Unit,
     navigateToReportView: (String, ReportStatus) -> Unit,
-    navigateToConversation: (String) -> Unit,
+    navigateToConversation: (String, Boolean) -> Unit,
     usersViewModel: UsersViewModel
 ) {
     NavHost(
@@ -53,8 +54,8 @@ fun UserNavigation(
         composable("SearchContact") {
             SearchContactScreen(
                 navigateBack = { navController.popBackStack() },
-                onUserSelected = { username ->
-                    navController.navigate("Conversation/$username")
+                onUserSelected = { id, isConversation ->
+                    navController.navigate(RouteScreen.Conversation(id, isConversation))
                 }
             )
         }
