@@ -67,45 +67,47 @@ fun MessagesTab(
         )
     }
 
-    HandleLocationPermission(
-        onPermissionGranted = {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = Spacing.Sides),
-                verticalArrangement = Arrangement.spacedBy(Spacing.Large)
-            ) {
-                items(conversationsList, key = { it.id }) { conversation ->
-                    ConversationItem(
-                        conversation = conversation,
-                        onClick = {
-                            conversationsList = conversationsList.map {
-                                if (it.id == conversation.id) {
-                                    it.copy(isRead = true)
-                                } else it
-                            }
-                            navigateToConversation(conversation.id, true)
-                        },
-                        onMarkRead = {
-                            conversationsList = conversationsList.map {
-                                if (it.id == conversation.id) {
-                                    it.copy(isRead = true)
-                                } else it
-                            }
-                        },
-                        onMarkUnread = {
-                            conversationsList = conversationsList.map {
-                                if (it.id == conversation.id) {
-                                    it.copy(isRead = false)
-                                } else it
-                            }
-                        },
-                        onDelete = {
-                            conversationsList = conversationsList.filterNot { it.id == conversation.id }
-                        }
-                    )
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = Spacing.Sides),
+        verticalArrangement = Arrangement.spacedBy(Spacing.Large)
+    ) {
+        items(conversationsList, key = { it.id }) { conversation ->
+            ConversationItem(
+                conversation = conversation,
+                onClick = {
+                    conversationsList = conversationsList.map {
+                        if (it.id == conversation.id) {
+                            it.copy(isRead = true)
+                        } else it
+                    }
+                    navigateToConversation(conversation.id, true)
+                },
+                onMarkRead = {
+                    conversationsList = conversationsList.map {
+                        if (it.id == conversation.id) {
+                            it.copy(isRead = true)
+                        } else it
+                    }
+                },
+                onMarkUnread = {
+                    conversationsList = conversationsList.map {
+                        if (it.id == conversation.id) {
+                            it.copy(isRead = false)
+                        } else it
+                    }
+                },
+                onDelete = {
+                    conversationsList = conversationsList.filterNot { it.id == conversation.id }
                 }
-            }
+            )
         }
-    )
+    }
+
+//    HandleLocationPermission(
+//        onPermissionGranted = {
+//
+//        }
+//    )
 }

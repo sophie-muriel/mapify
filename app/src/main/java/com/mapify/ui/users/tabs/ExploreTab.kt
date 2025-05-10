@@ -54,25 +54,26 @@ fun ExploreTab(
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
     val storedReports by reportsViewModel.reports.collectAsState()
 
-    HandleLocationPermission(
-        onPermissionGranted = {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = Spacing.Sides),
-                verticalArrangement = Arrangement.spacedBy(Spacing.Large),
-            ) {
-                items(storedReports) {
-                    if(!it.isDeleted){
-                        ReportCard(
-                            report = it,
-                            navigateToDetail = navigateToDetail
-                        )
-                    }
-                }
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = Spacing.Sides),
+        verticalArrangement = Arrangement.spacedBy(Spacing.Large),
+    ) {
+        items(storedReports) {
+            if(!it.isDeleted){
+                ReportCard(
+                    report = it,
+                    navigateToDetail = navigateToDetail
+                )
             }
         }
-    )
+    }
+//    HandleLocationPermission(
+//        onPermissionGranted = {
+//
+//        }
+//    )
 }
 
 @Composable
