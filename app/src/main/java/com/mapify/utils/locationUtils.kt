@@ -21,6 +21,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.mapify.ui.components.GenericDialog
+import com.mapify.ui.navigation.RouteScreen
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 suspend fun getLocationName(
@@ -119,5 +120,21 @@ fun HandleLocationPermission(
                 permissionLauncher.launch(permission)
             }
         )
+    }
+}
+
+@Composable
+fun LocationPermissionWrapper(
+    currentRoute: String?,
+    content: @Composable () -> Unit
+) {
+    val excludedRoutes = listOf(
+        RouteScreen.Login::class.qualifiedName,
+        RouteScreen.Registration::class.qualifiedName
+    )
+    if (currentRoute in excludedRoutes || currentRoute == null) {
+        content()
+    } else {
+        HandleLocationPermission(onPermissionGranted = content)
     }
 }
