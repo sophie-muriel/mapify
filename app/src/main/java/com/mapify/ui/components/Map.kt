@@ -76,16 +76,17 @@ fun Map(
             }
         }else{
             reports?.forEach{ report ->
-                PointAnnotation(
-                    point = Point.fromLngLat(report.location!!.longitude, report.location!!.latitude)
-                ){
-                    iconImage = marker
-                    interactionsState.onClicked {
-                        navigateToDetail(report.id)
-                        true
+                if(!report.isDeleted){
+                    PointAnnotation(
+                        point = Point.fromLngLat(report.location!!.longitude, report.location!!.latitude)
+                    ){
+                        iconImage = marker
+                        interactionsState.onClicked {
+                            navigateToDetail(report.id)
+                            true
+                        }
                     }
                 }
-
             }
         }
     }
