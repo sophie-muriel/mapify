@@ -20,13 +20,15 @@ import com.mapbox.maps.plugin.gestures.generated.GesturesSettings
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapify.R
+import com.mapify.model.Report
 
 @Composable
 fun Map(
     navigateToDetail: (String) -> Unit,
     isClickable: Boolean = false,
     onMapClickListener: OnMapClickListener? = null,
-    clickedPoint: Point? = null
+    clickedPoint: Point? = null,
+    reports: List<Report>? = null,
 ){
     val mapViewportState = rememberMapViewportState {
         setCameraOptions {
@@ -73,19 +75,17 @@ fun Map(
                 }
             }
         }else{
-            PointAnnotation(
-                point = Point.fromLngLat(-75.6730958, 4.5326466)
-            ){
-                iconImage = marker
-                interactionsState.onClicked {
-                    navigateToDetail("1")
-                    true
+            reports?.forEach{ report ->
+                PointAnnotation(
+                    point = Point.fromLngLat(report.location!!.longitude, report.location!!.latitude)
+                ){
+                    iconImage = marker
+                    interactionsState.onClicked {
+                        navigateToDetail(report.id)
+                        true
+                    }
                 }
-            }
-            PointAnnotation(
-                point = Point.fromLngLat(-75.6636135, 4.5482888)
-            ){
-                iconImage = marker
+
             }
         }
     }
