@@ -42,66 +42,67 @@ fun NotificationsTab(
 
     var remainingDays = -1
 
-    HandleLocationPermission(
-        onPermissionGranted = {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = Spacing.Sides),
-                verticalArrangement = Arrangement.spacedBy(Spacing.Large)
-            ) {
-                items(userReports) { report ->
-                    if(report.userId == user?.id){
-                        if(report.isDeleted){
-                            NotificationItem(
-                                title = stringResource(id = R.string.report_deleted),
-                                status = stringResource(id = R.string.deleted),
-                                supportingText = formatNotificationOrMessageDate(LocalDateTime.now()),
-                                statusMessage = stringResource(id = R.string.report_deleted_message),
-                                onClick = {
-                                    exitDialogVisible = true
-                                },
-                                statusColor = MaterialTheme.colorScheme.error
-                            )
-                        }else{
-                            remainingDays = report.remainingDaysToDeletion
-                            NotificationItem(
-                                title = report.title,
-                                status = if (report.status == ReportStatus.VERIFIED)
-                                    stringResource(id = R.string.verified)
-                                else
-                                    stringResource(id = R.string.rejected),
-                                supportingText = formatNotificationOrMessageDate(report.date),
-                                statusMessage = if (report.status == ReportStatus.VERIFIED)
-                                    stringResource(id = R.string.report_verified_message)
-                                else
-                                    stringResource(id = R.string.report_rejected_days_remaining, remainingDays),
-                                imageUrl = report.images.first(),
-                                onClick = { navigateToReportView(report.id, report.status) },
-                                statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = Spacing.Sides),
+        verticalArrangement = Arrangement.spacedBy(Spacing.Large)
+    ) {
+        items(userReports) { report ->
+            if(report.userId == user?.id){
+                if(report.isDeleted){
+                    NotificationItem(
+                        title = stringResource(id = R.string.report_deleted),
+                        status = stringResource(id = R.string.deleted),
+                        supportingText = formatNotificationOrMessageDate(LocalDateTime.now()),
+                        statusMessage = stringResource(id = R.string.report_deleted_message),
+                        onClick = {
+                            exitDialogVisible = true
+                        },
+                        statusColor = MaterialTheme.colorScheme.error
+                    )
+                }else{
+                    remainingDays = report.remainingDaysToDeletion
+                    NotificationItem(
+                        title = report.title,
+                        status = if (report.status == ReportStatus.VERIFIED)
+                            stringResource(id = R.string.verified)
+                        else
+                            stringResource(id = R.string.rejected),
+                        supportingText = formatNotificationOrMessageDate(report.date),
+                        statusMessage = if (report.status == ReportStatus.VERIFIED)
+                            stringResource(id = R.string.report_verified_message)
+                        else
+                            stringResource(id = R.string.report_rejected_days_remaining, remainingDays),
+                        imageUrl = report.images.first(),
+                        onClick = { navigateToReportView(report.id, report.status) },
+                        statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    )
                 }
-                if (userReports.isNotEmpty()) {
-                    item {
-                        Spacer(modifier = Modifier.height(Spacing.Large))
-                    }
-                }
-            }
-
-            if (exitDialogVisible) {
-                GenericDialog(
-                    title = stringResource(id = R.string.report_deleted),
-                    message = stringResource(id = R.string.report_deleted_message),
-                    onExit = {
-                        exitDialogVisible = false
-                    },
-                    onExitText = stringResource(id = R.string.ok)
-                )
             }
         }
-    )
+        if (userReports.isNotEmpty()) {
+            item {
+                Spacer(modifier = Modifier.height(Spacing.Large))
+            }
+        }
+    }
+
+    if (exitDialogVisible) {
+        GenericDialog(
+            title = stringResource(id = R.string.report_deleted),
+            message = stringResource(id = R.string.report_deleted_message),
+            onExit = {
+                exitDialogVisible = false
+            },
+            onExitText = stringResource(id = R.string.ok)
+        )
+    }
+//    HandleLocationPermission(
+//        onPermissionGranted = {
+//
+//        }
+//    )
 
 }
 

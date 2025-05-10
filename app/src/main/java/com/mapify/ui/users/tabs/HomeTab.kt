@@ -14,12 +14,13 @@ fun HomeTab(
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
     val reports by reportsViewModel.reports.collectAsState()
 
-    HandleLocationPermission(
-        onPermissionGranted = {
-            Map(
-                navigateToDetail = navigateToDetail,
-                reports = reports
-            )
-        }
+    Map(
+        navigateToDetail = navigateToDetail,
+        reports = reports
     )
+//    HandleLocationPermission(
+//        onPermissionGranted = {
+//
+//        }
+//    )
 }
