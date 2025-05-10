@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,7 +25,7 @@ import java.time.LocalDateTime
 @Composable
 fun SearchContactScreen(
     navigateBack: () -> Unit,
-    onUserSelected: (String) -> Unit,
+    onUserSelected: (String, Boolean) -> Unit,
     usersViewModel: UsersViewModel
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -123,9 +124,10 @@ fun SearchContactScreen(
                     items(recentSearches) { email ->
                         val conversation = conversationsList.find { it.recipient.email == email }
                         if (conversation != null) {
+                            Log.d("xd", conversation.id)
                             RecentSearchItem(
                                 email = email,
-                                onClick = { onUserSelected(conversation.id) }
+                                onClick = { onUserSelected(conversation.id, true) }
                             )
                         }
                     }
@@ -136,8 +138,7 @@ fun SearchContactScreen(
                             fullName = user.fullName,
                             email = user.email,
                             onClick = {
-                                val idToPass = conversation?.id ?: user.id
-                                onUserSelected(idToPass)
+                                onUserSelected(conversation?.id ?: user.id, conversation != null)
                             }
                         )
                     }
