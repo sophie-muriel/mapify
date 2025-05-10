@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.mapify.R
 import com.mapify.model.*
@@ -33,6 +34,12 @@ fun NotificationsTab(
 
     val storedReports by reportsViewModel.reports.collectAsState()
 
+    val context = LocalContext.current
+
+    val user = LocalMainViewModel.current.usersViewModel.loadUser(context)
+
+    val userReports = storedReports.filter { it.userId == user?.id }.sortedByDescending { it.date }
+
     var remainingDays = -1
 
     HandleLocationPermission(
@@ -43,39 +50,43 @@ fun NotificationsTab(
                     .padding(horizontal = Spacing.Sides),
                 verticalArrangement = Arrangement.spacedBy(Spacing.Large)
             ) {
-                items(storedReports.sortedByDescending { it.date }) { report ->
-                    if(report.isDeleted){
-                        NotificationItem(
-                            title = stringResource(id = R.string.report_deleted),
-                            status = stringResource(id = R.string.deleted),
-                            supportingText = formatNotificationOrMessageDate(LocalDateTime.now()),
-                            statusMessage = stringResource(id = R.string.report_deleted_message),
-                            onClick = {
-                                exitDialogVisible = true
-                            },
-                            statusColor = MaterialTheme.colorScheme.error
-                        )
-                    }else{
-                        remainingDays = report.remainingDaysToDeletion
-                        NotificationItem(
-                            title = report.title,
-                            status = if (report.status == ReportStatus.VERIFIED)
-                                stringResource(id = R.string.verified)
-                            else
-                                stringResource(id = R.string.rejected),
-                            supportingText = formatNotificationOrMessageDate(report.date),
-                            statusMessage = if (report.status == ReportStatus.VERIFIED)
-                                stringResource(id = R.string.report_verified_message)
-                            else
-                                stringResource(id = R.string.report_rejected_days_remaining, remainingDays),
-                            imageUrl = report.images.first(),
-                            onClick = { navigateToReportView(report.id, report.status) },
-                            statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-                        )
+                items(userReports) { report ->
+                    if(report.userId == user?.id){
+                        if(report.isDeleted){
+                            NotificationItem(
+                                title = stringResource(id = R.string.report_deleted),
+                                status = stringResource(id = R.string.deleted),
+                                supportingText = formatNotificationOrMessageDate(LocalDateTime.now()),
+                                statusMessage = stringResource(id = R.string.report_deleted_message),
+                                onClick = {
+                                    exitDialogVisible = true
+                                },
+                                statusColor = MaterialTheme.colorScheme.error
+                            )
+                        }else{
+                            remainingDays = report.remainingDaysToDeletion
+                            NotificationItem(
+                                title = report.title,
+                                status = if (report.status == ReportStatus.VERIFIED)
+                                    stringResource(id = R.string.verified)
+                                else
+                                    stringResource(id = R.string.rejected),
+                                supportingText = formatNotificationOrMessageDate(report.date),
+                                statusMessage = if (report.status == ReportStatus.VERIFIED)
+                                    stringResource(id = R.string.report_verified_message)
+                                else
+                                    stringResource(id = R.string.report_rejected_days_remaining, remainingDays),
+                                imageUrl = report.images.first(),
+                                onClick = { navigateToReportView(report.id, report.status) },
+                                statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
                 }
-                item {
-                    Spacer(modifier = Modifier.height(Spacing.Large))
+                if (userReports.isNotEmpty()) {
+                    item {
+                        Spacer(modifier = Modifier.height(Spacing.Large))
+                    }
                 }
             }
 
