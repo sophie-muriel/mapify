@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.model.Conversation
 import com.mapify.model.Message
+import com.mapify.model.User
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
@@ -34,7 +35,8 @@ import java.util.*
 @Composable
 fun ConversationScreen(
     usersViewModel: UsersViewModel,
-    conversationId: String,
+    id: String,
+    isConversation: Boolean,
     navigateBack: () -> Unit
 ) {
     val allUsers by usersViewModel.users.collectAsState()
@@ -49,8 +51,20 @@ fun ConversationScreen(
         )
     }
 
-    val conversation = remember(conversationId) {
-        conversationsList.find { it.id == conversationId }!!
+    val conversation: Conversation
+
+    if (isConversation) {
+        conversation = remember(id) {
+            conversationsList.find { it.id == id }
+        }!!
+    } else {
+        conversation = Conversation(
+            id = UUID.randomUUID().toString(),
+            recipient = usersViewModel.findById(id)!!,
+            messages = emptyList(),
+            isRead = true
+        )
+        conversationsList = conversationsList + conversation
     }
 
     var messageText by remember { mutableStateOf(TextFieldValue("")) }
