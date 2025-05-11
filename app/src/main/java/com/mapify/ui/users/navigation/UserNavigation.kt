@@ -22,8 +22,7 @@ fun UserNavigation(
     navController: NavHostController,
     navigateToDetail: (String) -> Unit,
     navigateToReportView: (String, ReportStatus) -> Unit,
-    navigateToConversation: (String, Boolean) -> Unit,
-    usersViewModel: UsersViewModel
+    navigateToConversation: (String, Boolean) -> Unit
 ) {
     NavHost(
         modifier = Modifier.padding(padding),
@@ -47,8 +46,7 @@ fun UserNavigation(
         }
         composable<UserRouteTab.Messages> {
             MessagesTab(
-                navigateToConversation = navigateToConversation,
-                usersViewModel = usersViewModel
+                navigateToConversation = navigateToConversation
             )
         }
         composable("SearchContact") {
