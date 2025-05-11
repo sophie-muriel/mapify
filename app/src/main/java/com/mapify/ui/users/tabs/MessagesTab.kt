@@ -32,12 +32,15 @@ fun MessagesTab(
                             messages = listOf(
                                 Message(
                                     id = "msg1",
-                                    sender = allUsers[0].fullName,
+                                    senderId = allUsers[0].id,
                                     content = "Hi, just checking if there are any updates on the report.",
                                     timestamp = LocalDateTime.now().minusMinutes(5)
                                 )
                             ),
-                            isRead = false
+                            isRead = mapOf(
+                                allUsers[0].id to true,
+                                allUsers[1].id to false
+                            )
                         ),
                         Conversation(
                             id = "2",
@@ -45,12 +48,15 @@ fun MessagesTab(
                             messages = listOf(
                                 Message(
                                     id = "msg2",
-                                    sender = allUsers[2].fullName,
+                                    senderId = allUsers[2].id,
                                     content = "Thanks for your response.",
                                     timestamp = LocalDateTime.now().minusHours(2)
                                 )
                             ),
-                            isRead = true
+                            isRead = mapOf(
+                                allUsers[2].id to true,
+                                allUsers[0].id to false
+                            )
                         ),
                         Conversation(
                             id = "conv3",
@@ -58,12 +64,15 @@ fun MessagesTab(
                             messages = listOf(
                                 Message(
                                     id = "msg3",
-                                    sender = allUsers[2].fullName,
+                                    senderId = allUsers[2].id,
                                     content = "Could you take a look at the file I sent you?",
                                     timestamp = LocalDateTime.now().minusDays(5)
                                 )
                             ),
-                            isRead = false
+                            isRead = mapOf(
+                                allUsers[2].id to true,
+                                allUsers[1].id to false
+                            )
                         )
                     )
                 )
@@ -73,7 +82,7 @@ fun MessagesTab(
 
     val filteredConversations by remember {
         derivedStateOf {
-            conversationsList.filter { user in it.participants }
+            conversationsList.filter { it.participants.any { participant -> participant.id == user.id } }
         }
     }
 
@@ -84,27 +93,32 @@ fun MessagesTab(
         verticalArrangement = Arrangement.spacedBy(Spacing.Large)
     ) {
         items(filteredConversations, key = { it.id }) { conversation ->
+            val recipient = conversation.participants.firstOrNull { it.id != user.id } ?: user
             ConversationItem(
                 conversation = conversation,
                 onClick = {
-                    markConversationAsRead(conversationsList, conversation.id)
+                    markConversationAsRead(conversationsList, conversation.id, user.id)
                     navigateToConversation(conversation.id, true)
                 },
-                onMarkRead = { markConversationAsRead(conversationsList, conversation.id) },
-                onMarkUnread = { markConversationAsUnread(conversationsList, conversation.id) },
+                onMarkRead = { markConversationAsRead(conversationsList, conversation.id, user.id) },
+                onMarkUnread = { markConversationAsUnread(conversationsList, conversation.id, user.id) },
                 onDelete = { conversationsList.removeIf { it.id == conversation.id } },
-                recipient = conversation.participants.first { it != user }
+                recipient = recipient
             )
         }
     }
 }
 
-private fun markConversationAsRead(conversations: MutableList<Conversation>, id: String) {
-    conversations.find { it.id == id }?.isRead = true
+private fun markConversationAsRead(conversations: MutableList<Conversation>, id: String, userId: String) {
+    conversations.find { it.id == id }?.apply {
+        isRead = isRead.toMutableMap().also { it[userId] = true }
+    }
 }
 
-private fun markConversationAsUnread(conversations: MutableList<Conversation>, id: String) {
-    conversations.find { it.id == id }?.isRead = false
+private fun markConversationAsUnread(conversations: MutableList<Conversation>, id: String, userId: String) {
+    conversations.find { it.id == id }?.apply {
+        isRead = isRead.toMutableMap().also { it[userId] = false }
+    }
 }
 
 //    HandleLocationPermission(
