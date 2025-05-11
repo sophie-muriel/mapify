@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.mapify.R
 import com.mapify.model.Conversation
@@ -28,10 +29,12 @@ fun SearchContactScreen(
     navigateBack: () -> Unit,
     onUserSelected: (String, Boolean) -> Unit
 ) {
+    val context = LocalContext.current
 
     val usersViewModel = LocalMainViewModel.current.usersViewModel
-
+    val allUsers by usersViewModel.users.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
+    val user = usersViewModel.loadUser(context)!!
 
     val recentSearches = listOf(
         "barry.mccoquiner@example.com",
@@ -39,61 +42,62 @@ fun SearchContactScreen(
         "alice.johnson@example.com"
     )
 
-    val allUsers by usersViewModel.users.collectAsState()
-
-    val conversationsList by remember {
-        mutableStateOf(
-            listOf(
-                Conversation(
-                    id = "1",
-                    recipient = allUsers[0],
-                    messages = listOf(
-                        Message(
-                            id = "msg1",
-                            sender = allUsers[0].fullName,
-                            content = "Hi, just checking if there are any updates on the report.",
-                            timestamp = LocalDateTime.now().minusMinutes(5)
+    val conversationsList = remember {
+        mutableStateListOf<Conversation>().apply {
+            if (allUsers.size > 2) {
+                addAll(
+                    listOf(
+                        Conversation(
+                            id = "1",
+                            participants = listOf(allUsers[1], allUsers[0]),
+                            messages = listOf(
+                                Message(
+                                    id = "msg1",
+                                    sender = allUsers[0].fullName,
+                                    content = "Hi, just checking if there are any updates on the report.",
+                                    timestamp = LocalDateTime.now().minusMinutes(5)
+                                )
+                            ),
+                            isRead = false
+                        ),
+                        Conversation(
+                            id = "2",
+                            participants = listOf(allUsers[2], allUsers[0]),
+                            messages = listOf(
+                                Message(
+                                    id = "msg2",
+                                    sender = allUsers[2].fullName,
+                                    content = "Thanks for your response.",
+                                    timestamp = LocalDateTime.now().minusHours(2)
+                                )
+                            ),
+                            isRead = true
+                        ),
+                        Conversation(
+                            id = "conv3",
+                            participants = listOf(allUsers[1], allUsers[2]),
+                            messages = listOf(
+                                Message(
+                                    id = "msg3",
+                                    sender = allUsers[2].fullName,
+                                    content = "Could you take a look at the file I sent you?",
+                                    timestamp = LocalDateTime.now().minusDays(5)
+                                )
+                            ),
+                            isRead = false
                         )
-                    ),
-                    isRead = false
-                ),
-                Conversation(
-                    id = "2",
-                    recipient = allUsers[1],
-                    messages = listOf(
-                        Message(
-                            id = "msg2",
-                            sender = allUsers[1].fullName,
-                            content = "Thanks for your response.",
-                            timestamp = LocalDateTime.now().minusHours(2)
-                        )
-                    ),
-                    isRead = true
-                ),
-                Conversation(
-                    id = "conv3",
-                    recipient = allUsers[2],
-                    messages = listOf(
-                        Message(
-                            id = "msg3",
-                            sender = allUsers[2].fullName,
-                            content = "Could you take a look at the file I sent you?",
-                            timestamp = LocalDateTime.now().minusDays(5)
-                        )
-                    ),
-                    isRead = false
+                    )
                 )
-            )
-        )
+            }
+        }
     }
 
     val filteredUsers = remember(searchQuery) {
-        if (searchQuery.isNotBlank()) {
-            allUsers.filter {
-                it.email.contains(searchQuery, ignoreCase = true) ||
-                        it.fullName.contains(searchQuery, ignoreCase = true)
-            }
-        } else emptyList()
+        allUsers.filter {
+            it.email != user.email && (searchQuery.isBlank() ||
+                    it.email.contains(searchQuery, ignoreCase = true) ||
+                    it.fullName.contains(searchQuery, ignoreCase = true))
+        }
     }
 
     Scaffold(
@@ -125,7 +129,9 @@ fun SearchContactScreen(
             LazyColumn(verticalArrangement = Arrangement.spacedBy(Spacing.Inline)) {
                 if (searchQuery.isBlank()) {
                     items(recentSearches) { email ->
-                        val conversation = conversationsList.find { it.recipient.email == email }
+                        val conversation = conversationsList.find {
+                            it.participants.any { participant -> participant.email == email }
+                        }
                         if (conversation != null) {
                             Log.d("xd", conversation.id)
                             RecentSearchItem(
@@ -135,13 +141,15 @@ fun SearchContactScreen(
                         }
                     }
                 } else {
-                    items(filteredUsers) { user ->
-                        val conversation = conversationsList.find { it.recipient.email == user.email }
+                    items(filteredUsers) { u ->
+                        val conversation = conversationsList.find {
+                            it.participants.any { participant -> participant.email == u.email }
+                        }
                         SearchUserItem(
-                            fullName = user.fullName,
-                            email = user.email,
+                            fullName = u.fullName,
+                            email = u.email,
                             onClick = {
-                                onUserSelected(conversation?.id ?: user.id, conversation != null)
+                                onUserSelected(conversation?.id ?: u.id, conversation != null)
                             }
                         )
                     }
