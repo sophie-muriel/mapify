@@ -14,20 +14,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.model.Conversation
 import com.mapify.model.Message
-import com.mapify.model.User
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.components.ProfileIcon
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
-import com.mapify.viewmodel.UsersViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -39,19 +38,59 @@ fun ConversationScreen(
     isConversation: Boolean,
     navigateBack: () -> Unit
 ) {
-
+    val context = LocalContext.current
     val usersViewModel = LocalMainViewModel.current.usersViewModel
-
     val allUsers by usersViewModel.users.collectAsState()
+    val user = usersViewModel.loadUser(context)!!
 
-    var conversationsList by remember {
-        mutableStateOf(
-            listOf(
-                Conversation("1", allUsers[0], listOf(Message("msg1", allUsers[0].fullName, "Hi, just checking if there are any updates on the report.", LocalDateTime.now().minusMinutes(5))), false),
-                Conversation("2", allUsers[1], listOf(Message("msg2", allUsers[1].fullName, "Thanks for your response.", LocalDateTime.now().minusHours(2))), true),
-                Conversation("conv3", allUsers[2], listOf(Message("msg3", allUsers[2].fullName, "Could you take a look at the file I sent you?", LocalDateTime.now().minusDays(5))), false)
-            )
-        )
+    val conversationsList = remember {
+        mutableStateListOf<Conversation>().apply {
+            if (allUsers.size > 2) {
+                addAll(
+                    listOf(
+                        Conversation(
+                            id = "1",
+                            participants = listOf(allUsers[1], allUsers[0]),
+                            messages = listOf(
+                                Message(
+                                    id = "msg1",
+                                    sender = allUsers[0].fullName,
+                                    content = "Hi, just checking if there are any updates on the report.",
+                                    timestamp = LocalDateTime.now().minusMinutes(5)
+                                )
+                            ),
+                            isRead = false
+                        ),
+                        Conversation(
+                            id = "2",
+                            participants = listOf(allUsers[2], allUsers[0]),
+                            messages = listOf(
+                                Message(
+                                    id = "msg2",
+                                    sender = allUsers[2].fullName,
+                                    content = "Thanks for your response.",
+                                    timestamp = LocalDateTime.now().minusHours(2)
+                                )
+                            ),
+                            isRead = true
+                        ),
+                        Conversation(
+                            id = "conv3",
+                            participants = listOf(allUsers[1], allUsers[2]),
+                            messages = listOf(
+                                Message(
+                                    id = "msg3",
+                                    sender = allUsers[2].fullName,
+                                    content = "Could you take a look at the file I sent you?",
+                                    timestamp = LocalDateTime.now().minusDays(5)
+                                )
+                            ),
+                            isRead = false
+                        )
+                    )
+                )
+            }
+        }
     }
 
     val conversation: Conversation
@@ -63,13 +102,17 @@ fun ConversationScreen(
     } else {
         conversation = Conversation(
             id = UUID.randomUUID().toString(),
-            recipient = usersViewModel.findById(id)!!,
+            participants = listOf(
+                user,
+                usersViewModel.findById(id)!!
+            ),
             messages = emptyList(),
             isRead = true
         )
-        conversationsList = conversationsList + conversation
+        conversationsList.add(conversation)
     }
 
+    val recipient = conversation.participants.first { it != user }
     var messageText by remember { mutableStateOf(TextFieldValue("")) }
     val messages = remember { mutableStateListOf<Message>().apply { addAll(conversation.messages) } }
 
@@ -99,7 +142,7 @@ fun ConversationScreen(
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
-                            text = conversation.recipient.fullName,
+                            text = recipient.fullName,
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.offset(x = 24.dp)
                         )
@@ -141,7 +184,7 @@ fun ConversationScreen(
                         message = msg,
                         isMe = msg.sender == stringResource(id = R.string.me_message),
                         senderName = msg.sender,
-                        profileImageUrl = conversation.recipient.profileImageUrl
+                        profileImageUrl = recipient.profileImageUrl
                     )
                 }
             }
@@ -208,7 +251,7 @@ fun ConversationScreen(
             onClose = { showDeleteDialog = false },
             onExitText = stringResource(id = R.string.delete),
             onExit = {
-                conversationsList = conversationsList.filterNot { it.id == conversation.id }
+                conversationsList.remove(conversation)
                 showDeleteDialog = false
                 navigateBack()
             }
