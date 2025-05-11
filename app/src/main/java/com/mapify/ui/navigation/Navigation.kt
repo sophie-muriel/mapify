@@ -2,7 +2,6 @@ package com.mapify.ui.navigation
 
 import LocationPermissionWrapper
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -17,7 +16,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.mapify.model.User
 import com.mapify.ui.screens.ConversationScreen
 import com.mapify.ui.screens.CreateReportScreen
 import com.mapify.ui.screens.EditReportScreen
@@ -30,9 +28,7 @@ import com.mapify.ui.screens.SearchContactScreen
 import com.mapify.ui.screens.SettingsScreen
 import com.mapify.ui.screens.SearchFiltersScreen
 import com.mapify.ui.users.HomeScreen
-import com.mapify.utils.SharedPreferencesUtils
 import com.mapify.viewmodel.MainViewModel
-import com.mapify.viewmodel.UsersViewModel
 
 val LocalMainViewModel = staticCompositionLocalOf<MainViewModel> { error("MainViewModel not found!") }
 
@@ -44,8 +40,6 @@ fun Navigation(
     val context = LocalContext.current
     val navController = rememberNavController()
     val user = mainViewModel.usersViewModel.loadUser(context)
-    Log.d("Navigation", "User from SharedPreferences: ${user?.fullName}")
-
     val startDestination: RouteScreen = if (user != null) RouteScreen.Home else RouteScreen.Login
 
     val latitude = rememberSaveable { mutableStateOf<Double?>(null) }
