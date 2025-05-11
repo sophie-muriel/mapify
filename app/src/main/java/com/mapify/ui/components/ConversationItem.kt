@@ -32,8 +32,16 @@ fun ConversationItem(
     var expanded by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     val lastMessage = conversation.messages.maxByOrNull { it.timestamp }
-    val lastMessageContent = lastMessage?.content ?: ""
+    val lastMessageContent = lastMessage?.content?.let {
+        if (lastMessage.senderId == recipient.id) {
+            it
+        } else {
+            "(Me) $it"
+        }
+    } ?: ""
     val time = lastMessage?.timestamp?.let { formatNotificationOrMessageDate(it) } ?: ""
+    val isRead = conversation.isRead[recipient.id] != true
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -56,13 +64,13 @@ fun ConversationItem(
                     name = recipient.fullName,
                     time = time,
                     content = lastMessageContent,
-                    isRead = conversation.isRead
+                    isRead = isRead
                 )
             }
         }
         ConversationOptionsMenu(
             expanded = expanded,
-            isRead = conversation.isRead,
+            isRead = isRead,
             onDismiss = { expanded = false },
             onMarkRead = {
                 expanded = false
