@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mapify.model.Conversation
+import com.mapify.model.User
 import com.mapify.ui.theme.Spacing
 import com.mapify.ui.users.tabs.formatNotificationOrMessageDate
 
@@ -22,6 +23,7 @@ import com.mapify.ui.users.tabs.formatNotificationOrMessageDate
 @Composable
 fun ConversationItem(
     conversation: Conversation,
+    recipient: User,
     onClick: () -> Unit,
     onMarkRead: () -> Unit,
     onMarkUnread: () -> Unit,
@@ -47,11 +49,11 @@ fun ConversationItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 MessageUserAvatar(
-                    imageUrl = conversation.recipient.profileImageUrl,
-                    name = conversation.recipient.fullName
+                    imageUrl = recipient.profileImageUrl,
+                    name = recipient.fullName
                 )
                 ConversationTextSection(
-                    name = conversation.recipient.fullName,
+                    name = recipient.fullName,
                     time = time,
                     content = lastMessageContent,
                     isRead = conversation.isRead
