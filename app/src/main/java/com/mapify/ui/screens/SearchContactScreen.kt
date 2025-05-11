@@ -53,12 +53,15 @@ fun SearchContactScreen(
                             messages = listOf(
                                 Message(
                                     id = "msg1",
-                                    sender = allUsers[0].fullName,
+                                    senderId = allUsers[0].id,
                                     content = "Hi, just checking if there are any updates on the report.",
                                     timestamp = LocalDateTime.now().minusMinutes(5)
                                 )
                             ),
-                            isRead = false
+                            isRead = mapOf(
+                                allUsers[0].id to true,
+                                allUsers[1].id to false
+                            )
                         ),
                         Conversation(
                             id = "2",
@@ -66,12 +69,15 @@ fun SearchContactScreen(
                             messages = listOf(
                                 Message(
                                     id = "msg2",
-                                    sender = allUsers[2].fullName,
+                                    senderId = allUsers[2].id,
                                     content = "Thanks for your response.",
                                     timestamp = LocalDateTime.now().minusHours(2)
                                 )
                             ),
-                            isRead = true
+                            isRead = mapOf(
+                                allUsers[2].id to true,
+                                allUsers[0].id to false
+                            )
                         ),
                         Conversation(
                             id = "conv3",
@@ -79,12 +85,15 @@ fun SearchContactScreen(
                             messages = listOf(
                                 Message(
                                     id = "msg3",
-                                    sender = allUsers[2].fullName,
+                                    senderId = allUsers[2].id,
                                     content = "Could you take a look at the file I sent you?",
                                     timestamp = LocalDateTime.now().minusDays(5)
                                 )
                             ),
-                            isRead = false
+                            isRead = mapOf(
+                                allUsers[2].id to true,
+                                allUsers[1].id to false
+                            )
                         )
                     )
                 )
@@ -133,7 +142,6 @@ fun SearchContactScreen(
                             it.participants.any { participant -> participant.email == email }
                         }
                         if (conversation != null) {
-                            Log.d("xd", conversation.id)
                             RecentSearchItem(
                                 email = email,
                                 onClick = { onUserSelected(conversation.id, true) }
