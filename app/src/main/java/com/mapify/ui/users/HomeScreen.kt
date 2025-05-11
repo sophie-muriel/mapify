@@ -39,9 +39,6 @@ fun HomeScreen(
     navigateToSearchFilters: () -> Unit,
     navigateToSearchContact: () -> Unit
 ) {
-
-    val usersViewModel = LocalMainViewModel.current.usersViewModel
-    
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
     val currentRoute = navBackStackEntry?.destination?.route
@@ -144,8 +141,7 @@ fun HomeScreen(
             navController = navController,
             navigateToDetail = navigateToDetail,
             navigateToReportView = navigateToReportView,
-            navigateToConversation = navigateToConversation,
-            usersViewModel = usersViewModel
+            navigateToConversation = navigateToConversation
         )
         Box(
             modifier = Modifier
