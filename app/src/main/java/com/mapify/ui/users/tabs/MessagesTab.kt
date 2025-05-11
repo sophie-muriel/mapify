@@ -92,7 +92,8 @@ fun MessagesTab(
                 },
                 onMarkRead = { markConversationAsRead(conversationsList, conversation.id) },
                 onMarkUnread = { markConversationAsUnread(conversationsList, conversation.id) },
-                onDelete = { conversationsList.removeIf { it.id == conversation.id } }
+                onDelete = { conversationsList.removeIf { it.id == conversation.id } },
+                recipient = conversation.participants.first { it != user }
             )
         }
     }
