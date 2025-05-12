@@ -14,6 +14,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -176,15 +178,17 @@ fun ConversationScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = Spacing.Large),
+                .padding(padding),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Top
         ) {
+            val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacing.Large),
                 verticalArrangement = Arrangement.spacedBy(Spacing.Large),
                 reverseLayout = true
             ) {
@@ -198,55 +202,69 @@ fun ConversationScreen(
                 }
             }
 
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = Spacing.Small, vertical = Spacing.Large),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    value = messageText,
-                    onValueChange = { messageText = it },
-                    placeholder = {
-                        Text(
-                            text = stringResource(id = R.string.write_a_message),
-                            style = MaterialTheme.typography.bodyMedium,
-                            maxLines = 1
+                    .background(MaterialTheme.colorScheme.surface)
+                    .drawBehind {
+                        drawLine(
+                            color = borderColor,
+                            start = Offset(0f, 0f),
+                            end = Offset(size.width, 0f),
+                            strokeWidth = 1.dp.toPx()
                         )
-                    },
+                    }
+            ) {
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(end = Spacing.Large)
-                        .heightIn(min = 52.dp, max = 140.dp),
-                    maxLines = 4,
-                    singleLine = false,
-                    shape = MaterialTheme.shapes.large,
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                )
-                IconButton(
-                    onClick = {
-                        if (messageText.text.isNotBlank()) {
-                            messages.add(
-                                Message(
-                                    id = "${messages.size + 1}",
-                                    senderId = user.id,
-                                    content = messageText.text,
-                                    timestamp = LocalDateTime.now()
-                                )
-                            )
-                            messageText = TextFieldValue("")
-                        }
-                    },
-                    modifier = Modifier
-                        .size(46.dp)
-                        .background(MaterialTheme.colorScheme.primary, CircleShape)
+                        .padding(vertical = Spacing.Large)
+                        .padding(horizontal = Spacing.Large),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Send,
-                        contentDescription = stringResource(id = R.string.send),
-                        tint = MaterialTheme.colorScheme.onPrimary
+                    OutlinedTextField(
+                        value = messageText,
+                        onValueChange = { messageText = it },
+                        placeholder = {
+                            Text(
+                                text = stringResource(id = R.string.write_a_message),
+                                style = MaterialTheme.typography.bodyMedium,
+                                maxLines = 1
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(end = Spacing.Large)
+                            .heightIn(min = 52.dp, max = 140.dp),
+                        maxLines = 4,
+                        singleLine = false,
+                        shape = MaterialTheme.shapes.large,
+                        textStyle = MaterialTheme.typography.bodyMedium,
                     )
+                    IconButton(
+                        onClick = {
+                            if (messageText.text.isNotBlank()) {
+                                messages.add(
+                                    Message(
+                                        id = "${messages.size + 1}",
+                                        senderId = user.id,
+                                        content = messageText.text,
+                                        timestamp = LocalDateTime.now()
+                                    )
+                                )
+                                messageText = TextFieldValue("")
+                            }
+                        },
+                        modifier = Modifier
+                            .size(46.dp)
+                            .background(MaterialTheme.colorScheme.primary, CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Send,
+                            contentDescription = stringResource(id = R.string.send),
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
                 }
             }
         }
