@@ -1,10 +1,8 @@
 package com.mapify.ui.screens
 
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -68,8 +66,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.R
-import com.mapify.model.Category
-import com.mapify.model.Location
 import com.mapify.model.Report
 import com.mapify.model.ReportStatus
 import com.mapify.model.Role
@@ -89,7 +85,6 @@ import androidx.compose.material.icons.filled.Unpublished
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -103,7 +98,6 @@ import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.utils.SharedPreferencesUtils
-import com.mapify.viewmodel.UsersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -188,12 +182,12 @@ fun ReportViewScreen(
     val state = rememberCarouselState { report.images.count() }
     val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     var showComments by remember { mutableStateOf(false) }
-    var bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var comment by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
     var commentCounter by rememberSaveable { mutableIntStateOf(4) }
 
-    val isCreator = user?.id == report.userId
+    val isCreator = user.id == report.userId
     var showDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
     var showVerifyDialog by rememberSaveable { mutableStateOf(false) }
     var showRejectionInputDialog by rememberSaveable { mutableStateOf(false) }
@@ -386,10 +380,10 @@ fun ReportViewScreen(
                 comment = comment,
                 onCommentChange = { comment = it },
                 onClick = {
-                    var newComment = Comment(
+                    val newComment = Comment(
                         id = commentCounter.toString(),
                         content = comment,
-                        userId = user?.id ?: "",
+                        userId = user.id,
                         reportId = reportId,
                         date = LocalDateTime.now()
                     )
@@ -398,7 +392,7 @@ fun ReportViewScreen(
                     comment = ""
                 },
                 users = users,
-                userId = user?.id ?: ""
+                userId = user.id
             )
         }
 
