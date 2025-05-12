@@ -1,8 +1,10 @@
 package com.mapify.ui.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -90,6 +93,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import com.mapify.model.Comment
@@ -571,86 +576,123 @@ fun Comments(
         sheetState = state,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
-        LazyColumn(
+        Column(
             modifier = Modifier
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f)
         ) {
-            items(comments) { comment ->
-                ListItem(
-                    headlineContent = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(Spacing.Inline)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 72.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    items(comments) { comment ->
+                        ListItem(
+                            headlineContent = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(Spacing.Inline)
 
+                                ) {
+                                    Text(
+                                        text = users.find { it.id == comment.userId }?.fullName ?: "",
+                                        style = MaterialTheme.typography.titleSmall
+                                    )
+                                    if (comment.userId == userId) {
+                                        Text(
+                                            text = stringResource(id = R.string.me),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            },
+                            supportingContent = {
+                                Text(text = comment.content)
+                            },
+                            leadingContent = {
+                                Icon(
+                                    modifier = Modifier
+                                        .width(40.dp)
+                                        .height(40.dp),
+                                    imageVector = Icons.Default.AccountCircle,
+                                    contentDescription = stringResource(id = R.string.person_icon)
+                                )
+                            },
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(vertical = Spacing.Large)
+                ) {
+                    val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface)
+                            .drawBehind {
+                                drawLine(
+                                    color = borderColor,
+                                    start = Offset(0f, 0f),
+                                    end = Offset(size.width, 0f),
+                                    strokeWidth = 1.dp.toPx()
+                                )
+                            }
+                            .padding(top = Spacing.Inline + Spacing.Small)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = Spacing.Sides),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = users.find { it.id == comment.userId }?.fullName ?: "",
-                                style = MaterialTheme.typography.titleSmall
+                            OutlinedTextField(
+                                value = comment,
+                                onValueChange = onCommentChange,
+                                placeholder = {
+                                    Text(
+                                        text = stringResource(id = R.string.leave_a_comment),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        maxLines = 1
+                                    )
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                                    .heightIn(min = 52.dp, max = 140.dp)
+                                    .padding(end = Spacing.Large),
+                                maxLines = 4,
+                                singleLine = false,
+                                shape = MaterialTheme.shapes.large,
+                                textStyle = MaterialTheme.typography.bodyMedium,
                             )
-                            if (comment.userId == userId) {
-                                Text(
-                                    text = stringResource(id = R.string.me),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.primary
+                            IconButton(
+                                onClick = { onClick() },
+                                modifier = Modifier
+                                    .size(46.dp)
+                                    .background(MaterialTheme.colorScheme.primary, CircleShape)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Send,
+                                    contentDescription = stringResource(id = R.string.send_icon),
+                                    tint = MaterialTheme.colorScheme.onPrimary
                                 )
                             }
                         }
-                    },
-                    supportingContent = {
-                        Text(text = comment.content)
-                    },
-                    leadingContent = {
-                        Icon(
-                            modifier = Modifier
-                                .width(40.dp)
-                                .height(40.dp),
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = stringResource(id = R.string.person_icon)
-                        )
-                    },
-                )
+                    }
+                }
             }
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Spacing.Small + Spacing.Sides, vertical = Spacing.Large),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            OutlinedTextField(
-                value = comment,
-                onValueChange = onCommentChange,
-                placeholder = {
-                    Text(
-                        text = stringResource(id = R.string.leave_a_comment),
-                        style = MaterialTheme.typography.bodyMedium,
-                        maxLines = 1
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(end = Spacing.Large)
-                    .heightIn(min = 52.dp, max = 140.dp),
-                maxLines = 4,
-                singleLine = false,
-                shape = MaterialTheme.shapes.large,
-                textStyle = MaterialTheme.typography.bodyMedium,
-            )
-            IconButton(
-                onClick = { onClick() },
-                modifier = Modifier
-                    .size(46.dp)
-                    .background(MaterialTheme.colorScheme.primary, CircleShape)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = stringResource(id = R.string.send_icon),
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-        }
+
     }
 }
 
