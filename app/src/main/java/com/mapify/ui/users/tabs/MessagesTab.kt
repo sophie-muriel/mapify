@@ -1,5 +1,6 @@
 package com.mapify.ui.users.tabs
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,72 +19,13 @@ fun MessagesTab(
 ) {
     val context = LocalContext.current
     val usersViewModel = LocalMainViewModel.current.usersViewModel
-    val allUsers by usersViewModel.users.collectAsState()
+    val conversationsViewModel = LocalMainViewModel.current.conversationsViewModel
     val user = usersViewModel.loadUser(context)!!
+    val conversations by conversationsViewModel.conversations.collectAsState()
+    Log.d("MessagesTab", "Conversations list updated: ${conversations.size}")
 
-    val conversationsList = remember {
-        mutableStateListOf<Conversation>().apply {
-            if (allUsers.size > 2) {
-                addAll(
-                    listOf(
-                        Conversation(
-                            id = "1",
-                            participants = listOf(allUsers[1], allUsers[0]),
-                            messages = listOf(
-                                Message(
-                                    id = "msg1",
-                                    senderId = allUsers[0].id,
-                                    content = "Hi, just checking if there are any updates on the report.",
-                                    timestamp = LocalDateTime.now().minusMinutes(5)
-                                )
-                            ),
-                            isRead = mapOf(
-                                allUsers[0].id to true,
-                                allUsers[1].id to false
-                            )
-                        ),
-                        Conversation(
-                            id = "2",
-                            participants = listOf(allUsers[2], allUsers[0]),
-                            messages = listOf(
-                                Message(
-                                    id = "msg2",
-                                    senderId = allUsers[2].id,
-                                    content = "Thanks for your response.",
-                                    timestamp = LocalDateTime.now().minusHours(2)
-                                )
-                            ),
-                            isRead = mapOf(
-                                allUsers[2].id to true,
-                                allUsers[0].id to false
-                            )
-                        ),
-                        Conversation(
-                            id = "conv3",
-                            participants = listOf(allUsers[1], allUsers[2]),
-                            messages = listOf(
-                                Message(
-                                    id = "msg3",
-                                    senderId = allUsers[2].id,
-                                    content = "Could you take a look at the file I sent you?",
-                                    timestamp = LocalDateTime.now().minusDays(5)
-                                )
-                            ),
-                            isRead = mapOf(
-                                allUsers[2].id to true,
-                                allUsers[1].id to false
-                            )
-                        )
-                    )
-                )
-            }
-        }
-    }
-
-    val filteredConversations by remember {
-        derivedStateOf {
-            conversationsList.filter { it.participants.any { participant -> participant.id == user.id } }
-        }
+    val filteredConversations = conversations.filter { conversation ->
+        user.id in conversation.participants.map { it.id } && conversation.messages.isNotEmpty()
     }
 
     LazyColumn(
@@ -97,27 +39,17 @@ fun MessagesTab(
             ConversationItem(
                 conversation = conversation,
                 onClick = {
-                    markConversationAsRead(conversationsList, conversation.id, user.id)
+                    conversationsViewModel.markAsRead(conversation.id, user.id)
                     navigateToConversation(conversation.id, true)
                 },
-                onMarkRead = { markConversationAsRead(conversationsList, conversation.id, user.id) },
-                onMarkUnread = { markConversationAsUnread(conversationsList, conversation.id, user.id) },
-                onDelete = { conversationsList.removeIf { it.id == conversation.id } },
-                recipient = recipient
+                onMarkRead = { conversationsViewModel.markAsRead(conversation.id, user.id) },
+                onMarkUnread = { conversationsViewModel.markAsUnread(conversation.id, user.id) },
+                onDelete = {
+                    conversationsViewModel.deleteForUser(conversation.id, user.id) },
+                recipient = recipient,
+                user = user
             )
         }
-    }
-}
-
-private fun markConversationAsRead(conversations: MutableList<Conversation>, id: String, userId: String) {
-    conversations.find { it.id == id }?.apply {
-        isRead = isRead.toMutableMap().also { it[userId] = true }
-    }
-}
-
-private fun markConversationAsUnread(conversations: MutableList<Conversation>, id: String, userId: String) {
-    conversations.find { it.id == id }?.apply {
-        isRead = isRead.toMutableMap().also { it[userId] = false }
     }
 }
 
