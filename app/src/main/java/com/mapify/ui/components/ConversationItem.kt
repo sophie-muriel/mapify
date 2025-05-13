@@ -1,5 +1,6 @@
 package com.mapify.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,7 @@ import com.mapify.ui.users.tabs.formatNotificationOrMessageDate
 @Composable
 fun ConversationItem(
     conversation: Conversation,
+    user: User,
     recipient: User,
     onClick: () -> Unit,
     onMarkRead: () -> Unit,
@@ -40,7 +42,7 @@ fun ConversationItem(
         }
     } ?: ""
     val time = lastMessage?.timestamp?.let { formatNotificationOrMessageDate(it) } ?: ""
-    val isRead = conversation.isRead[recipient.id] != true
+    val isRead = conversation.isRead[user.id] ?: false
 
     Box(
         modifier = Modifier
