@@ -35,7 +35,7 @@ class ReportsViewModel: ViewModel() {
         return _reports.value.filter { it.userId == userId }
     }
 
-    fun getReports(): List<Report> {
+    private fun getReports(): List<Report> {
         return listOf(
             Report(
                 id = "1",
