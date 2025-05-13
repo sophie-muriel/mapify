@@ -21,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.mapify.R
-import com.mapify.model.Conversation
 import com.mapify.model.Message
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
@@ -33,6 +32,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+private val COLOMBIA_LOCALE = Locale("es", "CO")
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversationScreen(
@@ -42,90 +43,25 @@ fun ConversationScreen(
 ) {
     val context = LocalContext.current
     val usersViewModel = LocalMainViewModel.current.usersViewModel
-    val allUsers by usersViewModel.users.collectAsState()
+    val conversationsViewModel = LocalMainViewModel.current.conversationsViewModel
     val user = usersViewModel.loadUser(context)!!
 
-    val conversationsList = remember {
-        mutableStateListOf<Conversation>().apply {
-            if (allUsers.size > 2) {
-                addAll(
-                    listOf(
-                        Conversation(
-                            id = "1",
-                            participants = listOf(allUsers[1], allUsers[0]),
-                            messages = listOf(
-                                Message(
-                                    id = "msg1",
-                                    senderId = allUsers[0].id,
-                                    content = "Hi, just checking if there are any updates on the report.",
-                                    timestamp = LocalDateTime.now().minusMinutes(5)
-                                )
-                            ),
-                            isRead = mapOf(
-                                allUsers[0].id to true,
-                                allUsers[1].id to false
-                            )
-                        ),
-                        Conversation(
-                            id = "2",
-                            participants = listOf(allUsers[2], allUsers[0]),
-                            messages = listOf(
-                                Message(
-                                    id = "msg2",
-                                    senderId = allUsers[2].id,
-                                    content = "Thanks for your response.",
-                                    timestamp = LocalDateTime.now().minusHours(2)
-                                )
-                            ),
-                            isRead = mapOf(
-                                allUsers[2].id to true,
-                                allUsers[0].id to false
-                            )
-                        ),
-                        Conversation(
-                            id = "conv3",
-                            participants = listOf(allUsers[1], allUsers[2]),
-                            messages = listOf(
-                                Message(
-                                    id = "msg3",
-                                    senderId = allUsers[2].id,
-                                    content = "Could you take a look at the file I sent you?",
-                                    timestamp = LocalDateTime.now().minusDays(5)
-                                )
-                            ),
-                            isRead = mapOf(
-                                allUsers[2].id to true,
-                                allUsers[1].id to false
-                            )
-                        )
-                    )
-                )
-            }
+    val conversation = remember(id, isConversation) {
+        if (isConversation) {
+            conversationsViewModel.find(id) ?: error("Conversation not found.")
+        } else {
+            conversationsViewModel.createConversation(
+                user,
+                usersViewModel.findById(id)!!
+            )
         }
     }
 
-    val conversation: Conversation
-
-    if (isConversation) {
-        conversation = remember(id) {
-            conversationsList.find { it.id == id }
-        }!!
-    } else {
-        conversation = Conversation(
-            id = UUID.randomUUID().toString(),
-            participants = listOf(
-                user,
-                usersViewModel.findById(id)!!
-            ),
-            messages = emptyList(),
-            isRead = mapOf(user.id to true, usersViewModel.findById(id)!!.id to false)
-        )
-        conversationsList.add(conversation)
-    }
+    conversationsViewModel.getMessages(conversation.id)
 
     val recipient = conversation.participants.first { it != user }
     var messageText by remember { mutableStateOf(TextFieldValue("")) }
-    val messages = remember { mutableStateListOf<Message>().apply { addAll(conversation.messages) } }
+    val messages by conversationsViewModel.messages.collectAsState()
 
     var showDeleteDialog by remember { mutableStateOf(false) }
 
@@ -188,11 +124,12 @@ fun ConversationScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .padding(horizontal = Spacing.Large),
+                    .padding(horizontal = Spacing.Large)
+                    .padding(bottom = Spacing.Large),
                 verticalArrangement = Arrangement.spacedBy(Spacing.Large),
                 reverseLayout = true
             ) {
-                items(messages.reversed()) { msg ->
+                items(messages) { msg ->
                     ChatBubble(
                         message = msg,
                         isMe = msg.senderId == user.id,
@@ -244,14 +181,12 @@ fun ConversationScreen(
                     IconButton(
                         onClick = {
                             if (messageText.text.isNotBlank()) {
-                                messages.add(
-                                    Message(
-                                        id = "${messages.size + 1}",
-                                        senderId = user.id,
-                                        content = messageText.text,
-                                        timestamp = LocalDateTime.now()
-                                    )
+                                conversationsViewModel.sendMessage(
+                                    conversation.id,
+                                    user.id,
+                                    messageText.text
                                 )
+
                                 messageText = TextFieldValue("")
                             }
                         },
@@ -277,7 +212,7 @@ fun ConversationScreen(
             onClose = { showDeleteDialog = false },
             onExitText = stringResource(id = R.string.delete),
             onExit = {
-                conversationsList.remove(conversation)
+                conversationsViewModel.deleteForUser(conversation.id, user.id)
                 showDeleteDialog = false
                 navigateBack()
             }
@@ -349,6 +284,6 @@ fun ChatBubble(
 }
 
 fun formatTime(dateTime: LocalDateTime): String {
-    val formatter = DateTimeFormatter.ofPattern("hh:mm a", Locale("es", "CO"))
+    val formatter = DateTimeFormatter.ofPattern("hh:mm a", COLOMBIA_LOCALE)
     return dateTime.format(formatter)
 }
