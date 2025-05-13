@@ -4,5 +4,5 @@ data class Conversation(
     val id: String,
     val participants: List<User>,
     val messages: List<Message>,
-    var isRead: Map<String, Boolean>
+    var isRead: MutableMap<String, Boolean>
 )
