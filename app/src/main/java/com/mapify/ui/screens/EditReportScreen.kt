@@ -30,6 +30,7 @@ import getLocationName
 import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.mapify.ui.navigation.LocalMainViewModel
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -43,100 +44,8 @@ fun EditReportScreen(
     val context = LocalContext.current
     var isValidating by remember { mutableStateOf(false) }
 
-    val storedReports = listOf(
-        Report(
-            id = "1",
-            title = "Report 1",
-            category = Category.SECURITY,
-            description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque. " +
-                    "Donec et tortor scelerisque, ornare mi et, tempus sem. Maecenas ullamcorper nulla vel arcu malesuada consectetur. " +
-                    "Donec sed pharetra sapien. Nam vitae mi eleifend ex pellentesque vulputate ac in elit." +
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque. " +
-                    "Donec et tortor scelerisque, ornare mi et, tempus sem. Maecenas ullamcorper nulla vel arcu malesuada consectetur. " +
-                    "Donec sed pharetra sapien. Nam vitae mi eleifend ex pellentesque vulputate ac in elit.",
-            images = listOf(
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s",
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOvSWqWExnQHszC2ZfSLd-xZNC94pRxMO7ag&s"
-            ),
-            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
-            status = ReportStatus.PENDING_VERIFICATION,
-            userId = "1",
-            date = LocalDateTime.now(),
-            priorityCounter = 10
-        ),
-        Report(
-            id = "2",
-            title = "Report 2",
-            category = Category.PETS,
-            description = "This is an embedded test report to test the pets category and the resolved flag and verified status",
-            images = listOf(
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHtshKCjboh0e9X3dP5l-igYWWA4C8-nSaw&s",
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThXTf5MoQt2F4rJ9lnIRpA-fQ7zZNSRQwtkQ&s",
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFSUC03tbmiZ9hVh3ShKNIJmVyPVk4XIf16A&s"
-            ),
-            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
-            status = ReportStatus.VERIFIED,
-            userId = "1",
-            date = LocalDateTime.now(),
-            isResolved = true,
-            priorityCounter = 25
-        ),
-        Report(
-            id = "3",
-            title = "Report 3",
-            category = Category.INFRASTRUCTURE,
-            description = "Etiam tristique, risus ac pellentesque ullamcorper, mauris nisl tincidunt dui, sit amet porttitor eros nisl a dolor. " +
-                    "Mauris eu sapien tincidunt, pulvinar leo a, tincidunt orci. In leo justo, hendrerit at convallis nec, semper in neque. Nunc " +
-                    "at metus eros. Aliquam erat volutpat. Sed nec faucibus leo, quis cursus nisl.",
-            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
-            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
-            status = ReportStatus.VERIFIED,
-            userId = "2",
-            date = LocalDateTime.now(),
-            priorityCounter = 11
-        ),
-
-        Report(
-            id = "4",
-            title = "Report 4",
-            category = Category.COMMUNITY,
-            description = "Etiam tristique, risus ac pellentesque ullamcorper, mauris nisl tincidunt dui, sit amet porttitor eros nisl a dolor.",
-            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
-            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
-            status = ReportStatus.VERIFIED,
-            userId = "2",
-            date = LocalDateTime.now().minusHours(3),
-            priorityCounter = 21
-        ),
-        Report(
-            id = "5",
-            title = "Report 5",
-            category = Category.SECURITY,
-            description = "Mauris eu sapien tincidunt, pulvinar leo a, tincidunt orci. In leo justo, hendrerit at convallis nec, semper in neque. Nunc " +
-                    "at metus eros. Aliquam erat volutpat. Sed nec faucibus leo, quis cursus nisl.",
-            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
-            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
-            status = ReportStatus.PENDING_VERIFICATION,
-            userId = "2",
-            date = LocalDateTime.now().minusDays(1),
-            isResolved = true,
-            priorityCounter = 3
-        ),
-        Report(
-            id = "6",
-            title = "Report 6",
-            category = Category.PETS,
-            description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque. " +
-                    "Donec et tortor scelerisque, ornare mi et, tempus sem. Maecenas ullamcorper nulla vel arcu malesuada consectetur. ",
-            images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
-            location = Location(43230.1, 753948.7, "Colombia", "Armenia"),
-            status = ReportStatus.VERIFIED,
-            userId = "2",
-            date = LocalDateTime.now().minusMinutes(45),
-            isResolved = true,
-            priorityCounter = 15
-        )
-    )
+    val reportsViewModel = LocalMainViewModel.current.reportsViewModel
+    val storedReports by reportsViewModel.reports.collectAsState()
 
     val report = storedReports.find { it.id == reportId } ?: return
 
