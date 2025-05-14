@@ -22,6 +22,8 @@ import com.mapify.ui.components.SimpleTopBar
 
 @Composable
 fun ReportLocationScreen(
+    latitude: Double?,
+    longitude: Double?,
     navigateBack: (Double?, Double?) -> Unit
 ) {
 
@@ -35,9 +37,9 @@ fun ReportLocationScreen(
                 navIconVector = Icons.AutoMirrored.Filled.ArrowBack,
                 navIconDescription = stringResource(id = R.string.back_arrow_icon),
                 onClickNavIcon = {
-                    val latitude = clickedPoint?.latitude()
-                    val longitude = clickedPoint?.longitude()
-                    navigateBack(latitude, longitude)
+                    val capturedLatitude = clickedPoint?.latitude()
+                    val capturedLongitude = clickedPoint?.longitude()
+                    navigateBack(capturedLatitude, capturedLongitude)
                 },
                 actions = false
             )
@@ -52,6 +54,8 @@ fun ReportLocationScreen(
             Map(
                 navigateToDetail = {  },
                 isClickable = true,
+                latitude = latitude,
+                longitude = longitude,
                 onMapClickListener = { point ->
                     clickedPoint = point
                     true
