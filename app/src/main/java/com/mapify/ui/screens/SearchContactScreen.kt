@@ -23,7 +23,6 @@ import com.mapify.ui.components.SearchUserItem
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.ui.navigation.LocalMainViewModel
 
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun SearchContactScreen(
     navigateBack: () -> Unit,
