@@ -1,5 +1,6 @@
 package com.mapify.model
 
+import android.location.Location
 import java.time.LocalDate
 import java.time.LocalDateTime
 
