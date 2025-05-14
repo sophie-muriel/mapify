@@ -26,6 +26,8 @@ import com.mapify.model.Report
 fun Map(
     navigateToDetail: (String) -> Unit,
     isClickable: Boolean = false,
+    latitude: Double? = null,
+    longitude: Double? = null,
     onMapClickListener: OnMapClickListener? = null,
     clickedPoint: Point? = null,
     reports: List<Report>? = null,
@@ -66,14 +68,18 @@ fun Map(
             mapViewportState.transitionToFollowPuckState()
         }
 
-        if(isClickable){
-            if(clickedPoint != null){
-                PointAnnotation(
-                    point = clickedPoint
-                ){
+        if (isClickable) {
+            val pointToShow = clickedPoint ?: if (latitude != null && longitude != null) {
+                Point.fromLngLat(longitude, latitude)
+            } else {
+                null
+            }
+            pointToShow?.let { point ->
+                PointAnnotation(point = point) {
                     iconImage = marker
                 }
             }
+
         }else{
             reports?.forEach{ report ->
                 if(!report.isDeleted){
