@@ -1,6 +1,5 @@
 package com.mapify.ui.users.tabs
 
-import HandleLocationPermission
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,14 +36,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mapify.R
-import com.mapify.model.Category
-import com.mapify.model.Location
 import com.mapify.model.Report
-import com.mapify.model.ReportStatus
-import com.mapify.ui.components.Map
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
-import java.time.LocalDateTime
 
 @Composable
 fun ExploreTab(
