@@ -122,7 +122,12 @@ fun Navigation(
                                 navController.popBackStack()
                             },
                             navigateToReportLocation = {
-                                navController.navigate(RouteScreen.ReportLocation)
+                                navController.navigate(
+                                    RouteScreen.ReportLocation(
+                                        latitude = latitude.value,
+                                        longitude = longitude.value
+                                    )
+                                )
                             },
                             navigateToReportView = {
                                 navController.navigate(RouteScreen.ReportView(it))
@@ -130,7 +135,10 @@ fun Navigation(
                         )
                     }
                     composable<RouteScreen.ReportLocation> {
+                        val args = it.toRoute<RouteScreen.ReportLocation>()
                         ReportLocationScreen(
+                            latitude = args.latitude,
+                            longitude = args.longitude,
                             navigateBack = { lat, lng ->
                                 latitude.value = lat
                                 longitude.value = lng
