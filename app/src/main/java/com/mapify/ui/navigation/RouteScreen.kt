@@ -9,7 +9,7 @@ sealed class RouteScreen {
     @Serializable data object Login : RouteScreen()
     @Serializable data object Registration : RouteScreen()
     @Serializable data class CreateReport(val latitude: Double? = null, val longitude: Double? = null) : RouteScreen()
-    @Serializable data object ReportLocation : RouteScreen()
+    @Serializable data class ReportLocation(val latitude: Double? = null, val longitude: Double? = null) : RouteScreen()
     @Serializable data class ReportView(val reportId: String, val reportStatus: ReportStatus? = null) : RouteScreen()
     @Serializable data object Profile : RouteScreen()
     @Serializable data object Settings : RouteScreen()
