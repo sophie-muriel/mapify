@@ -106,7 +106,7 @@ fun ReportViewScreen(
     reportStatusP: ReportStatus? = null,
     navigateBack: () -> Unit,
     navigateToReportEdit: ((String) -> Unit)? = null,
-    navigateToReportLocation: () -> Unit
+    navigateToReportLocation: (Double?, Double?) -> Unit,
 ) {
 
     val context = LocalContext.current
@@ -345,7 +345,7 @@ fun ReportViewScreen(
                         icon = Icons.Default.Place,
                         text = "1.2KM",
                         onClick = {
-                            navigateToReportLocation()
+                            navigateToReportLocation(report.location?.latitude, report.location?.longitude)
                         },
                         isClickable = true
                     )
