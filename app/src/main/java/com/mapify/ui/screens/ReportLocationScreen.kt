@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +25,8 @@ import com.mapify.ui.components.SimpleTopBar
 fun ReportLocationScreen(
     latitude: Double?,
     longitude: Double?,
-    navigateBack: (Double?, Double?) -> Unit
+    navigateBack: (Double?, Double?) -> Unit,
+    isReadOnly: Boolean
 ) {
 
     var clickedPoint by remember { mutableStateOf<Point?>(null) }
@@ -53,7 +55,8 @@ fun ReportLocationScreen(
         ) {
             Map(
                 navigateToDetail = {  },
-                isClickable = true,
+                isOneReport = true,
+                isReadOnly = isReadOnly,
                 latitude = latitude,
                 longitude = longitude,
                 onMapClickListener = { point ->
