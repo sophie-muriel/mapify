@@ -1,11 +1,17 @@
 package com.mapify.ui.screens
 
+import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Location
+import android.os.Build
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -38,8 +44,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.LocationServices
 import com.mapify.R
-import com.mapify.model.Location
 import com.mapify.model.Role
 import com.mapify.model.User
 import com.mapify.ui.components.GenericTextField
@@ -47,12 +53,17 @@ import com.mapify.ui.components.LogoTitle
 import com.mapify.ui.theme.Spacing
 import java.util.UUID
 import com.mapify.ui.navigation.LocalMainViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun RegistrationScreen(
     navigateBack: () -> Unit
 ) {
-
+    val context = LocalContext.current
     val usersViewModel = LocalMainViewModel.current.usersViewModel
 
     var name by rememberSaveable { mutableStateOf("") }
@@ -66,11 +77,7 @@ fun RegistrationScreen(
 
     var locationShared by rememberSaveable { mutableStateOf(false) }
     var locationForm by rememberSaveable { mutableStateOf(false) }
-    val location = Location( //TODO: dynamic change
-        latitude = 43230.2, longitude = 753948.8, country = "Colombia", city = "Armenia"
-    )
-
-    val context = LocalContext.current
+    var location by rememberSaveable { mutableStateOf("Loading...") }
 
     val nameError = nameTouched && name.isBlank()
     val emailError = emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
@@ -86,16 +93,30 @@ fun RegistrationScreen(
     val locationAccessPermissionGranted = stringResource(id = R.string.location_access_permission_granted)
     val locationAccessPermissionDenied = stringResource(id = R.string.location_access_permission_denied)
 
+    var userLocation by rememberSaveable { mutableStateOf<Location?>(null) }
+    var locationText by rememberSaveable { mutableStateOf("Loading...") }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         hasPermission = isGranted
-        if(hasPermission){
+        if (isGranted) {
             Toast.makeText(context, locationAccessPermissionGranted, Toast.LENGTH_SHORT).show()
-        }else{
+
+            CoroutineScope(Dispatchers.Main).launch {
+                val fetchedLocation = fetchUserLocation(context)
+
+                userLocation = fetchedLocation
+                locationShared = true
+                locationText = userLocation?.let {
+                    getFormattedLocation(context, it.latitude, it.longitude)
+                } ?: "Unable to get location"
+            }
+        } else {
             Toast.makeText(context, locationAccessPermissionDenied, Toast.LENGTH_SHORT).show()
         }
     }
+
 
     fun resetFields() {
         name = ""
@@ -206,7 +227,7 @@ fun RegistrationScreen(
                         )
                         .align(Alignment.CenterHorizontally),
                     text = if (locationShared)
-                        stringResource(id = R.string.location_enabled, location)
+                        stringResource(id = R.string.location_enabled, locationText)
                     else
                         stringResource(id = R.string.enable_location_access_message),
                     style = MaterialTheme.typography.bodyMedium,
@@ -219,16 +240,20 @@ fun RegistrationScreen(
                     locationShared = locationShared,
                     onClickConfirmLocation = {
                         if (locationShared) {
-                            usersViewModel.create(
+                            userLocation?.let {
                                 User(
                                     id = UUID.randomUUID().toString(),
                                     fullName = name,
                                     email = email,
                                     password = password,
                                     role = Role.CLIENT,
-                                    registrationLocation = location
+                                    location = it
                                 )
-                            )
+                            }?.let {
+                                usersViewModel.create(
+                                    it
+                                )
+                            }
                             Toast.makeText(
                                 context,
                                 context.getString(R.string.registration_successful),
@@ -246,9 +271,17 @@ fun RegistrationScreen(
             }
         }
     }
-    LaunchedEffect(locationForm, locationShared) {
-        if (locationForm && locationShared && !hasPermission) {
-            permissionLauncher.launch(permission)
+    LaunchedEffect(locationForm) {
+        if (locationForm) {
+            if (hasPermission) {
+                userLocation = fetchUserLocation(context)
+                locationShared = true
+                locationText = userLocation?.let {
+                    getFormattedLocation(context, it.latitude, it.longitude)
+                } ?: "Unable to get location"
+            } else {
+                permissionLauncher.launch(permission)
+            }
         }
     }
 }
@@ -431,4 +464,14 @@ fun ConfirmLocationForm(
     }
 
     Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
+}
+
+@RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+private suspend fun fetchUserLocation(context: Context): Location? {
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    return try {
+        fusedLocationClient.lastLocation.await()
+    } catch (e: Exception) {
+        null
+    }
 }
