@@ -143,7 +143,8 @@ fun Navigation(
                                 latitude.value = lat
                                 longitude.value = lng
                                 navController.popBackStack()
-                            }
+                            },
+                            isReadOnly = args.isReadOnly
                         )
                     }
                     composable<RouteScreen.ReportView> { it ->
@@ -157,8 +158,14 @@ fun Navigation(
                             navigateToReportEdit = {
                                 navController.navigate(RouteScreen.EditReport(it))
                             },
-                            navigateToReportLocation = {
-                                navController.navigate(RouteScreen.ReportLocation)
+                            navigateToReportLocation = { lat, long ->
+                                navController.navigate(
+                                    RouteScreen.ReportLocation(
+                                        latitude = lat,
+                                        longitude = long,
+                                        isReadOnly = true
+                                    )
+                                )
                             }
                         )
                     }
@@ -195,7 +202,14 @@ fun Navigation(
                                 longitude.value = null
                                 navController.popBackStack()
                             },
-                            navigateToReportLocation = { navController.navigate(RouteScreen.ReportLocation) },
+                            navigateToReportLocation = { lat, long ->
+                                navController.navigate(
+                                    RouteScreen.ReportLocation(
+                                        latitude = lat,
+                                        longitude = long
+                                    )
+                                )
+                            },
                             reportId = args.reportId
                         )
                     }
