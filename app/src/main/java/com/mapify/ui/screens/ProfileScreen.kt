@@ -1,7 +1,11 @@
 package com.mapify.ui.screens
 
+import android.content.Context
+import android.location.Location
+import android.os.Build
 import android.util.Patterns
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -23,7 +27,20 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import com.mapify.model.User
 import com.mapify.ui.navigation.LocalMainViewModel
+import getLocationName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+suspend fun getFormattedLocation(context: Context, latitude: Double, longitude: Double): String {
+    val locationName = getLocationName(context, latitude, longitude)
+    val country = locationName.second ?: "Unknown Country"
+    val city = locationName.first ?: "Unknown City"
+    return "$city, $country"
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun ProfileScreen(
     navigateBack: () -> Unit
@@ -47,6 +64,12 @@ fun ProfileScreen(
     val nameError = nameTouched && name.isBlank()
     val emailError = emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
     val passwordError = passwordTouched && password.length < 6
+
+    var location by rememberSaveable { mutableStateOf("Loading...") }
+
+    LaunchedEffect(Unit) {
+        location = getFormattedLocation(context, user.location.latitude, user.location.longitude)
+    }
 
     BackHandler(enabled = editMode && (nameTouched || emailTouched || passwordTouched)) {
         exitDialogVisible = true
@@ -97,7 +120,7 @@ fun ProfileScreen(
                 name = name,
                 email = email,
                 password = password,
-                location = user.registrationLocation.toString(),
+                location = location,
                 isEditMode = editMode,
                 onValueChangeName = { name = it; nameTouched = true },
                 onValueChangeEmail = { email = it; emailTouched = true },
@@ -110,7 +133,7 @@ fun ProfileScreen(
                             email = email,
                             password = password,
                             role = it.role,
-                            registrationLocation = it.registrationLocation
+                            location = it.location
                         )
                         usersViewModel.edit(updatedUser = updatedUser, userId = it.id)
                     }
