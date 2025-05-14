@@ -1,8 +1,8 @@
 package com.mapify.viewmodel
 
+import android.location.Location
 import androidx.lifecycle.ViewModel
 import com.mapify.model.Category
-import com.mapify.model.Location
 import com.mapify.model.Report
 import com.mapify.model.ReportStatus
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,27 +36,58 @@ class ReportsViewModel: ViewModel() {
     }
 
     private fun getReports(): List<Report> {
+        val location1 = Location("gps")
+        location1.latitude = 4.532890
+        location1.longitude = -75.677856
+
+        val location2 = Location("gps")
+        location2.latitude = 4.532890
+        location2.longitude = -75.677856
+
+        val location3 = Location("gps")
+        location3.latitude = 4.532890
+        location3.longitude = -75.677856
+
+        val location4 = Location("gps")
+        location4.latitude = 4.532890
+        location4.longitude = -75.677856
+
+        val location5 = Location("gps")
+        location5.latitude = 4.532890
+        location5.longitude = -75.677856
+
         return listOf(
             Report(
                 id = "1",
                 title = "Report 1",
                 category = Category.SECURITY,
-                description = "This is a report",
-                images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s"),
-                location = Location(4.542029, -75.663209, "Colombia", "Armenia"),
+                description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque. " +
+                        "Donec et tortor scelerisque, ornare mi et, tempus sem. Maecenas ullamcorper nulla vel arcu malesuada consectetur. " +
+                        "Donec sed pharetra sapien. Nam vitae mi eleifend ex pellentesque vulputate ac in elit." +
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque. " +
+                        "Donec et tortor scelerisque, ornare mi et, tempus sem. Maecenas ullamcorper nulla vel arcu malesuada consectetur. " +
+                        "Donec sed pharetra sapien. Nam vitae mi eleifend ex pellentesque vulputate ac in elit.",
+                images = listOf(
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s",
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOvSWqWExnQHszC2ZfSLd-xZNC94pRxMO7ag&s"
+                ),
+                location = location1,
                 status = ReportStatus.PENDING_VERIFICATION,
                 userId = "1",
                 date = LocalDateTime.now(),
-                rejectionDate = LocalDateTime.now().minusDays(1),
-                isDeletedManually = true
+                priorityCounter = 10
             ),
             Report(
                 id = "2",
                 title = "Report 2",
                 category = Category.PETS,
-                description = "This is a test report...",
-                images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHtshKCjboh0e9X3dP5l-igYWWA4C8-nSaw&s"),
-                location = Location(4.552580, -75.658404, "Colombia", "Armenia"),
+                description = "This is an embedded test report to test the pets category and the resolved flag and verified status",
+                images = listOf(
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHtshKCjboh0e9X3dP5l-igYWWA4C8-nSaw&s",
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThXTf5MoQt2F4rJ9lnIRpA-fQ7zZNSRQwtkQ&s",
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFSUC03tbmiZ9hVh3ShKNIJmVyPVk4XIf16A&s"
+                ),
+                location = location2,
                 status = ReportStatus.VERIFIED,
                 userId = "1",
                 date = LocalDateTime.now(),
@@ -67,78 +98,42 @@ class ReportsViewModel: ViewModel() {
                 id = "3",
                 title = "Report 3",
                 category = Category.INFRASTRUCTURE,
-                description = "Another report example",
+                description = "Etiam tristique, risus ac pellentesque ullamcorper, mauris nisl tincidunt dui, sit amet porttitor eros nisl a dolor. " +
+                        "Mauris eu sapien tincidunt, pulvinar leo a, tincidunt orci. In leo justo, hendrerit at convallis nec, semper in neque. Nunc " +
+                        "at metus eros. Aliquam erat volutpat. Sed nec faucibus leo, quis cursus nisl.",
                 images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
-                location = Location(4.547182, -75.667272, "Colombia", "Armenia"),
+                location = location3,
                 status = ReportStatus.VERIFIED,
                 userId = "2",
-                date = LocalDateTime.now().minusHours(13)
+                date = LocalDateTime.now(),
+                priorityCounter = 11
             ),
+
             Report(
                 id = "4",
                 title = "Report 4",
                 category = Category.COMMUNITY,
-                description = "Report about illegal dumping near the river.",
+                description = "Etiam tristique, risus ac pellentesque ullamcorper, mauris nisl tincidunt dui, sit amet porttitor eros nisl a dolor.",
                 images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
-                location = Location(4.544938, -75.657802, "Colombia", "Armenia"),
+                location = location4,
                 status = ReportStatus.VERIFIED,
-                userId = "3",
+                userId = "2",
                 date = LocalDateTime.now().minusHours(3),
-                isResolved = false,
-                priorityCounter = 10
+                priorityCounter = 21
             ),
             Report(
                 id = "5",
                 title = "Report 5",
                 category = Category.SECURITY,
-                description = "Potholes causing problems in traffic.",
+                description = "Mauris eu sapien tincidunt, pulvinar leo a, tincidunt orci. In leo justo, hendrerit at convallis nec, semper in neque. Nunc " +
+                        "at metus eros. Aliquam erat volutpat. Sed nec faucibus leo, quis cursus nisl.",
                 images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
-                location = Location(4.535901, -75.669179, "Colombia", "Armenia"),
+                location = location5,
                 status = ReportStatus.PENDING_VERIFICATION,
-                userId = "4",
+                userId = "2",
                 date = LocalDateTime.now().minusDays(1),
-                isResolved = false,
-                priorityCounter = 3,
-                rejectionDate = LocalDateTime.now().minusDays(2)
-            ),
-            Report(
-                id = "6",
-                title = "Report 6",
-                category = Category.PETS,
-                description = "Lost dog seen in the neighborhood.",
-                images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAHUz_3weYlC2aCZNSsna_PNEqGHZ1Di0Eg&s"),
-                location = Location(4.532393, -75.673202, "Colombia", "Armenia"),
-                status = ReportStatus.VERIFIED,
-                userId = "5",
-                date = LocalDateTime.now().minusMinutes(45),
                 isResolved = true,
-                priorityCounter = 15,
-                isDeletedManually = true
-            ),
-            Report(
-                id = "7",
-                title = "Report 7",
-                category = Category.SECURITY,
-                description = "This is a report",
-                images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkmoJWVhxab15KM_FQbk539hzwjN7qhyWeDw&s"),
-                location = Location(4.539816, -75.670499, "Colombia", "Armenia"),
-                status = ReportStatus.PENDING_VERIFICATION,
-                userId = "1",
-                date = LocalDateTime.now(),
-                rejectionDate = LocalDateTime.now().minusDays(1)
-            ),
-            Report(
-                id = "8",
-                title = "Report 8",
-                category = Category.PETS,
-                description = "This is a test report...",
-                images = listOf("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHtshKCjboh0e9X3dP5l-igYWWA4C8-nSaw&s"),
-                location = Location(4.537453, -75.678245, "Colombia", "Armenia"),
-                status = ReportStatus.VERIFIED,
-                userId = "1",
-                date = LocalDateTime.now(),
-                isResolved = true,
-                priorityCounter = 25
+                priorityCounter = 3
             )
         )
     }
