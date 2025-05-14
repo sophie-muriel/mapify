@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
@@ -15,6 +16,7 @@ import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
 import com.mapbox.maps.extension.compose.rememberMapState
 import com.mapbox.maps.plugin.PuckBearing
+import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.generated.GesturesSettings
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
@@ -35,8 +37,8 @@ fun Map(
 ){
     val mapViewportState = rememberMapViewportState {
         setCameraOptions {
-            zoom(8.0)
-            center(Point.fromLngLat(-75.6491181, 4.4687891))
+            zoom(10.0)
+            center(Point.fromLngLat(-75.666375, 4.539860))
             pitch(45.0)
         }
     }
@@ -65,7 +67,6 @@ fun Map(
                 puckBearing = PuckBearing.COURSE
                 puckBearingEnabled = true
             }
-
             mapViewportState.transitionToFollowPuckState()
         }
 
@@ -80,6 +81,11 @@ fun Map(
                     PointAnnotation(point = point) {
                         iconImage = marker
                     }
+                    mapViewportState.setCameraOptions {
+                        center(point)
+                        zoom(16.4)
+                        pitch(45.0)
+                    }
                 }
             }else{
                 val pointToShow = clickedPoint ?: if (latitude != null && longitude != null) {
@@ -90,6 +96,24 @@ fun Map(
                 pointToShow?.let { point ->
                     PointAnnotation(point = point) {
                         iconImage = marker
+                    }
+                    if(clickedPoint != null){
+                        mapViewportState.easeTo(
+                            cameraOptions = CameraOptions.Builder()
+                                .center(point)
+                                .zoom(16.4)
+                                .pitch(45.0)
+                                .build(),
+                            animationOptions = MapAnimationOptions.mapAnimationOptions {
+                                duration(500L)
+                            }
+                        )
+                    }else{
+                        mapViewportState.setCameraOptions {
+                            center(point)
+                            zoom(16.4)
+                            pitch(45.0)
+                        }
                     }
                 }
             }
