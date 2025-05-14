@@ -53,6 +53,7 @@ fun ExploreTab(
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
     val storedReports by reportsViewModel.reports.collectAsState()
+    val visibleReports = storedReports.filter { !it.isDeleted }
 
     LazyColumn(
         modifier = Modifier
@@ -60,20 +61,13 @@ fun ExploreTab(
             .padding(horizontal = Spacing.Sides),
         verticalArrangement = Arrangement.spacedBy(Spacing.Large),
     ) {
-        items(storedReports) {
-            if(!it.isDeleted){
-                ReportCard(
-                    report = it,
-                    navigateToDetail = navigateToDetail
-                )
-            }
+        items(visibleReports) {
+            ReportCard(
+                report = it,
+                navigateToDetail = navigateToDetail
+            )
         }
     }
-//    HandleLocationPermission(
-//        onPermissionGranted = {
-//
-//        }
-//    )
 }
 
 @Composable
