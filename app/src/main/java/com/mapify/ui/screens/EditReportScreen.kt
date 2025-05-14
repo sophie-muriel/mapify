@@ -1,6 +1,7 @@
 package com.mapify.ui.screens
 
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
@@ -36,7 +37,7 @@ import com.mapify.ui.navigation.LocalMainViewModel
 @Composable
 fun EditReportScreen(
     navigateBack: () -> Unit,
-    navigateToReportLocation: () -> Unit,
+    navigateToReportLocation: (Double?, Double?) -> Unit,
     reportId: String,
     latitude: Double? = null,
     longitude: Double? = null
@@ -198,7 +199,13 @@ fun EditReportScreen(
                     location = if (latitude != null && longitude != null) locationVisible else report.location.toString(),
                     onValueChangeLocation = { },
                     locationError = locationError,
-                    navigateToReportLocation = navigateToReportLocation,
+                    navigateToReportLocation = {
+                        if(latitude != null && longitude != null){
+                            navigateToReportLocation(latitude, longitude)
+                        }else{
+                            navigateToReportLocation(report.location?.latitude, report.location?.longitude)
+                        }
+                    },
                     onClickCreate = {
                         if (!isValidating) saveReportVisible = true
                     },
