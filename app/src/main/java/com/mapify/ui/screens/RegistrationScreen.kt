@@ -117,7 +117,6 @@ fun RegistrationScreen(
         }
     }
 
-
     fun resetFields() {
         name = ""
         nameTouched = false
@@ -467,7 +466,7 @@ fun ConfirmLocationForm(
 }
 
 @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-private suspend fun fetchUserLocation(context: Context): Location? {
+suspend fun fetchUserLocation(context: Context): Location? {
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     return try {
         fusedLocationClient.lastLocation.await()

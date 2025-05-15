@@ -1,10 +1,14 @@
 package com.mapify.ui.screens
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.util.Patterns
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -25,12 +29,14 @@ import com.mapify.ui.theme.Spacing
 import com.mapify.viewmodel.UsersViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import com.mapify.model.User
 import com.mapify.ui.navigation.LocalMainViewModel
 import getLocationName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 suspend fun getFormattedLocation(context: Context, latitude: Double, longitude: Double): String {
@@ -65,10 +71,88 @@ fun ProfileScreen(
     val emailError = emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
     val passwordError = passwordTouched && password.length < 6
 
-    var location by rememberSaveable { mutableStateOf("Loading...") }
+    val permission = android.Manifest.permission.ACCESS_FINE_LOCATION
+
+    var hasPermission by remember {
+        mutableStateOf(ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
+    }
+
+    val locationAccessPermissionGranted = stringResource(id = R.string.location_access_permission_granted)
+    val locationAccessPermissionDenied = stringResource(id = R.string.location_access_permission_denied)
+
+    var userLocation by rememberSaveable { mutableStateOf<Location?>(user.location) }
+    var locationText by rememberSaveable { mutableStateOf("Loading...") }
+    var isRefreshingLocation by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        location = getFormattedLocation(context, user.location.latitude, user.location.longitude)
+        userLocation?.let {
+            locationText = getFormattedLocation(context, it.latitude, it.longitude)
+        } ?: run {
+            locationText = "Unknown location"
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasPermission = isGranted
+        if (isGranted) {
+            Toast.makeText(context, locationAccessPermissionGranted, Toast.LENGTH_SHORT).show()
+            isRefreshingLocation = true
+            CoroutineScope(Dispatchers.Main).launch {
+                val fetchedLocation = fetchUserLocation(context)
+
+                userLocation = fetchedLocation
+                locationText = userLocation?.let {
+                    getFormattedLocation(context, it.latitude, it.longitude)
+                } ?: "Unable to get location"
+
+                userLocation?.let { location ->
+                    val updatedUser = User(
+                        id = user.id,
+                        fullName = user.fullName,
+                        email = user.email,
+                        password = user.password,
+                        role = user.role,
+                        location = location
+                    )
+                    usersViewModel.edit(updatedUser = updatedUser, userId = user.id)
+                }
+                isRefreshingLocation = false
+            }
+        } else {
+            Toast.makeText(context, locationAccessPermissionDenied, Toast.LENGTH_SHORT).show()
+            isRefreshingLocation = false
+        }
+    }
+
+    fun refreshLocation() {
+        isRefreshingLocation = true
+        if (hasPermission) {
+            CoroutineScope(Dispatchers.Main).launch {
+                val fetchedLocation = fetchUserLocation(context)
+
+                userLocation = fetchedLocation
+                locationText = userLocation?.let {
+                    getFormattedLocation(context, it.latitude, it.longitude)
+                } ?: "Unable to get location"
+
+                userLocation?.let { location ->
+                    val updatedUser = User(
+                        id = user.id,
+                        fullName = user.fullName,
+                        email = user.email,
+                        password = user.password,
+                        role = user.role,
+                        location = location
+                    )
+                    usersViewModel.edit(updatedUser = updatedUser, userId = user.id)
+                }
+                isRefreshingLocation = false
+            }
+        } else {
+            permissionLauncher.launch(permission)
+        }
     }
 
     BackHandler(enabled = editMode && (nameTouched || emailTouched || passwordTouched)) {
@@ -120,7 +204,7 @@ fun ProfileScreen(
                 name = name,
                 email = email,
                 password = password,
-                location = location,
+                location = locationText,
                 isEditMode = editMode,
                 onValueChangeName = { name = it; nameTouched = true },
                 onValueChangeEmail = { email = it; emailTouched = true },
@@ -133,7 +217,7 @@ fun ProfileScreen(
                             email = email,
                             password = password,
                             role = it.role,
-                            location = it.location
+                            location = userLocation ?: it.location
                         )
                         usersViewModel.edit(updatedUser = updatedUser, userId = it.id)
                     }
@@ -141,15 +225,12 @@ fun ProfileScreen(
                     emailTouched = false
                     passwordTouched = false
                     editMode = false
-
-                    nameTouched = false
-                    emailTouched = false
-                    passwordTouched = false
-                    editMode = false
                 },
                 nameError = nameError,
                 emailError = emailError,
-                passwordError = passwordError
+                passwordError = passwordError,
+                onRefreshLocation = { refreshLocation() },
+                isRefreshingLocation = isRefreshingLocation
             )
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen / 2))
@@ -191,7 +272,9 @@ fun ProfileContent(
     onClickEdit: () -> Unit,
     nameError: Boolean,
     emailError: Boolean,
-    passwordError: Boolean
+    passwordError: Boolean,
+    onRefreshLocation: () -> Unit,
+    isRefreshingLocation: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -271,6 +354,22 @@ fun ProfileContent(
             isSingleLine = true,
             leadingIcon = {
                 Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            },
+            showTrailingIcon = true,
+            trailingIcon = {
+                IconButton(
+                    onClick = onRefreshLocation,
+                    enabled = !isRefreshingLocation
+                ) {
+                    if (isRefreshingLocation) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(Icons.Outlined.Replay, contentDescription = "Refresh location", tint = MaterialTheme.colorScheme.primary)
+                    }
+                }
             }
         )
 
