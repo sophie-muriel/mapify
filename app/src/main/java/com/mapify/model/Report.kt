@@ -17,7 +17,9 @@ class Report(
     var isResolved: Boolean = false,
     var priorityCounter: Int = 0,
     var rejectionDate: LocalDateTime? = null,
-    var isDeletedManually: Boolean = false
+    var isDeletedManually: Boolean = false,
+    var rejectionMessage: String? = null,
+    var reportBoosters: MutableList<String> = mutableListOf()
 ) {
     init {
         require(images.size in 1..5) { "A report must have between 1 and 5 images." }
