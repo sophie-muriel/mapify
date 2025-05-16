@@ -125,7 +125,9 @@ fun Navigation(
                                 navController.navigate(
                                     RouteScreen.ReportLocation(
                                         latitude = latitude.value,
-                                        longitude = longitude.value
+                                        longitude = longitude.value,
+                                        isCenteredOnUser = true,
+                                        hasPrimaryFab = false
                                     )
                                 )
                             },
@@ -144,7 +146,9 @@ fun Navigation(
                                 longitude.value = lng
                                 navController.popBackStack()
                             },
-                            isReadOnly = args.isReadOnly
+                            isReadOnly = args.isReadOnly,
+                            isCenteredOnUser = args.isCenteredOnUser,
+                            hasPrimaryFab = args.hasPrimaryFab
                         )
                     }
                     composable<RouteScreen.ReportView> { it ->
