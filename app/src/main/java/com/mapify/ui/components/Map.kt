@@ -1,5 +1,7 @@
 package com.mapify.ui.components
 
+import android.content.pm.PackageManager
+import android.location.Location
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -32,6 +34,15 @@ import com.mapify.R
 import com.mapify.model.Report
 import kotlinx.coroutines.delay
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import com.mapify.ui.screens.fetchUserLocation
+import com.mapify.ui.screens.getFormattedLocation
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun Map(
@@ -46,6 +57,16 @@ fun Map(
     isCenteredOnUser: Boolean = false,
     hasPrimaryFab: Boolean = true
 ){
+    val context = LocalContext.current
+
+    var userLocation by rememberSaveable { mutableStateOf<Location?>(null) }
+
+    val permission = android.Manifest.permission.ACCESS_FINE_LOCATION
+
+    var hasPermission by remember {
+        mutableStateOf(ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
+    }
+
     val mapViewportState = rememberMapViewportState {
         setCameraOptions {
             zoom(10.0)
@@ -162,7 +183,25 @@ fun Map(
                     .padding(16.dp)
             ) {
                 CreateFAB(
-                    onClick = { mapViewportState.transitionToFollowPuckState() },
+                    onClick = {
+                        CoroutineScope(Dispatchers.Main).launch @androidx.annotation.RequiresPermission(
+                            allOf = [android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION]
+                        ) {
+                            val fetchedLocation = fetchUserLocation(context)
+                            userLocation = fetchedLocation
+                        }
+                        val point = userLocation?.let { Point.fromLngLat(it.longitude, it.latitude) }
+                        mapViewportState.easeTo(
+                            cameraOptions = CameraOptions.Builder()
+                                .center(point)
+                                .zoom(16.4)
+                                .pitch(45.0)
+                                .build(),
+                            animationOptions = MapAnimationOptions.mapAnimationOptions {
+                                duration(500L)
+                            }
+                        )
+                    },
                     icon = Icons.Filled.MyLocation,
                     iconDescription = "Centrar en ubicación",
                     color = MaterialTheme.colorScheme.secondary
