@@ -2,6 +2,7 @@ package com.mapify.ui.screens
 
 import android.location.Location
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
@@ -119,7 +120,7 @@ fun CreateReportScreen(
 
     BackHandler { exitDialogVisible = true }
     var locationVisible by rememberSaveable { mutableStateOf("") }
-    var locationNotVisible: Location? = null
+    var locationNotVisible by rememberSaveable{ mutableStateOf<Location?>(null) }
 
     BackHandler(enabled = true) {
         exitDialogVisible = true
