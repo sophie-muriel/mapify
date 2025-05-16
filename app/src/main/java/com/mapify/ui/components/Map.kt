@@ -190,18 +190,18 @@ fun Map(
                         ) {
                             val fetchedLocation = fetchUserLocation(context)
                             userLocation = fetchedLocation
+                            val point = userLocation?.let { Point.fromLngLat(it.longitude, it.latitude) }
+                            mapViewportState.easeTo(
+                                cameraOptions = CameraOptions.Builder()
+                                    .center(point)
+                                    .zoom(16.4)
+                                    .pitch(45.0)
+                                    .build(),
+                                animationOptions = MapAnimationOptions.mapAnimationOptions {
+                                    duration(500L)
+                                }
+                            )
                         }
-                        val point = userLocation?.let { Point.fromLngLat(it.longitude, it.latitude) }
-                        mapViewportState.easeTo(
-                            cameraOptions = CameraOptions.Builder()
-                                .center(point)
-                                .zoom(16.4)
-                                .pitch(45.0)
-                                .build(),
-                            animationOptions = MapAnimationOptions.mapAnimationOptions {
-                                duration(500L)
-                            }
-                        )
                     },
                     icon = Icons.Filled.MyLocation,
                     iconDescription = stringResource(id = R.string.center_on_user_location_icon),
