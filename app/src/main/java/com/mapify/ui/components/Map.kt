@@ -37,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import com.mapify.ui.screens.fetchUserLocation
 import com.mapify.ui.screens.getFormattedLocation
@@ -203,7 +204,7 @@ fun Map(
                         )
                     },
                     icon = Icons.Filled.MyLocation,
-                    iconDescription = "Centrar en ubicación",
+                    iconDescription = stringResource(id = R.string.center_on_user_location_icon),
                     color = MaterialTheme.colorScheme.secondary
                 )
             }
