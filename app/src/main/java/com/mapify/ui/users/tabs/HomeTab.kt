@@ -16,7 +16,8 @@ fun HomeTab(
 
     Map(
         navigateToDetail = navigateToDetail,
-        reports = reports
+        reports = reports,
+        isCenteredOnUser = true
     )
 //    HandleLocationPermission(
 //        onPermissionGranted = {
