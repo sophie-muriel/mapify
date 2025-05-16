@@ -26,7 +26,9 @@ fun ReportLocationScreen(
     latitude: Double?,
     longitude: Double?,
     navigateBack: (Double?, Double?) -> Unit,
-    isReadOnly: Boolean
+    isReadOnly: Boolean,
+    isCenteredOnUser: Boolean,
+    hasPrimaryFab: Boolean
 ) {
 
     var clickedPoint by remember { mutableStateOf<Point?>(null) }
@@ -57,6 +59,8 @@ fun ReportLocationScreen(
                 navigateToDetail = {  },
                 isOneReport = true,
                 isReadOnly = isReadOnly,
+                isCenteredOnUser = isCenteredOnUser,
+                hasPrimaryFab = hasPrimaryFab,
                 latitude = latitude,
                 longitude = longitude,
                 onMapClickListener = { point ->
