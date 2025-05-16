@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.mapify.model.Category
 import com.mapify.model.Report
 import com.mapify.model.ReportStatus
+import com.mapify.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +22,23 @@ class ReportsViewModel: ViewModel() {
 
     fun create(report: Report) {
         _reports.value += report
+    }
+
+    fun edit(updatedReport: Report) {
+        _reports.value = _reports.value.map { report ->
+            if (report.id == updatedReport.id) updatedReport else report
+        }
+    }
+
+    fun deactivate(deactivatedReport: Report) {
+        deactivatedReport.isDeletedManually = true
+        _reports.value = _reports.value.map { report ->
+            if (report.id == deactivatedReport.id) deactivatedReport else report
+        }
+    }
+
+    fun count(): Int {
+        return _reports.value.size
     }
 
     fun delete(reportId: String) {
