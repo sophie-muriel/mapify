@@ -1,6 +1,5 @@
 package com.mapify.ui.screens
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -88,7 +87,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -142,37 +140,11 @@ fun ReportViewScreen(
         }
     }
 
-    var storedComments by remember {
-        mutableStateOf(
-            listOf<Comment>(
-                Comment(
-                    id = "1",
-                    content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque.",
-                    userId = "1",
-                    reportId = reportId,
-                    date = LocalDateTime.now()
-                ),
-                Comment(
-                    id = "2",
-                    content = "Lorem ipsum dolor sit amet",
-                    userId = "2",
-                    reportId = reportId,
-                    date = LocalDateTime.now()
-                ),
-                Comment(
-                    id = "3",
-                    content = "Lorem ipsum dolor sit amet",
-                    userId = "2",
-                    reportId = reportId,
-                    date = LocalDateTime.now()
-                )
-            )
-        )
-    }
+    var storedComments by remember { mutableStateOf(emptyList<Comment>()) }
 
     val report = storedReports.find { it.id == reportId } ?: return
-    var reportStatus by remember { mutableStateOf(report.status) } //This allows to change verification icon
-    //val reportStatus = report.status
+    var reportStatus by remember { mutableStateOf(report.status) }
+
     val starIcon = if (report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline
     val starIconDescription = if (report.isHighPriority)
         stringResource(id = R.string.star_icon_prioritized) else stringResource(id = R.string.star_icon_not_prioritized)
@@ -186,7 +158,6 @@ fun ReportViewScreen(
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var comment by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
-    var commentCounter by rememberSaveable { mutableIntStateOf(4) }
 
     val isCreator = user.id == report.userId
     var showDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
@@ -376,6 +347,7 @@ fun ReportViewScreen(
         }
 
         if (showComments) {
+            storedComments = reportsViewModel.findById(reportId)?.comments ?: emptyList()
             Comments(
                 state = bottomSheetState,
                 onDismissRequest = {
@@ -386,14 +358,13 @@ fun ReportViewScreen(
                 onCommentChange = { comment = it },
                 onClick = {
                     val newComment = Comment(
-                        id = commentCounter.toString(),
+                        id = (reportsViewModel.countComments(reportId) + 1).toString(),
                         content = comment,
                         userId = user.id,
-                        reportId = reportId,
                         date = LocalDateTime.now()
                     )
-                    commentCounter++
-                    storedComments = storedComments + newComment
+                    report.comments.add(newComment)
+                    reportsViewModel.edit(report)
                     comment = ""
                 },
                 users = users,
