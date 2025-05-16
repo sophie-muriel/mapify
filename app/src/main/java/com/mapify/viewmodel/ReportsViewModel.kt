@@ -152,7 +152,7 @@ class ReportsViewModel: ViewModel() {
             )
         )
 
-        return listOf(
+        return mutableListOf(
             Report(
                 id = "1",
                 title = "Report 1",
