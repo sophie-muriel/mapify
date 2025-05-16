@@ -37,24 +37,24 @@ class ReportsViewModel: ViewModel() {
 
     private fun getReports(): List<Report> {
         val location1 = Location("gps")
-        location1.latitude = 4.532890
-        location1.longitude = -75.677856
+        location1.latitude = 4.547765
+        location1.longitude = -75.661503
 
         val location2 = Location("gps")
-        location2.latitude = 4.532890
-        location2.longitude = -75.677856
+        location2.latitude = 4.543147
+        location2.longitude = -75.658812
 
         val location3 = Location("gps")
-        location3.latitude = 4.532890
-        location3.longitude = -75.677856
+        location3.latitude = 4.542909
+        location3.longitude = -75.663342
 
         val location4 = Location("gps")
-        location4.latitude = 4.532890
-        location4.longitude = -75.677856
+        location4.latitude = 4.546373
+        location4.longitude = -75.667055
 
         val location5 = Location("gps")
-        location5.latitude = 4.532890
-        location5.longitude = -75.677856
+        location5.latitude = 4.536084
+        location5.longitude = -75.668962
 
         return listOf(
             Report(
