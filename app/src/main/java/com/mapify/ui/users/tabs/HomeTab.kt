@@ -19,9 +19,4 @@ fun HomeTab(
         reports = reports,
         isCenteredOnUser = true
     )
-//    HandleLocationPermission(
-//        onPermissionGranted = {
-//
-//        }
-//    )
 }
