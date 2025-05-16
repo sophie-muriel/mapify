@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -192,7 +193,12 @@ fun ReportViewScreen(
     var showVerifyDialog by rememberSaveable { mutableStateOf(false) }
     var showRejectionInputDialog by rememberSaveable { mutableStateOf(false) }
     var rejectionMessage by remember { mutableStateOf("") }
-    var boostCounter by rememberSaveable { mutableIntStateOf(0) } //One to one database table is needed for this
+    var canBoost by rememberSaveable { mutableStateOf(false) }
+    if(user.id !in report.reportBoosters){
+        canBoost = true
+    }
+
+    var boosted by rememberSaveable { mutableStateOf(false) }
     var showBoostToast by rememberSaveable { mutableStateOf(false) }
 
     val menuItems =
@@ -271,7 +277,6 @@ fun ReportViewScreen(
                         )
                     }
                 ) {
-                    boostCounter++
                     showBoostToast = true
                 }
             )
@@ -407,7 +412,7 @@ fun ReportViewScreen(
                 message = stringResource(id = R.string.delete_report_description),
                 onClose = { showDeleteDialogVisible = false },
                 onExit = {
-                    report.isDeletedManually = true
+                    reportsViewModel.deactivate(report)
                     Toast.makeText(context, reportDeleted, Toast.LENGTH_SHORT).show()
                     showDeleteDialogVisible = false
                     navigateBack()
@@ -428,7 +433,13 @@ fun ReportViewScreen(
                 onExit = {
                     Toast.makeText(context, reportVerified, Toast.LENGTH_SHORT).show()
                     showVerifyDialog = false
+                    if(report.rejectionMessage != null){
+                        report.rejectionMessage = null
+                        report.rejectionDate = null
+                    }
                     reportStatus = ReportStatus.VERIFIED
+                    report.status = ReportStatus.VERIFIED
+                    reportsViewModel.edit(report)
                 },
                 onCloseText =stringResource(id = R.string.cancel),
                 onExitText = stringResource(id = R.string.verify)
@@ -454,10 +465,12 @@ fun ReportViewScreen(
                     }
                     Toast.makeText(context, rejectionMessageSend, Toast.LENGTH_SHORT).show()
                     showRejectionInputDialog = false
+                    report.rejectionMessage = rejectionMessage
                     reportStatus = ReportStatus.PENDING_VERIFICATION
+                    report.status = ReportStatus.PENDING_VERIFICATION
                     report.rejectionDate = LocalDateTime.now()
+                    reportsViewModel.edit(report)
                     rejectionMessage = ""
-                    //TODO: here we will have to create an instance of message and save it in the database
                 },
                 onCloseText =stringResource(id = R.string.cancel),
                 onExitText = stringResource(id = R.string.send),
@@ -482,10 +495,14 @@ fun ReportViewScreen(
         val reportBoosted = stringResource(id = R.string.report_boosted)
         val reportAlreadyBoosted = stringResource(id = R.string.report_already_boosted)
 
-        if(showBoostToast && boostCounter == 1){
+        if(showBoostToast && canBoost && !boosted){
             Toast.makeText(context, reportBoosted, Toast.LENGTH_SHORT).show()
+            report.priorityCounter++
+            report.reportBoosters.add(user.id)
+            reportsViewModel.edit(report)
+            boosted = true
             showBoostToast = false
-        }else if(showBoostToast && boostCounter > 1){
+        }else if(showBoostToast && (!canBoost || boosted)){
             Toast.makeText(context, reportAlreadyBoosted, Toast.LENGTH_SHORT).show()
             showBoostToast = false
         }

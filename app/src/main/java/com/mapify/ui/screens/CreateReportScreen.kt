@@ -2,7 +2,6 @@ package com.mapify.ui.screens
 
 import android.location.Location
 import android.os.Build
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
@@ -12,10 +11,8 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,15 +25,10 @@ import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.ReportForm
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.utils.isImageValid
-import getLocationName
 import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.unit.dp
-import com.google.android.gms.location.LocationServices
 import com.mapify.ui.navigation.LocalMainViewModel
-import com.mapify.utils.SharedPreferencesUtils
-import com.mapify.viewmodel.UsersViewModel
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -51,6 +43,8 @@ fun CreateReportScreen(
     val context = LocalContext.current
 
     val user = LocalMainViewModel.current.usersViewModel.loadUser(context)!!
+
+    val reportsViewModel = LocalMainViewModel.current.reportsViewModel
 
     var isValidating by remember { mutableStateOf(false) }
 
@@ -116,8 +110,9 @@ fun CreateReportScreen(
         }
     }
 
-    val reportsList = remember { mutableStateListOf<Report>() }
-    var reportsIdCounter by rememberSaveable { mutableIntStateOf(4) }
+    var reportsIdCounter by rememberSaveable { mutableIntStateOf(0) }
+
+    reportsIdCounter = reportsViewModel.count()
 
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
     var publishReportVisible by rememberSaveable { mutableStateOf(false) }
@@ -240,18 +235,17 @@ fun CreateReportScreen(
             onExit = {
                 publishReportVisible = false
                 val newReport = Report(
+                    id = (reportsIdCounter + 1).toString(),
                     title = title,
                     category = Category.entries.find { it.displayName == dropDownValue }!!,
                     description = description,
                     location = locationNotVisible,
                     images = photos,
-                    id = reportsIdCounter.toString(),
                     status = ReportStatus.NOT_VERIFIED,
                     userId = user.id,
                     date = LocalDateTime.now()
                 )
-                reportsIdCounter++
-                reportsList.add(newReport)
+                reportsViewModel.create(newReport)
                 navigateToReportView(newReport.id)
             },
             onCloseText = stringResource(R.string.cancel),

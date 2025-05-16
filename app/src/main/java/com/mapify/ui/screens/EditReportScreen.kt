@@ -258,6 +258,7 @@ fun EditReportScreen(
                 if ((titleTouched || dropDownTouched || descriptionTouched || photoTouchedList.any { it }) && report.rejectionDate != null) {
                     report.rejectionDate = null
                 }
+                reportsViewModel.edit(report)
                 navigateBack() //TODO: add proper navigation when saving the report
             },
             onCloseText = stringResource(id = R.string.cancel),
