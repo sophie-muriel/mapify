@@ -132,6 +132,7 @@ fun Navigation(
                                 )
                             },
                             navigateToReportView = {
+                                navController.popBackStack()
                                 navController.navigate(RouteScreen.ReportView(it))
                             }
                         )
