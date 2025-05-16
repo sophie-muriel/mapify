@@ -3,6 +3,7 @@ package com.mapify.viewmodel
 import android.location.Location
 import androidx.lifecycle.ViewModel
 import com.mapify.model.Category
+import com.mapify.model.Comment
 import com.mapify.model.Report
 import com.mapify.model.ReportStatus
 import com.mapify.model.User
@@ -41,6 +42,11 @@ class ReportsViewModel: ViewModel() {
         return _reports.value.size
     }
 
+    fun countComments(reportId: String): Int {
+        val report =_reports.value.find { it.id == reportId }
+        return report?.comments?.size ?: 0
+    }
+
     fun delete(reportId: String) {
         _reports.value = _reports.value.filter { it.id != reportId }
     }
@@ -74,6 +80,78 @@ class ReportsViewModel: ViewModel() {
         location5.latitude = 4.536084
         location5.longitude = -75.668962
 
+        val comments1 = mutableListOf<Comment>(
+            Comment(
+                id = "1",
+                content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque.",
+                userId = "1",
+                date = LocalDateTime.now()
+            ),
+            Comment(
+                id = "2",
+                content = "Lorem ipsum dolor sit amet",
+                userId = "2",
+                date = LocalDateTime.now()
+            ),
+            Comment(
+                id = "3",
+                content = "Lorem ipsum dolor sit amet",
+                userId = "3",
+                date = LocalDateTime.now()
+            )
+        )
+
+        val comments2 = mutableListOf<Comment>(
+            Comment(
+                id = "1",
+                content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque.",
+                userId = "1",
+                date = LocalDateTime.now()
+            )
+        )
+
+        val comments3 = mutableListOf<Comment>(
+            Comment(
+                id = "1",
+                content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque.",
+                userId = "1",
+                date = LocalDateTime.now()
+            ),
+            Comment(
+                id = "2",
+                content = "Lorem ipsum dolor sit amet",
+                userId = "2",
+                date = LocalDateTime.now()
+            )
+        )
+
+        val comments4 = mutableListOf<Comment>(
+            Comment(
+                id = "1",
+                content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus tellus luctus dictum pellentesque.",
+                userId = "1",
+                date = LocalDateTime.now()
+            ),
+            Comment(
+                id = "2",
+                content = "Lorem ipsum dolor sit amet",
+                userId = "2",
+                date = LocalDateTime.now()
+            ),
+            Comment(
+                id = "3",
+                content = "Lorem ipsum dolor sit amet",
+                userId = "2",
+                date = LocalDateTime.now()
+            ),
+            Comment(
+                id = "4",
+                content = "Lorem ipsum dolor sit amet",
+                userId = "1",
+                date = LocalDateTime.now()
+            )
+        )
+
         return listOf(
             Report(
                 id = "1",
@@ -93,7 +171,8 @@ class ReportsViewModel: ViewModel() {
                 status = ReportStatus.PENDING_VERIFICATION,
                 userId = "1",
                 date = LocalDateTime.now(),
-                priorityCounter = 10
+                priorityCounter = 10,
+                comments = comments1
             ),
             Report(
                 id = "2",
@@ -110,7 +189,8 @@ class ReportsViewModel: ViewModel() {
                 userId = "1",
                 date = LocalDateTime.now(),
                 isResolved = true,
-                priorityCounter = 25
+                priorityCounter = 25,
+                comments = comments2
             ),
             Report(
                 id = "3",
@@ -124,7 +204,8 @@ class ReportsViewModel: ViewModel() {
                 status = ReportStatus.VERIFIED,
                 userId = "2",
                 date = LocalDateTime.now(),
-                priorityCounter = 11
+                priorityCounter = 11,
+                comments = comments3
             ),
 
             Report(
@@ -137,7 +218,8 @@ class ReportsViewModel: ViewModel() {
                 status = ReportStatus.VERIFIED,
                 userId = "2",
                 date = LocalDateTime.now().minusHours(3),
-                priorityCounter = 21
+                priorityCounter = 21,
+                comments = comments4
             ),
             Report(
                 id = "5",
