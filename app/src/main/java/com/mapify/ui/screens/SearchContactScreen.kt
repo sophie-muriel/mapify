@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,6 +22,7 @@ import com.mapify.ui.components.SearchUserItem
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.ui.navigation.LocalMainViewModel
 
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun SearchContactScreen(
     navigateBack: () -> Unit,
@@ -34,7 +34,9 @@ fun SearchContactScreen(
 
     val allUsers by usersViewModel.users.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-    val user = usersViewModel.loadUser(context)!!
+    usersViewModel.loadUser(context)
+    val user = usersViewModel.user.value ?: return
+
     val conversations = conversationsViewModel.conversations.collectAsState().value
     val recentSearches = conversationsViewModel.recentSearches
 

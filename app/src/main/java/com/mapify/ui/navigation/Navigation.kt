@@ -28,19 +28,20 @@ import com.mapify.ui.screens.SearchContactScreen
 import com.mapify.ui.screens.SettingsScreen
 import com.mapify.ui.screens.SearchFiltersScreen
 import com.mapify.ui.users.HomeScreen
+import com.mapify.utils.SharedPreferencesUtils
 import com.mapify.viewmodel.MainViewModel
 
 val LocalMainViewModel = staticCompositionLocalOf<MainViewModel> { error("MainViewModel not found!") }
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun Navigation(
     mainViewModel: MainViewModel
 ) {
     val context = LocalContext.current
     val navController = rememberNavController()
-    val user = mainViewModel.usersViewModel.loadUser(context)
-    val startDestination: RouteScreen = if (user != null) RouteScreen.Home else RouteScreen.Login
+    mainViewModel.usersViewModel.loadUser(context)
+    val startDestination: RouteScreen = if (mainViewModel.usersViewModel.user.value != null) RouteScreen.Home else RouteScreen.Login
 
     val latitude = rememberSaveable { mutableStateOf<Double?>(null) }
     val longitude = rememberSaveable { mutableStateOf<Double?>(null) }
@@ -63,11 +64,16 @@ fun Navigation(
                                 navController.navigate(RouteScreen.Registration)
                             },
                             navigateToHome = {
-                                navController.navigate(RouteScreen.Home) {
-                                    popUpTo(0) {
-                                        inclusive = true
+                                val currentUser = mainViewModel.usersViewModel.user.value
+                                if (currentUser != null) {
+                                    SharedPreferencesUtils.savePreference(context, currentUser.id, currentUser.role)
+
+                                    navController.navigate(RouteScreen.Home) {
+                                        popUpTo(0) {
+                                            inclusive = true
+                                        }
+                                        launchSingleTop = true
                                     }
-                                    launchSingleTop = true
                                 }
                             }
                         )

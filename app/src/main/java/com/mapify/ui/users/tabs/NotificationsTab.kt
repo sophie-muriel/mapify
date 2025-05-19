@@ -1,6 +1,5 @@
 package com.mapify.ui.users.tabs
 
-import HandleLocationPermission
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,9 +35,10 @@ fun NotificationsTab(
 
     val context = LocalContext.current
 
-    val user = LocalMainViewModel.current.usersViewModel.loadUser(context)
+    LocalMainViewModel.current.usersViewModel.loadUser(context)
+    val user = LocalMainViewModel.current.usersViewModel.user.value ?: return
 
-    val userReports = storedReports.filter { it.userId == user?.id }.sortedByDescending { it.date }
+    val userReports = storedReports.filter { it.userId == user.id }.sortedByDescending { it.date }
 
     var remainingDays = -1
 
@@ -49,7 +49,7 @@ fun NotificationsTab(
         verticalArrangement = Arrangement.spacedBy(Spacing.Large)
     ) {
         items(userReports) { report ->
-            if(report.userId == user?.id){
+            if(report.userId == user.id){
                 if(report.isDeleted){
                     NotificationItem(
                         title = stringResource(id = R.string.report_deleted),
