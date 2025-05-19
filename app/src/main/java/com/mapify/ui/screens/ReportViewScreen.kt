@@ -111,7 +111,8 @@ fun ReportViewScreen(
     val context = LocalContext.current
 
     val usersViewModel = LocalMainViewModel.current.usersViewModel
-    val user = LocalMainViewModel.current.usersViewModel.loadUser(context)!!
+    usersViewModel.loadUser(context)
+    val user = usersViewModel.user.value ?: return
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
 

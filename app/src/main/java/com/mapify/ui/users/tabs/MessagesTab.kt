@@ -7,11 +7,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.mapify.model.*
 import com.mapify.ui.components.ConversationItem
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
-import java.time.LocalDateTime
 
 @Composable
 fun MessagesTab(
@@ -20,7 +18,9 @@ fun MessagesTab(
     val context = LocalContext.current
     val usersViewModel = LocalMainViewModel.current.usersViewModel
     val conversationsViewModel = LocalMainViewModel.current.conversationsViewModel
-    val user = usersViewModel.loadUser(context)!!
+    usersViewModel.loadUser(context)
+    val user = usersViewModel.user.value ?: return
+
     val conversations by conversationsViewModel.conversations.collectAsState()
     Log.d("MessagesTab", "Conversations list updated: ${conversations.size}")
 

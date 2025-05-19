@@ -1,6 +1,5 @@
 package com.mapify.ui.screens
 
-import android.location.Location
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Scaffold
@@ -27,11 +25,10 @@ import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.ReportForm
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.utils.isImageValid
-import getLocationName
 import kotlinx.coroutines.delay
-import java.time.LocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.mapify.ui.navigation.LocalMainViewModel
+import updateCityCountry
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -91,14 +88,12 @@ fun EditReportScreen(
     }
 
     var locationVisible by rememberSaveable { mutableStateOf("") }
-    var locationNotVisible: Location? = null
+    var locationNotVisible by remember { mutableStateOf<Location?>(null) }
 
     LaunchedEffect(Unit) {
         if (latitude != null && longitude != null) {
-            val loc = Location("gps")
-
-            loc.latitude = latitude
-            loc.longitude = longitude
+            val loc = Location(latitude, longitude)
+            loc.updateCityCountry(context)
 
             locationNotVisible = loc
             locationVisible = loc.toString()

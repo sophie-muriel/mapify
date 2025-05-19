@@ -1,8 +1,6 @@
 package com.mapify.ui.screens
 
-import android.location.Location
 import android.os.Build
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
@@ -30,6 +28,7 @@ import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.mapify.ui.navigation.LocalMainViewModel
+import updateCityCountry
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -43,7 +42,8 @@ fun CreateReportScreen(
 
     val context = LocalContext.current
 
-    val user = LocalMainViewModel.current.usersViewModel.loadUser(context)!!
+    LocalMainViewModel.current.usersViewModel.loadUser(context)
+    val user = LocalMainViewModel.current.usersViewModel.user.value ?: return
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
 
@@ -120,7 +120,7 @@ fun CreateReportScreen(
 
     BackHandler { exitDialogVisible = true }
     var locationVisible by rememberSaveable { mutableStateOf("") }
-    var locationNotVisible by rememberSaveable{ mutableStateOf<Location?>(null) }
+    var locationNotVisible by remember { mutableStateOf<Location?>(null) }
 
     BackHandler(enabled = true) {
         exitDialogVisible = true
@@ -128,10 +128,8 @@ fun CreateReportScreen(
 
     LaunchedEffect(Unit) {
         if (latitude != null && longitude != null) {
-            val loc = Location("gps")
-
-            loc.latitude = latitude
-            loc.longitude = longitude
+            val loc = Location(latitude, longitude)
+            loc.updateCityCountry(context)
 
             locationNotVisible = loc
             locationVisible = loc.toString()
