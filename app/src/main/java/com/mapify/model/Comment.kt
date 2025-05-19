@@ -7,5 +7,4 @@ class Comment(
     var content: String,
     var userId: String,
     var date: LocalDateTime
-) {
-}
+)
