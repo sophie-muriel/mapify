@@ -1,7 +1,8 @@
 package com.mapify.ui.components
 
 import android.content.pm.PackageManager
-import android.location.Location
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -39,12 +40,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
-import com.mapify.ui.screens.fetchUserLocation
-import com.mapify.ui.screens.getFormattedLocation
+import com.mapify.model.Location
+import fetchUserLocation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun Map(
     navigateToDetail: (String) -> Unit,
