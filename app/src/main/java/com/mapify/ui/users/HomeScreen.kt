@@ -18,15 +18,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mapify.R
 import com.mapify.model.ReportStatus
-import com.mapify.model.User
 import com.mapify.ui.users.navigation.UserNavigation
 import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.CreateFAB
 import com.mapify.ui.components.SimpleTopBar
-import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.users.navigation.UserRouteTab
-import com.mapify.utils.SharedPreferencesUtils
-import com.mapify.viewmodel.UsersViewModel
 
 @Composable
 fun HomeScreen(

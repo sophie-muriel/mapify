@@ -1,12 +1,14 @@
 package com.mapify.ui.users.tabs
 
-import HandleLocationPermission
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.mapify.ui.components.Map
 import com.mapify.ui.navigation.LocalMainViewModel
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun HomeTab(
     navigateToDetail: (String) -> Unit

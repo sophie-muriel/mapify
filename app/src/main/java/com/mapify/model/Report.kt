@@ -1,6 +1,5 @@
 package com.mapify.model
 
-import android.location.Location
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -10,7 +9,7 @@ class Report(
     var category: Category,
     var description: String,
     var images: List<String>,
-    var location: Location?,
+    var location: Location? = null,
     var status: ReportStatus,
     var userId: String,
     var date: LocalDateTime,

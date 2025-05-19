@@ -1,5 +1,7 @@
 package com.mapify.ui.users.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -14,8 +16,8 @@ import com.mapify.ui.users.tabs.ExploreTab
 import com.mapify.ui.users.tabs.HomeTab
 import com.mapify.ui.users.tabs.MessagesTab
 import com.mapify.ui.users.tabs.NotificationsTab
-import com.mapify.viewmodel.UsersViewModel
 
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun UserNavigation(
     padding: PaddingValues,

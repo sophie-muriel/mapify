@@ -1,6 +1,7 @@
 package com.mapify.ui.screens
 
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import com.mapify.R
 import com.mapify.ui.components.Map
 import com.mapify.ui.components.SimpleTopBar
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun ReportLocationScreen(
     latitude: Double?,
