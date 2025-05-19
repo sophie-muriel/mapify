@@ -144,9 +144,9 @@ class UsersViewModel : ViewModel() {
         }
     }
 
-    fun findById(userId: String) {
+    fun findById(userId: String, isCurrent: Boolean) {
         viewModelScope.launch {
-            findByIdFirebase(userId, false)
+            findByIdFirebase(userId, isCurrent)
         }
     }
 
