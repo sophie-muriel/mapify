@@ -1,9 +1,6 @@
 package com.mapify.ui.screens
 
-import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Build
 import android.util.Patterns
 import android.widget.Toast
@@ -11,7 +8,6 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -24,12 +20,14 @@ import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,19 +42,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.google.android.gms.location.LocationServices
 import com.mapify.R
-import com.mapify.model.Role
+import com.mapify.model.Location
 import com.mapify.model.User
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.LogoTitle
 import com.mapify.ui.theme.Spacing
-import java.util.UUID
 import com.mapify.ui.navigation.LocalMainViewModel
+import com.mapify.utils.RequestResult
+import fetchUserLocation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -65,6 +63,7 @@ fun RegistrationScreen(
 ) {
     val context = LocalContext.current
     val usersViewModel = LocalMainViewModel.current.usersViewModel
+    val registerResult by usersViewModel.registerResult.collectAsState()
 
     var name by rememberSaveable { mutableStateOf("") }
     var nameTouched by rememberSaveable { mutableStateOf(false) }
@@ -80,20 +79,28 @@ fun RegistrationScreen(
     var location by rememberSaveable { mutableStateOf("Loading...") }
 
     val nameError = nameTouched && name.isBlank()
-    val emailError = emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
+    val emailError =
+        emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
     val passwordError = passwordTouched && password.length < 6
     val passwordConfirmationError = passwordConfirmationTouched && passwordConfirmation != password
 
     val permission = android.Manifest.permission.ACCESS_FINE_LOCATION
 
     var hasPermission by remember {
-        mutableStateOf(ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
+        )
     }
 
-    val locationAccessPermissionGranted = stringResource(id = R.string.location_access_permission_granted)
-    val locationAccessPermissionDenied = stringResource(id = R.string.location_access_permission_denied)
+    val locationAccessPermissionGranted =
+        stringResource(id = R.string.location_access_permission_granted)
+    val locationAccessPermissionDenied =
+        stringResource(id = R.string.location_access_permission_denied)
 
-    var userLocation by rememberSaveable { mutableStateOf<Location?>(null) }
+    var userLocation by remember { mutableStateOf<Location?>(null) }
     var locationText by rememberSaveable { mutableStateOf("Loading...") }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -108,9 +115,7 @@ fun RegistrationScreen(
 
                 userLocation = fetchedLocation
                 locationShared = true
-                locationText = userLocation?.let {
-                    getFormattedLocation(context, it.latitude, it.longitude)
-                } ?: "Unable to get location"
+                locationText = userLocation?.toString() ?: "Unable to get location"
             }
         } else {
             Toast.makeText(context, locationAccessPermissionDenied, Toast.LENGTH_SHORT).show()
@@ -179,10 +184,16 @@ fun RegistrationScreen(
                     },
                     passwordConfirmationError = passwordConfirmationError,
                     onClickRegister = {
-                        if(usersViewModel.find(email) == null){
+
+                        usersViewModel.find(email)
+                        if (usersViewModel.foundUser.value == null) {
                             locationForm = true
                         } else {
-                            Toast.makeText(context, context.getString(R.string.email_taken), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.email_taken),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     },
                     navigateToLogin = {
@@ -205,7 +216,9 @@ fun RegistrationScreen(
                     Image(
                         painter = painterResource(id = R.drawable.mapify_dark),
                         contentDescription = stringResource(id = R.string.location_icon_description),
-                        modifier = Modifier.fillMaxWidth().aspectRatio(2f)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(2f)
                     )
                 }
 
@@ -235,17 +248,50 @@ fun RegistrationScreen(
 
                 Spacer(modifier = Modifier.height(Spacing.Large * 18.1f))
 
+                when (registerResult) {
+                    null -> {
+
+                    }
+
+                    is RequestResult.Success -> {
+                        LaunchedEffect(Unit) {
+                            Toast.makeText(
+                                context,
+                                (registerResult as RequestResult.Success).message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            delay(2000)
+                            usersViewModel.resetRegisterResult()
+                            navigateBack()
+                        }
+                    }
+
+                    is RequestResult.Failure -> {
+                        LaunchedEffect(Unit) {
+                            Toast.makeText(
+                                context,
+                                (registerResult as RequestResult.Failure).message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            delay(2000)
+                            usersViewModel.resetRegisterResult()
+                        }
+                    }
+
+                    is RequestResult.Loading -> {
+                        LinearProgressIndicator()
+                    }
+                }
+
                 ConfirmLocationForm(
                     locationShared = locationShared,
                     onClickConfirmLocation = {
                         if (locationShared) {
                             userLocation?.let {
                                 User(
-                                    id = UUID.randomUUID().toString(),
                                     fullName = name,
                                     email = email,
                                     password = password,
-                                    role = Role.CLIENT,
                                     location = it
                                 )
                             }?.let {
@@ -253,12 +299,6 @@ fun RegistrationScreen(
                                     it
                                 )
                             }
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.registration_successful),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            navigateBack()
                             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                                 resetFields()
                             }, 100)
@@ -275,9 +315,7 @@ fun RegistrationScreen(
             if (hasPermission) {
                 userLocation = fetchUserLocation(context)
                 locationShared = true
-                locationText = userLocation?.let {
-                    getFormattedLocation(context, it.latitude, it.longitude)
-                } ?: "Unable to get location"
+                locationText = userLocation?.toString() ?: "Unable to get location"
             } else {
                 permissionLauncher.launch(permission)
             }
@@ -463,14 +501,4 @@ fun ConfirmLocationForm(
     }
 
     Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
-}
-
-@RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-suspend fun fetchUserLocation(context: Context): Location? {
-    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-    return try {
-        fusedLocationClient.lastLocation.await()
-    } catch (e: Exception) {
-        null
-    }
 }

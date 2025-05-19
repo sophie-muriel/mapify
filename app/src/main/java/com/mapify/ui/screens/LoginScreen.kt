@@ -22,10 +22,10 @@ import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.LogoTitle
 import com.mapify.ui.theme.Spacing
-import com.mapify.utils.SharedPreferencesUtils
-import com.mapify.viewmodel.UsersViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.mapify.ui.navigation.LocalMainViewModel
+import com.mapify.utils.RequestResult
+import kotlinx.coroutines.delay
 
 @Composable
 fun SetSoftInputModePan() {
@@ -50,6 +50,7 @@ fun LoginScreen(
 ) {
 
     val usersViewModel = LocalMainViewModel.current.usersViewModel
+    val registerResult by usersViewModel.registerResult.collectAsState()
 
     SetSoftInputModePan()
     val context = LocalContext.current
@@ -86,16 +87,7 @@ fun LoginScreen(
                 onValueChangeEmail = { email = it },
                 onValueChangePassword = { password = it },
                 onClickLogin = {
-                    val user = usersViewModel.login(email, password)
-                    if (user == null) {
-                        Toast.makeText(context, R.string.incorrect_credentials, Toast.LENGTH_SHORT).show()
-                    } else {
-                        SharedPreferencesUtils.savePreference(context, user.id, user.role)
-                        navigateToHome()
-                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                            resetFields()
-                        }, 200)
-                    }
+                    usersViewModel.login(email, password)
                 },
                 onClickRegistration = {
                     navigateToRegistration()
@@ -112,6 +104,41 @@ fun LoginScreen(
                 recoveryEmailError = recoveryEmailError,
                 resetRecoveryFields = { resetRecoveryFields() }
             )
+
+            when (registerResult) {
+                null -> {
+
+                }
+
+                is RequestResult.Success -> {
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(
+                            context,
+                            (registerResult as RequestResult.Success).message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        delay(2000)
+                        usersViewModel.resetRegisterResult()
+                        navigateToHome()
+                    }
+                }
+
+                is RequestResult.Failure -> {
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(
+                            context,
+                            (registerResult as RequestResult.Failure).message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        delay(2000)
+                        usersViewModel.resetRegisterResult()
+                    }
+                }
+
+                is RequestResult.Loading -> {
+                    LinearProgressIndicator()
+                }
+            }
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
         }
