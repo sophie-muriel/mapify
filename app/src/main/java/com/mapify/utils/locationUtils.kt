@@ -13,6 +13,7 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresPermission
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
@@ -20,8 +21,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.google.android.gms.location.LocationServices
+import com.mapify.model.Location
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.navigation.RouteScreen
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 suspend fun getLocationName(
@@ -49,6 +55,16 @@ suspend fun getLocationName(
         }
     })
 }
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+suspend fun Location.updateCityCountry(context: Context) {
+    withContext(Dispatchers.IO) {
+        val locationName = getLocationName(context, latitude, longitude)
+        city = locationName.first ?: "Unknown City"
+        country = locationName.second ?: "Unknown Country"
+    }
+}
+
 
 @Composable
 fun HandleLocationPermission(
@@ -136,5 +152,24 @@ fun LocationPermissionWrapper(
         content()
     } else {
         HandleLocationPermission(onPermissionGranted = content)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+suspend fun fetchUserLocation(context: Context): com.mapify.model.Location? {
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    return try {
+        val androidLocation = fusedLocationClient.lastLocation.await()
+        if (androidLocation != null) {
+            val loc = com.mapify.model.Location(
+                latitude = androidLocation.latitude,
+                longitude = androidLocation.longitude
+            )
+            loc.updateCityCountry(context)
+            loc
+        } else null
+    } catch (e: Exception) {
+        null
     }
 }
