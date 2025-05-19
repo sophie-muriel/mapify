@@ -117,9 +117,11 @@ fun LoginScreen(
                             (registerResult as RequestResult.Success).message,
                             Toast.LENGTH_SHORT
                         ).show()
-                        delay(2000)
+                        delay(3000)
+                        if (usersViewModel.user.value != null) {
+                            navigateToHome()
+                        }
                         usersViewModel.resetRegisterResult()
-                        navigateToHome()
                     }
                 }
 
