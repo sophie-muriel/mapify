@@ -1,7 +1,6 @@
 package com.mapify.viewmodel
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
@@ -139,54 +138,54 @@ class ConversationsViewModel(private val usersViewModel: UsersViewModel) : ViewM
         val allUsers = usersViewModel.users.value
 
         return listOf(
-            Conversation(
-                id = UUID.randomUUID().toString(),
-                participants = listOf(allUsers[1], allUsers[0]),
-                messages = listOf(
-                    Message(
-                        id = "msg1",
-                        senderId = allUsers[0].id,
-                        content = "Hi, just checking if there are any updates on the report.",
-                        timestamp = LocalDateTime.now().minusMinutes(5)
-                    )
-                ),
-                isRead = mutableMapOf(
-                    allUsers[0].id to true,
-                    allUsers[1].id to false
-                )
-            ),
-            Conversation(
-                id = UUID.randomUUID().toString(),
-                participants = listOf(allUsers[2], allUsers[0]),
-                messages = listOf(
-                    Message(
-                        id = "msg2",
-                        senderId = allUsers[2].id,
-                        content = "Thanks for your response.",
-                        timestamp = LocalDateTime.now().minusHours(2)
-                    )
-                ),
-                isRead = mutableMapOf(
-                    allUsers[2].id to true,
-                    allUsers[0].id to false
-                )
-            ),
-            Conversation(
-                id = UUID.randomUUID().toString(),
-                participants = listOf(allUsers[1], allUsers[2]),
-                messages = listOf(
-                    Message(
-                        id = "msg3",
-                        senderId = allUsers[2].id,
-                        content = "Could you take a look at the file I sent you?",
-                        timestamp = LocalDateTime.now().minusDays(5)
-                    )
-                ),
-                isRead = mutableMapOf(
-                    allUsers[2].id to true,
-                    allUsers[1].id to false
-                )
-            )
+//            Conversation(
+//                id = UUID.randomUUID().toString(),
+//                participants = listOf(allUsers[1], allUsers[0]),
+//                messages = listOf(
+//                    Message(
+//                        id = "msg1",
+//                        senderId = allUsers[0].id,
+//                        content = "Hi, just checking if there are any updates on the report.",
+//                        timestamp = LocalDateTime.now().minusMinutes(5)
+//                    )
+//                ),
+//                isRead = mutableMapOf(
+//                    allUsers[0].id to true,
+//                    allUsers[1].id to false
+//                )
+//            ),
+//            Conversation(
+//                id = UUID.randomUUID().toString(),
+//                participants = listOf(allUsers[2], allUsers[0]),
+//                messages = listOf(
+//                    Message(
+//                        id = "msg2",
+//                        senderId = allUsers[2].id,
+//                        content = "Thanks for your response.",
+//                        timestamp = LocalDateTime.now().minusHours(2)
+//                    )
+//                ),
+//                isRead = mutableMapOf(
+//                    allUsers[2].id to true,
+//                    allUsers[0].id to false
+//                )
+//            ),
+//            Conversation(
+//                id = UUID.randomUUID().toString(),
+//                participants = listOf(allUsers[1], allUsers[2]),
+//                messages = listOf(
+//                    Message(
+//                        id = "msg3",
+//                        senderId = allUsers[2].id,
+//                        content = "Could you take a look at the file I sent you?",
+//                        timestamp = LocalDateTime.now().minusDays(5)
+//                    )
+//                ),
+//                isRead = mutableMapOf(
+//                    allUsers[2].id to true,
+//                    allUsers[1].id to false
+//                )
+//            )
         )
     }
 }
