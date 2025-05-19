@@ -46,7 +46,6 @@ import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
 import com.mapify.utils.SharedPreferencesUtils
-import com.mapify.viewmodel.UsersViewModel
 
 @Composable
 fun SettingsScreen(
@@ -132,6 +131,7 @@ fun SettingsScreen(
             onExit = {
                 logoutDialogVisible = false
                 SharedPreferencesUtils.clearPreference(context)
+                usersViewModel.logout()
                 navigateToLogin()
             },
             onCloseText = stringResource(id = R.string.cancel),
