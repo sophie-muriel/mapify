@@ -180,6 +180,11 @@ class UsersViewModel : ViewModel() {
             .document(userId)
             .delete()
             .await()
+
+        val user = auth.currentUser
+        if (user != null && user.uid == userId) {
+            user.delete().await()
+        }
     }
 
     fun login(email: String, password: String) {
