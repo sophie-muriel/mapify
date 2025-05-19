@@ -24,8 +24,8 @@ class UsersViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db = Firebase.firestore
 
-    private val _user = mutableStateOf<User?>(null)
-    val user: State<User?> get() = _user
+    private val _user = MutableStateFlow<User?>(null)
+    val user: StateFlow<User?> get() = _user.asStateFlow()
 
     private val _users = MutableStateFlow(emptyList<User>())
     val users: StateFlow<List<User>> = _users.asStateFlow()
@@ -123,6 +123,17 @@ class UsersViewModel : ViewModel() {
             .document(user.id)
             .set(userMap)
             .await()
+
+        val authUser = auth.currentUser
+        if (authUser != null && authUser.uid == user.id) {
+            if (authUser.email != user.email) {
+                authUser.updateEmail(user.email).await()
+            }
+
+            if (user.password.isNotEmpty()) {
+                authUser.updatePassword(user.password).await()
+            }
+        }
     }
 
     fun find(email: String) {

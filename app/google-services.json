@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "336127356590",
+    "project_id": "mapify-35d2e",
+    "storage_bucket": "mapify-35d2e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:336127356590:android:136649d6695193f72a873f",
+        "android_client_info": {
+          "package_name": "com.mapify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABsB8L06OXR3DcGuiu4H2XAPyCdfm6rNY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

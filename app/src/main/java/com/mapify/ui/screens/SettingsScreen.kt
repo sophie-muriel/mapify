@@ -26,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,7 +58,8 @@ fun SettingsScreen(
     val usersViewModel = LocalMainViewModel.current.usersViewModel
 
     val context = LocalContext.current
-    val userId = SharedPreferencesUtils.getPreference(context)["userId"] ?: return
+    usersViewModel.loadUser(context)
+    val user = usersViewModel.user.collectAsState().value
 
     val sendNotifications = remember { mutableStateOf(true) }
     val notificationVibration = remember { mutableStateOf(false) }
@@ -159,8 +161,10 @@ fun SettingsScreen(
             message = stringResource(id = R.string.account_deleted_message),
             onExit = {
                 accountDeletedDialogVisible = false
-                usersViewModel.delete(userId)
+                usersViewModel.delete(user!!.id)
                 SharedPreferencesUtils.clearPreference(context)
+                usersViewModel.logout()
+                usersViewModel.resetRegisterResult()
                 navigateToLogin()
             },
             onExitText = stringResource(id = R.string.ok)

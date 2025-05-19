@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.mapify.R
+import com.mapify.model.Conversation
 import com.mapify.model.Message
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
@@ -28,6 +30,7 @@ import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.components.ProfileIcon
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
+import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -48,24 +51,83 @@ fun ConversationScreen(
     usersViewModel.loadUser(context)
     val user = usersViewModel.user.value ?: return
 
-    val conversation = remember {
+    var isLoading by remember { mutableStateOf(true) }
+    var conversationId by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(id, isConversation) {
         if (isConversation) {
-            conversationsViewModel.find(id) ?: error("Conversation not found.")
+            // For existing conversation, just use the ID directly
+            val foundConversation = conversationsViewModel.find(id)
+            if (foundConversation != null) {
+                conversationId = id
+                conversationsViewModel.getMessages(id)
+                isLoading = false
+            } else {
+                // Handle error - conversation not found
+                Toast.makeText(
+                    context,
+                    "Conversation not found",
+                    Toast.LENGTH_SHORT
+                ).show()
+                navigateBack()
+            }
         } else {
-            usersViewModel.findById(id)
-            conversationsViewModel.createConversation(
-                user,
-                usersViewModel.foundUser.value!!
-            )
+            // For new conversation, create it first
+            usersViewModel.findById(id, false)
+            // Wait for the user to be found
+            delay(500) // Small delay to ensure foundUser is updated
+            val recipient = usersViewModel.foundUser.value
+            if (recipient != null) {
+                val newConversation = conversationsViewModel.createConversation(user, recipient)
+                if (newConversation != null) {
+                    conversationId = newConversation.id
+                    conversationsViewModel.getMessages(newConversation.id)
+                    isLoading = false
+                } else {
+                    // Handle error - failed to create conversation
+                    Toast.makeText(
+                        context,
+                        "Failed to create conversation",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    navigateBack()
+                }
+            } else {
+                // Handle error - recipient not found
+                Toast.makeText(
+                    context,
+                    "Recipient not found",
+                    Toast.LENGTH_SHORT
+                ).show()
+                navigateBack()
+            }
         }
     }
 
-    conversationsViewModel.getMessages(conversation.id)
+    // Show loading indicator while waiting
+    if (isLoading || conversationId == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
+    // Get the conversation from the conversationsViewModel using the ID
+    val conversation = conversationsViewModel.conversations.collectAsState().value.find { it.id == conversationId }
+    if (conversation == null) {
+        // Handle null conversation
+        LaunchedEffect(Unit) {
+            Toast.makeText(context, "Error loading conversation", Toast.LENGTH_SHORT).show()
+            navigateBack()
+        }
+        return
+    }
+
     val messages by conversationsViewModel.messages.collectAsState()
 
     val recipient = remember(conversation) {
-        conversation.participants.first { it != user }
-    }
+        conversation.participants.firstOrNull { it.id != user.id } ?: return@remember null
+    } ?: return // Return if recipient is null
 
     var messageText by remember { mutableStateOf(TextFieldValue("")) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -189,7 +251,7 @@ fun ConversationScreen(
                         onClick = {
                             if (messageText.text.isNotBlank()) {
                                 conversationsViewModel.sendMessage(
-                                    conversation.id,
+                                    conversation!!.id,
                                     user.id,
                                     messageText.text
                                 )
@@ -219,7 +281,7 @@ fun ConversationScreen(
             onClose = { showDeleteDialog = false },
             onExitText = stringResource(id = R.string.delete),
             onExit = {
-                conversationsViewModel.deleteForUser(conversation.id, user.id)
+                conversationsViewModel.deleteForUser(conversation!!.id, user.id)
                 showDeleteDialog = false
                 navigateBack()
             }

@@ -6,8 +6,10 @@ import androidx.annotation.RequiresApi
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
@@ -40,8 +42,10 @@ fun Navigation(
 ) {
     val context = LocalContext.current
     val navController = rememberNavController()
-    mainViewModel.usersViewModel.loadUser(context)
-    val startDestination: RouteScreen = if (mainViewModel.usersViewModel.user.value != null) RouteScreen.Home else RouteScreen.Login
+    val userState by mainViewModel.usersViewModel.user.collectAsState()
+    val startDestination = remember(userState) {
+        if (userState != null) RouteScreen.Home else RouteScreen.Login
+    }
 
     val latitude = rememberSaveable { mutableStateOf<Double?>(null) }
     val longitude = rememberSaveable { mutableStateOf<Double?>(null) }
@@ -69,10 +73,7 @@ fun Navigation(
                                     SharedPreferencesUtils.savePreference(context, currentUser.id, currentUser.role)
 
                                     navController.navigate(RouteScreen.Home) {
-                                        popUpTo(0) {
-                                            inclusive = true
-                                        }
-                                        launchSingleTop = true
+                                        popUpTo(RouteScreen.Login) { inclusive = true }
                                     }
                                 }
                             }
