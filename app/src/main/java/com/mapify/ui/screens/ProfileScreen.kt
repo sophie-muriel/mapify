@@ -1,8 +1,6 @@
 package com.mapify.ui.screens
 
-import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Build
 import android.util.Patterns
 import android.widget.Toast
@@ -26,25 +24,17 @@ import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.ui.theme.Spacing
-import com.mapify.viewmodel.UsersViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import com.mapify.model.Location
 import com.mapify.model.User
 import com.mapify.ui.navigation.LocalMainViewModel
-import getLocationName
+import fetchUserLocation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-suspend fun getFormattedLocation(context: Context, latitude: Double, longitude: Double): String {
-    val locationName = getLocationName(context, latitude, longitude)
-    val country = locationName.second ?: "Unknown Country"
-    val city = locationName.first ?: "Unknown City"
-    return "$city, $country"
-}
+import updateCityCountry
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -55,7 +45,8 @@ fun ProfileScreen(
     val context = LocalContext.current
 
     val usersViewModel = LocalMainViewModel.current.usersViewModel
-    val user = LocalMainViewModel.current.usersViewModel.loadUser(context)!!
+    usersViewModel.loadUser(context)
+    val user = usersViewModel.user.value ?: return
 
     var name by rememberSaveable { mutableStateOf(user.fullName) }
     var email by rememberSaveable { mutableStateOf(user.email) }
@@ -80,13 +71,14 @@ fun ProfileScreen(
     val locationAccessPermissionGranted = stringResource(id = R.string.location_access_permission_granted)
     val locationAccessPermissionDenied = stringResource(id = R.string.location_access_permission_denied)
 
-    var userLocation by rememberSaveable { mutableStateOf<Location?>(user.location) }
+    var userLocation by remember { mutableStateOf<Location?>(null) }
     var locationText by rememberSaveable { mutableStateOf("Loading...") }
     var isRefreshingLocation by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         userLocation?.let {
-            locationText = getFormattedLocation(context, it.latitude, it.longitude)
+            it.updateCityCountry(context)
+            locationText = it.toString()
         } ?: run {
             locationText = "Unknown location"
         }
@@ -103,9 +95,7 @@ fun ProfileScreen(
                 val fetchedLocation = fetchUserLocation(context)
 
                 userLocation = fetchedLocation
-                locationText = userLocation?.let {
-                    getFormattedLocation(context, it.latitude, it.longitude)
-                } ?: "Unable to get location"
+                locationText = userLocation?.toString() ?: "Unable to get location"
 
                 userLocation?.let { location ->
                     val updatedUser = User(
@@ -116,7 +106,7 @@ fun ProfileScreen(
                         role = user.role,
                         location = location
                     )
-                    usersViewModel.edit(updatedUser = updatedUser, userId = user.id)
+                    usersViewModel.update(user = updatedUser)
                 }
                 isRefreshingLocation = false
             }
@@ -133,9 +123,7 @@ fun ProfileScreen(
                 val fetchedLocation = fetchUserLocation(context)
 
                 userLocation = fetchedLocation
-                locationText = userLocation?.let {
-                    getFormattedLocation(context, it.latitude, it.longitude)
-                } ?: "Unable to get location"
+                locationText = userLocation?.toString() ?: "Unable to get location"
 
                 userLocation?.let { location ->
                     val updatedUser = User(
@@ -146,7 +134,7 @@ fun ProfileScreen(
                         role = user.role,
                         location = location
                     )
-                    usersViewModel.edit(updatedUser = updatedUser, userId = user.id)
+                    usersViewModel.update(user = updatedUser)
                 }
                 isRefreshingLocation = false
             }
@@ -219,7 +207,7 @@ fun ProfileScreen(
                             role = it.role,
                             location = userLocation ?: it.location
                         )
-                        usersViewModel.edit(updatedUser = updatedUser, userId = it.id)
+                        usersViewModel.update(user = updatedUser)
                     }
                     nameTouched = false
                     emailTouched = false
