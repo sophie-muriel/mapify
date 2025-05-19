@@ -44,41 +44,31 @@ fun ConversationScreen(
     val context = LocalContext.current
     val usersViewModel = LocalMainViewModel.current.usersViewModel
     val conversationsViewModel = LocalMainViewModel.current.conversationsViewModel
-    val user = usersViewModel.loadUser(context)!!
 
-    val conversation = remember(id, isConversation) {
+    usersViewModel.loadUser(context)
+    val user = usersViewModel.user.value ?: return
+
+    val conversation = remember {
         if (isConversation) {
             conversationsViewModel.find(id) ?: error("Conversation not found.")
         } else {
+            usersViewModel.findById(id)
             conversationsViewModel.createConversation(
                 user,
-                usersViewModel.findById(id)!!
+                usersViewModel.foundUser.value!!
             )
         }
     }
 
     conversationsViewModel.getMessages(conversation.id)
-
-    val recipient = conversation.participants.first { it != user }
-    var messageText by remember { mutableStateOf(TextFieldValue("")) }
     val messages by conversationsViewModel.messages.collectAsState()
 
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    val recipient = remember(conversation) {
+        conversation.participants.first { it != user }
+    }
 
-    val menuItems = listOf(
-        MenuAction.Simple(
-            stringResource(id = R.string.delete),
-            {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = stringResource(id = R.string.delete_icon),
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
-        ) {
-            showDeleteDialog = true
-        }
-    )
+    var messageText by remember { mutableStateOf(TextFieldValue("")) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -103,7 +93,24 @@ fun ConversationScreen(
                         )
                     }
                 },
-                actions = { MinimalDropdownMenu(menuItems) }
+                actions = {
+                    MinimalDropdownMenu(
+                        listOf(
+                            MenuAction.Simple(
+                                stringResource(id = R.string.delete),
+                                {
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = stringResource(id = R.string.delete_icon),
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            ) {
+                                showDeleteDialog = true
+                            }
+                        )
+                    )
+                }
             )
         },
         modifier = Modifier
@@ -133,7 +140,7 @@ fun ConversationScreen(
                     ChatBubble(
                         message = msg,
                         isMe = msg.senderId == user.id,
-                        senderName = usersViewModel.findById(msg.senderId)?.fullName ?: "Unknown",
+                        senderName = if (msg.senderId == user.id) user.fullName else recipient.fullName,
                         profileImageUrl = recipient.profileImageUrl
                     )
                 }
