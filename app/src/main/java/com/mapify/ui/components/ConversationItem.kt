@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mapify.model.Conversation
-import com.mapify.model.User
+import com.mapify.model.Participant
 import com.mapify.ui.theme.Spacing
 import com.mapify.ui.users.tabs.formatNotificationOrMessageDate
 
@@ -23,8 +23,8 @@ import com.mapify.ui.users.tabs.formatNotificationOrMessageDate
 @Composable
 fun ConversationItem(
     conversation: Conversation,
-    user: User,
-    recipient: User,
+    sender: Participant,
+    recipient: Participant,
     onClick: () -> Unit,
     onMarkRead: () -> Unit,
     onMarkUnread: () -> Unit,
@@ -41,7 +41,7 @@ fun ConversationItem(
         }
     } ?: ""
     val time = lastMessage?.timestamp?.let { formatNotificationOrMessageDate(it) } ?: ""
-    val isRead = conversation.isRead[user.id] ?: false
+    val isRead = conversation.isRead[sender.id] ?: false
 
     Box(
         modifier = Modifier
@@ -58,11 +58,10 @@ fun ConversationItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 MessageUserAvatar(
-                    imageUrl = recipient.profileImageUrl,
-                    name = recipient.fullName
+                    name = recipient.name
                 )
                 ConversationTextSection(
-                    name = recipient.fullName,
+                    name = recipient.name,
                     time = time,
                     content = lastMessageContent,
                     isRead = isRead
@@ -103,7 +102,7 @@ fun ConversationItem(
 }
 
 @Composable
-private fun MessageUserAvatar(imageUrl: String?, name: String) {
+private fun MessageUserAvatar(name: String) {
     Box(
         modifier = Modifier
             .width(70.dp)
@@ -111,7 +110,6 @@ private fun MessageUserAvatar(imageUrl: String?, name: String) {
         contentAlignment = Alignment.Center
     ) {
         ProfileIcon(
-            imageUrl = imageUrl,
             fallbackText = name,
             size = 50.dp
         )

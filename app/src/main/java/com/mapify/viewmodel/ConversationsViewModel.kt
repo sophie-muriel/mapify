@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import com.mapify.model.Conversation
 import com.mapify.model.Message
+import com.mapify.model.Participant
 import com.mapify.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,10 +34,13 @@ class ConversationsViewModel(private val usersViewModel: UsersViewModel) : ViewM
         _conversations.update { currentList -> currentList + conversation }
     }
 
-    fun createConversation(sender: User, recipient: User): Conversation {
+    fun createConversation(sender: Participant, recipient: Participant): Conversation {
         val newConversation = Conversation(
             id = UUID.randomUUID().toString(),
-            participants = listOf(sender, recipient),
+            participants = listOf(
+                Participant(sender.id, sender.name),
+                Participant(recipient.id, recipient.name)
+            ),
             messages = emptyList(),
             isRead = mutableMapOf(sender.id to true, recipient.id to false)
         )
@@ -82,13 +86,14 @@ class ConversationsViewModel(private val usersViewModel: UsersViewModel) : ViewM
         _messages.value = conversation?.messages?.reversed() ?: emptyList()
     }
 
-    fun sendMessage(conversationId: String, senderId: String, content: String) {
+    fun sendMessage(conversationId: String, senderId: String, senderName:String, content: String) {
         _conversations.update { currentList ->
             currentList.map { conversation ->
                 if (conversation.id == conversationId) {
                     val newMessage = Message(
                         id = UUID.randomUUID().toString(),
                         senderId = senderId,
+                        senderName = senderName,
                         content = content,
                         timestamp = LocalDateTime.now()
                     )

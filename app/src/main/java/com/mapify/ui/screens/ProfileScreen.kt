@@ -2,7 +2,6 @@ package com.mapify.ui.screens
 
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -50,7 +49,6 @@ fun ProfileScreen(
     var locationText by rememberSaveable { mutableStateOf("Loading...") }
 
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
-    Log.d("userID viewmodel", userId.toString())
 
     LaunchedEffect(Unit) {
         usersViewModel.resetFoundUser()
