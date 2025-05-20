@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -26,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,8 +60,16 @@ fun SettingsScreen(
     val usersViewModel = LocalMainViewModel.current.usersViewModel
 
     val context = LocalContext.current
-    usersViewModel.loadUser(context)
-    val user = usersViewModel.user.collectAsState().value
+
+    val userId = SharedPreferencesUtils.getPreference(context)["userId"]
+    Log.d("userID viewmodel", userId.toString())
+
+
+    val user by usersViewModel.user.collectAsState()
+
+    LaunchedEffect(Unit) {
+        usersViewModel.loadUser(userId)
+    }
 
     val sendNotifications = remember { mutableStateOf(true) }
     val notificationVibration = remember { mutableStateOf(false) }

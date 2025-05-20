@@ -1,6 +1,7 @@
 package com.mapify.ui.screens
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,6 +22,7 @@ import com.mapify.ui.theme.Spacing
 import com.mapify.ui.components.SearchUserItem
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.ui.navigation.LocalMainViewModel
+import com.mapify.utils.SharedPreferencesUtils
 
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
@@ -29,24 +31,26 @@ fun SearchContactScreen(
     onUserSelected: (String, Boolean) -> Unit
 ) {
     val context = LocalContext.current
+
+    val userId = SharedPreferencesUtils.getPreference(context)["userId"]
+
     val usersViewModel = LocalMainViewModel.current.usersViewModel
     val conversationsViewModel = LocalMainViewModel.current.conversationsViewModel
 
     val allUsers by usersViewModel.users.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-    usersViewModel.loadUser(context)
-    val user = usersViewModel.user.value ?: return
+    usersViewModel.loadUser(userId)
 
     val conversations = conversationsViewModel.conversations.collectAsState().value
     val recentSearches = conversationsViewModel.recentSearches
 
     val userConversations = conversations.filter { conv ->
-        conv.participants.any { it.id == user.id }
+        conv.participants.any { it.id == userId }
     }
 
     val filteredUsers = remember(searchQuery) {
         allUsers.filter {
-            it.id != user.id && (searchQuery.isBlank() ||
+            it.id != userId && (searchQuery.isBlank() ||
                     it.id.contains(searchQuery, ignoreCase = true) ||
                     it.fullName.contains(searchQuery, ignoreCase = true))
         }
@@ -94,12 +98,12 @@ fun SearchContactScreen(
                                 user = u,
                                 onClick = {
                                     val conversation = userConversations.firstOrNull { conv ->
-                                        conv.participants.any { it.id == user.id } &&
+                                        conv.participants.any { it.id == userId } &&
                                                 conv.participants.any { it.id == u.id }
                                     }
                                     onUserSelected(conversation?.id ?: u.id, conversation != null)
                                     if (conversation != null) {
-                                        conversationsViewModel.markAsRead(conversation.id, user.id)
+                                        conversationsViewModel.markAsRead(conversation.id, userId!!)
                                     }
                                 }
                             )
@@ -121,12 +125,12 @@ fun SearchContactScreen(
                                 email = u.email,
                                 onClick = {
                                     val conversation = userConversations.firstOrNull { conv ->
-                                        conv.participants.any { it.id == user.id } &&
+                                        conv.participants.any { it.id == userId } &&
                                                 conv.participants.any { it.id == u.id }
                                     }
                                     onUserSelected(conversation?.id ?: u.id, conversation != null)
                                     if (conversation != null) {
-                                        conversationsViewModel.markAsRead(conversation.id, user.id)
+                                        conversationsViewModel.markAsRead(conversation.id, userId!!)
                                     }
                                     conversationsViewModel.addRecentSearch(u)
                                 }

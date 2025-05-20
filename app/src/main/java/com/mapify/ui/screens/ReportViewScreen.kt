@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -111,8 +112,12 @@ fun ReportViewScreen(
     val context = LocalContext.current
 
     val usersViewModel = LocalMainViewModel.current.usersViewModel
-    usersViewModel.loadUser(context)
-    val user = usersViewModel.user.value ?: return
+
+    val userId = SharedPreferencesUtils.getPreference(context)["userId"]
+    Log.d("userID viewmodel", userId.toString())
+
+    usersViewModel.loadUser(userId)
+    val user = usersViewModel.user.collectAsState().value ?: return
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
 

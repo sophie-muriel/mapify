@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.mapify.ui.components.ConversationItem
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
+import com.mapify.utils.SharedPreferencesUtils
 
 @Composable
 fun MessagesTab(
@@ -20,8 +21,13 @@ fun MessagesTab(
     val context = LocalContext.current
     val usersViewModel = LocalMainViewModel.current.usersViewModel
     val conversationsViewModel = LocalMainViewModel.current.conversationsViewModel
-    usersViewModel.loadUser(context)
-    val user = usersViewModel.user.value ?: return
+
+    val userId = SharedPreferencesUtils.getPreference(context)["userId"]
+    Log.d("userID viewmodel", userId.toString())
+
+
+    usersViewModel.loadUser(userId)
+    val user = usersViewModel.user.collectAsState().value ?: return
 
     val conversations by conversationsViewModel.conversations.collectAsState()
     Log.d("MessagesTab", "Conversations list updated: ${conversations.size}")

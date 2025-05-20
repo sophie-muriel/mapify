@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -30,6 +31,7 @@ import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.components.ProfileIcon
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
+import com.mapify.utils.SharedPreferencesUtils
 import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -48,8 +50,12 @@ fun ConversationScreen(
     val usersViewModel = LocalMainViewModel.current.usersViewModel
     val conversationsViewModel = LocalMainViewModel.current.conversationsViewModel
 
-    usersViewModel.loadUser(context)
-    val user = usersViewModel.user.value ?: return
+    val userId = SharedPreferencesUtils.getPreference(context)["userId"]
+    Log.d("userID viewmodel", userId.toString())
+
+    usersViewModel.loadUser(userId)
+    val user = usersViewModel.user.collectAsState().value
+    if(user == null) return;
 
     var isLoading by remember { mutableStateOf(true) }
     var conversationId by remember { mutableStateOf<String?>(null) }
