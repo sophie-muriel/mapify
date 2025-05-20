@@ -58,15 +58,15 @@ fun ProfileScreen(
             it.updateCityCountry(context)
             locationText = it.toString()
         } ?: run {
-            locationText = "Unknown location"
+            locationText = "Loading..."
         }
     }
 
     val user by usersViewModel.user.collectAsState()
 
-    var name by rememberSaveable { mutableStateOf( "") }
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf( "Loading...") }
+    var email by rememberSaveable { mutableStateOf("Loading...") }
+    var password by rememberSaveable { mutableStateOf("Loading...") }
 
     var nameTouched by rememberSaveable { mutableStateOf(false) }
     var emailTouched by rememberSaveable { mutableStateOf(false) }
@@ -83,6 +83,7 @@ fun ProfileScreen(
             name = it.fullName
             email = it.email
             password = it.password
+            it.location?.updateCityCountry(context)
             locationText = it.location.toString()
         }
     }
