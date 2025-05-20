@@ -2,6 +2,7 @@ package com.mapify.ui.screens
 
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -30,6 +31,7 @@ import androidx.core.content.ContextCompat
 import com.mapify.model.Location
 import com.mapify.model.User
 import com.mapify.ui.navigation.LocalMainViewModel
+import com.mapify.utils.SharedPreferencesUtils
 import fetchUserLocation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,14 +45,30 @@ fun ProfileScreen(
 ) {
 
     val context = LocalContext.current
-
     val usersViewModel = LocalMainViewModel.current.usersViewModel
-    usersViewModel.loadUser(context)
-    val user = usersViewModel.user.value ?: return
+    var userLocation by remember { mutableStateOf<Location?>(null) }
+    var locationText by rememberSaveable { mutableStateOf("Loading...") }
 
-    var name by rememberSaveable { mutableStateOf(user.fullName) }
-    var email by rememberSaveable { mutableStateOf(user.email) }
-    var password by rememberSaveable { mutableStateOf(user.password) }
+    val userId = SharedPreferencesUtils.getPreference(context)["userId"]
+    Log.d("userID viewmodel", userId.toString())
+
+    LaunchedEffect(Unit) {
+        usersViewModel.resetFoundUser()
+        usersViewModel.resetCurrentUser()
+        usersViewModel.loadUser(userId)
+        userLocation?.let {
+            it.updateCityCountry(context)
+            locationText = it.toString()
+        } ?: run {
+            locationText = "Unknown location"
+        }
+    }
+
+    val user by usersViewModel.user.collectAsState()
+
+    var name by rememberSaveable { mutableStateOf( "") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
 
     var nameTouched by rememberSaveable { mutableStateOf(false) }
     var emailTouched by rememberSaveable { mutableStateOf(false) }
@@ -62,6 +80,15 @@ fun ProfileScreen(
     val emailError = emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
     val passwordError = passwordTouched && password.length < 6
 
+    LaunchedEffect(user) {
+        user?.let {
+            name = it.fullName
+            email = it.email
+            password = it.password
+            locationText = it.location.toString()
+        }
+    }
+
     val permission = android.Manifest.permission.ACCESS_FINE_LOCATION
 
     var hasPermission by remember {
@@ -71,18 +98,8 @@ fun ProfileScreen(
     val locationAccessPermissionGranted = stringResource(id = R.string.location_access_permission_granted)
     val locationAccessPermissionDenied = stringResource(id = R.string.location_access_permission_denied)
 
-    var userLocation by remember { mutableStateOf<Location?>(null) }
-    var locationText by rememberSaveable { mutableStateOf("Loading...") }
     var isRefreshingLocation by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        userLocation?.let {
-            it.updateCityCountry(context)
-            locationText = it.toString()
-        } ?: run {
-            locationText = "Unknown location"
-        }
-    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -98,15 +115,17 @@ fun ProfileScreen(
                 locationText = userLocation?.toString() ?: "Unable to get location"
 
                 userLocation?.let { location ->
-                    val updatedUser = User(
-                        id = user.id,
-                        fullName = user.fullName,
-                        email = user.email,
-                        password = user.password,
-                        role = user.role,
-                        location = location
-                    )
-                    usersViewModel.update(user = updatedUser)
+                    if(user!=null){
+                        val updatedUser = User(
+                            id = user!!.id,
+                            fullName = user!!.fullName,
+                            email = user!!.email,
+                            password = user!!.password,
+                            role = user!!.role,
+                            location = location
+                        )
+                        usersViewModel.update(user = updatedUser)
+                    }
                 }
                 isRefreshingLocation = false
             }
@@ -126,15 +145,17 @@ fun ProfileScreen(
                 locationText = userLocation?.toString() ?: "Unable to get location"
 
                 userLocation?.let { location ->
-                    val updatedUser = User(
-                        id = user.id,
-                        fullName = user.fullName,
-                        email = user.email,
-                        password = user.password,
-                        role = user.role,
-                        location = location
-                    )
-                    usersViewModel.update(user = updatedUser)
+                    if(user!=null){
+                        val updatedUser = User(
+                            id = user!!.id,
+                            fullName = user!!.fullName,
+                            email = user!!.email,
+                            password = user!!.password,
+                            role = user!!.role,
+                            location = location
+                        )
+                        usersViewModel.update(user = updatedUser)
+                    }
                 }
                 isRefreshingLocation = false
             }
@@ -198,7 +219,7 @@ fun ProfileScreen(
                 onValueChangeEmail = { email = it; emailTouched = true },
                 onValueChangePassword = { password = it; passwordTouched = true },
                 onClickEdit = {
-                    user.let {
+                    user!!.let {
                         val updatedUser = User(
                             id = it.id,
                             fullName = name,
@@ -233,10 +254,12 @@ fun ProfileScreen(
             onExit = {
                 exitDialogVisible = false
                 if (editMode) {
-                    name = user.fullName
-                    email = user.email
-                    password = user.password
-                    editMode = false
+                    if(user!=null) {
+                        name = user!!.fullName
+                        email = user!!.email
+                        password = user!!.password
+                        editMode = false
+                    }
                 } else {
                     navigateBack()
                 }

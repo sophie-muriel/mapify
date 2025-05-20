@@ -1,6 +1,7 @@
 package com.mapify.ui.screens
 
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.mapify.ui.navigation.LocalMainViewModel
+import com.mapify.utils.SharedPreferencesUtils
 import updateCityCountry
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -41,9 +43,13 @@ fun CreateReportScreen(
 ) {
 
     val context = LocalContext.current
+    val usersViewModel = LocalMainViewModel.current.usersViewModel
 
-    LocalMainViewModel.current.usersViewModel.loadUser(context)
-    val user = LocalMainViewModel.current.usersViewModel.user.value ?: return
+
+    val userId = SharedPreferencesUtils.getPreference(context)["userId"]
+    Log.d("userID viewmodel", userId.toString())
+
+    val user = usersViewModel.user.collectAsState().value ?: return
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
 

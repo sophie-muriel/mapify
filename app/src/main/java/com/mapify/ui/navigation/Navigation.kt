@@ -2,6 +2,7 @@ package com.mapify.ui.navigation
 
 import LocationPermissionWrapper
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -42,10 +43,17 @@ fun Navigation(
 ) {
     val context = LocalContext.current
     val navController = rememberNavController()
-    val userState by mainViewModel.usersViewModel.user.collectAsState()
-    val startDestination = remember(userState) {
-        if (userState != null) RouteScreen.Home else RouteScreen.Login
+    val map = SharedPreferencesUtils.getPreference(context)
+    Log.d("ROLE viewmodel", map["role"].toString())
+    val startDestination = if(map["role"] == "CLIENT"){
+        RouteScreen.Home
+    }else {
+        RouteScreen.Login
     }
+    //val userState by mainViewModel.usersViewModel.user.collectAsState()
+    //val startDestination = remember(userState) {
+    //    if (userState != null) RouteScreen.Home else RouteScreen.Login
+    //}
 
     val latitude = rememberSaveable { mutableStateOf<Double?>(null) }
     val longitude = rememberSaveable { mutableStateOf<Double?>(null) }

@@ -1,6 +1,7 @@
 package com.mapify.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -40,9 +41,8 @@ class UsersViewModel : ViewModel() {
         getUsers()
     }
 
-    fun loadUser(context: Context) {
-        val userId = SharedPreferencesUtils.getPreference(context)["userId"]
-        if (userId != null) {
+    fun loadUser(userId: String?) {
+        if (userId != null && user.value == null) {
             viewModelScope.launch { findByIdFirebase(userId, true) }
         }
     }
@@ -55,9 +55,9 @@ class UsersViewModel : ViewModel() {
         viewModelScope.launch {
             _registerResult.value = RequestResult.Loading
             _registerResult.value = kotlin.runCatching { createFirebase(user) }
-                .fold (
+                .fold(
                     onSuccess = { RequestResult.Success("User created successfully") },
-                    onFailure = { RequestResult.Failure(it.message?: "Error creating user") }
+                    onFailure = { RequestResult.Failure(it.message ?: "Error creating user") }
                 )
         }
     }
@@ -66,7 +66,7 @@ class UsersViewModel : ViewModel() {
         val responseUser = auth.createUserWithEmailAndPassword(user.email, user.password).await()
         val userId = responseUser.user?.uid ?: ""
 
-        val userCopy = User (
+        val userCopy = User(
             id = userId,
             fullName = user.fullName,
             email = user.email,
@@ -99,9 +99,9 @@ class UsersViewModel : ViewModel() {
         viewModelScope.launch {
             _registerResult.value = RequestResult.Loading
             _registerResult.value = kotlin.runCatching { updateFirebase(user) }
-                .fold (
+                .fold(
                     onSuccess = { RequestResult.Success("User updated successfully") },
-                    onFailure = { RequestResult.Failure(it.message?: "Error updating user") }
+                    onFailure = { RequestResult.Failure(it.message ?: "Error updating user") }
                 )
         }
     }
@@ -159,6 +159,14 @@ class UsersViewModel : ViewModel() {
         viewModelScope.launch {
             findByIdFirebase(userId, isCurrent)
         }
+    }
+
+    fun resetCurrentUser() {
+        _user.value = null
+    }
+
+    fun resetFoundUser(){
+        _foundUser.value = null
     }
 
     private suspend fun findByIdFirebase(userId: String, current: Boolean) {
