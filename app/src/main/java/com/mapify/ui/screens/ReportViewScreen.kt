@@ -1,6 +1,5 @@
 package com.mapify.ui.screens
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -110,14 +109,8 @@ fun ReportViewScreen(
 ) {
 
     val context = LocalContext.current
-
     val usersViewModel = LocalMainViewModel.current.usersViewModel
-
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
-    Log.d("userID viewmodel", userId.toString())
-
-    usersViewModel.loadUser(userId)
-    val user = usersViewModel.user.collectAsState().value ?: return
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
 
@@ -165,13 +158,13 @@ fun ReportViewScreen(
     var comment by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
 
-    val isCreator = user.id == report.userId
+    val isCreator = userId == report.userId
     var showDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
     var showVerifyDialog by rememberSaveable { mutableStateOf(false) }
     var showRejectionInputDialog by rememberSaveable { mutableStateOf(false) }
     var rejectionMessage by remember { mutableStateOf("") }
     var canBoost by rememberSaveable { mutableStateOf(false) }
-    if(user.id !in report.reportBoosters){
+    if(userId !in report.reportBoosters){
         canBoost = true
     }
 
@@ -366,7 +359,7 @@ fun ReportViewScreen(
                     val newComment = Comment(
                         id = (reportsViewModel.countComments(reportId) + 1).toString(),
                         content = comment,
-                        userId = user.id,
+                        userId = userId?: "",
                         date = LocalDateTime.now()
                     )
                     report.comments.add(newComment)
@@ -374,7 +367,7 @@ fun ReportViewScreen(
                     comment = ""
                 },
                 users = users,
-                userId = user.id
+                userId = userId?: ""
             )
         }
 
@@ -475,7 +468,7 @@ fun ReportViewScreen(
         if(showBoostToast && canBoost && !boosted){
             Toast.makeText(context, reportBoosted, Toast.LENGTH_SHORT).show()
             report.priorityCounter++
-            report.reportBoosters.add(user.id)
+            report.reportBoosters.add(userId?: "")
             reportsViewModel.edit(report)
             boosted = true
             showBoostToast = false

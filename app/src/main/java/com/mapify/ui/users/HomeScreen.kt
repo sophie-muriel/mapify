@@ -1,5 +1,7 @@
 package com.mapify.ui.users
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -24,6 +26,7 @@ import com.mapify.ui.components.CreateFAB
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.ui.users.navigation.UserRouteTab
 
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun HomeScreen(
     navigateToProfile: () -> Unit,

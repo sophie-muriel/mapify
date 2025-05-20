@@ -1,6 +1,5 @@
 package com.mapify.ui.screens
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -23,8 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.mapify.R
-import com.mapify.model.Conversation
 import com.mapify.model.Message
+import com.mapify.model.Participant
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
@@ -32,7 +32,6 @@ import com.mapify.ui.components.ProfileIcon
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
 import com.mapify.utils.SharedPreferencesUtils
-import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -51,25 +50,29 @@ fun ConversationScreen(
     val conversationsViewModel = LocalMainViewModel.current.conversationsViewModel
 
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
-    Log.d("userID viewmodel", userId.toString())
 
-    usersViewModel.loadUser(userId)
-    val user = usersViewModel.user.collectAsState().value
-    if(user == null) return;
+    val user by usersViewModel.user.collectAsState()
+    var userName by rememberSaveable { mutableStateOf( "") }
+
+    LaunchedEffect(user) {
+        usersViewModel.resetFoundUser()
+        usersViewModel.resetCurrentUser()
+        usersViewModel.loadUser(userId)
+        user?.let { userName = it.fullName }
+    }
 
     var isLoading by remember { mutableStateOf(true) }
     var conversationId by remember { mutableStateOf<String?>(null) }
 
+    val foundUser by usersViewModel.foundUser.collectAsState()
+
     LaunchedEffect(id, isConversation) {
         if (isConversation) {
-            // For existing conversation, just use the ID directly
             val foundConversation = conversationsViewModel.find(id)
             if (foundConversation != null) {
                 conversationId = id
                 conversationsViewModel.getMessages(id)
-                isLoading = false
             } else {
-                // Handle error - conversation not found
                 Toast.makeText(
                     context,
                     "Conversation not found",
@@ -77,40 +80,24 @@ fun ConversationScreen(
                 ).show()
                 navigateBack()
             }
+            isLoading = false
         } else {
-            // For new conversation, create it first
             usersViewModel.findById(id, false)
-            // Wait for the user to be found
-            delay(500) // Small delay to ensure foundUser is updated
-            val recipient = usersViewModel.foundUser.value
-            if (recipient != null) {
-                val newConversation = conversationsViewModel.createConversation(user, recipient)
-                if (newConversation != null) {
-                    conversationId = newConversation.id
-                    conversationsViewModel.getMessages(newConversation.id)
-                    isLoading = false
-                } else {
-                    // Handle error - failed to create conversation
-                    Toast.makeText(
-                        context,
-                        "Failed to create conversation",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    navigateBack()
-                }
-            } else {
-                // Handle error - recipient not found
-                Toast.makeText(
-                    context,
-                    "Recipient not found",
-                    Toast.LENGTH_SHORT
-                ).show()
-                navigateBack()
-            }
         }
     }
 
-    // Show loading indicator while waiting
+    LaunchedEffect(foundUser, isConversation) {
+        if (!isConversation && foundUser?.id == id) {
+            val newConversation = conversationsViewModel.createConversation(
+                Participant(userId?: "", userName),
+                Participant(foundUser?.id ?: "", foundUser?.fullName ?: "")
+            )
+            conversationId = newConversation.id
+            conversationsViewModel.getMessages(newConversation.id)
+            isLoading = false
+        }
+    }
+
     if (isLoading || conversationId == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -118,10 +105,10 @@ fun ConversationScreen(
         return
     }
 
-    // Get the conversation from the conversationsViewModel using the ID
-    val conversation = conversationsViewModel.conversations.collectAsState().value.find { it.id == conversationId }
+    val conversations by conversationsViewModel.conversations.collectAsState()
+    val conversation = conversations.find { it.id == conversationId }
+
     if (conversation == null) {
-        // Handle null conversation
         LaunchedEffect(Unit) {
             Toast.makeText(context, "Error loading conversation", Toast.LENGTH_SHORT).show()
             navigateBack()
@@ -132,8 +119,8 @@ fun ConversationScreen(
     val messages by conversationsViewModel.messages.collectAsState()
 
     val recipient = remember(conversation) {
-        conversation.participants.firstOrNull { it.id != user.id } ?: return@remember null
-    } ?: return // Return if recipient is null
+        conversation.participants.firstOrNull { it.id != userId } ?: return@remember null
+    } ?: return
 
     var messageText by remember { mutableStateOf(TextFieldValue("")) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -147,7 +134,7 @@ fun ConversationScreen(
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
-                            text = recipient.fullName,
+                            text = recipient.name,
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.offset(x = 24.dp)
                         )
@@ -207,9 +194,8 @@ fun ConversationScreen(
                 items(messages) { msg ->
                     ChatBubble(
                         message = msg,
-                        isMe = msg.senderId == user.id,
-                        senderName = if (msg.senderId == user.id) user.fullName else recipient.fullName,
-                        profileImageUrl = recipient.profileImageUrl
+                        isMe = msg.senderId == userId,
+                        senderName = if (msg.senderId == userId) userName else recipient.name
                     )
                 }
             }
@@ -257,8 +243,9 @@ fun ConversationScreen(
                         onClick = {
                             if (messageText.text.isNotBlank()) {
                                 conversationsViewModel.sendMessage(
-                                    conversation!!.id,
-                                    user.id,
+                                    conversation.id,
+                                    userId?: "",
+                                    userName,
                                     messageText.text
                                 )
 
@@ -287,7 +274,7 @@ fun ConversationScreen(
             onClose = { showDeleteDialog = false },
             onExitText = stringResource(id = R.string.delete),
             onExit = {
-                conversationsViewModel.deleteForUser(conversation!!.id, user.id)
+                conversationsViewModel.deleteForUser(conversation.id, userId?: "")
                 showDeleteDialog = false
                 navigateBack()
             }
@@ -299,8 +286,7 @@ fun ConversationScreen(
 fun ChatBubble(
     message: Message,
     isMe: Boolean,
-    senderName: String,
-    profileImageUrl: String? = null
+    senderName: String
 ) {
     val bubbleColor = if (isMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
     val textColor = if (isMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
@@ -312,7 +298,6 @@ fun ChatBubble(
     ) {
         if (!isMe) {
             ProfileIcon(
-                imageUrl = profileImageUrl,
                 fallbackText = senderName,
                 size = 50.dp
             )

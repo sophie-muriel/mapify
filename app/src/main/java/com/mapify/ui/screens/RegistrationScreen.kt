@@ -76,7 +76,6 @@ fun RegistrationScreen(
 
     var locationShared by rememberSaveable { mutableStateOf(false) }
     var locationForm by rememberSaveable { mutableStateOf(false) }
-    var location by rememberSaveable { mutableStateOf("Loading...") }
 
     val nameError = nameTouched && name.isBlank()
     val emailError =
@@ -184,17 +183,16 @@ fun RegistrationScreen(
                     },
                     passwordConfirmationError = passwordConfirmationError,
                     onClickRegister = {
-
-                        usersViewModel.find(email)
-                        if (usersViewModel.foundUser.value == null) {
-                            locationForm = true
-                        } else {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.email_taken),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        userLocation?.let {
+                            val newUser = User(
+                                fullName = name,
+                                email = email,
+                                password = password,
+                                location = it
+                            )
+                            usersViewModel.create(newUser)
                         }
+                        locationForm = true
                     },
                     navigateToLogin = {
                         navigateBack()
@@ -287,18 +285,6 @@ fun RegistrationScreen(
                     locationShared = locationShared,
                     onClickConfirmLocation = {
                         if (locationShared) {
-                            userLocation?.let {
-                                User(
-                                    fullName = name,
-                                    email = email,
-                                    password = password,
-                                    location = it
-                                )
-                            }?.let {
-                                usersViewModel.create(
-                                    it
-                                )
-                            }
                             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                                 resetFields()
                             }, 100)

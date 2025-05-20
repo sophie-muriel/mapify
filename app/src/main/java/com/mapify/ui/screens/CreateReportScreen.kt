@@ -1,7 +1,6 @@
 package com.mapify.ui.screens
 
 import android.os.Build
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
@@ -43,13 +42,8 @@ fun CreateReportScreen(
 ) {
 
     val context = LocalContext.current
-    val usersViewModel = LocalMainViewModel.current.usersViewModel
-
 
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
-    Log.d("userID viewmodel", userId.toString())
-
-    val user = usersViewModel.user.collectAsState().value ?: return
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
 
@@ -247,7 +241,7 @@ fun CreateReportScreen(
                     location = locationNotVisible,
                     images = photos,
                     status = ReportStatus.NOT_VERIFIED,
-                    userId = user.id,
+                    userId = userId?: "",
                     date = LocalDateTime.now()
                 )
                 reportsViewModel.create(newReport)

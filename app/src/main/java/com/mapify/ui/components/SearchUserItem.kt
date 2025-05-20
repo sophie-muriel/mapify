@@ -24,7 +24,6 @@ fun SearchUserItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         ProfileIcon(
-            imageUrl = null,
             fallbackText = fullName,
             size = 40.dp
         )
