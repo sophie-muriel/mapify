@@ -123,9 +123,6 @@ fun CreateReportScreen(
     BackHandler { exitDialogVisible = true }
     var locationVisible by rememberSaveable { mutableStateOf("") }
 
-    var locationLongitude by rememberSaveable { mutableStateOf<Double?>(null) }
-    var locationLatitude by rememberSaveable { mutableStateOf<Double?>(null) }
-
     BackHandler(enabled = true) {
         exitDialogVisible = true
     }
@@ -135,8 +132,6 @@ fun CreateReportScreen(
             val loc = Location(latitude, longitude)
             loc.updateCityCountry(context)
             locationVisible = loc.toString()
-            locationLongitude = loc.longitude
-            locationLatitude = loc.latitude
         }
     }
 
@@ -231,16 +226,6 @@ fun CreateReportScreen(
     }
 
     if (publishReportVisible) {
-        val locationToSave = locationLatitude?.let { lat ->
-            locationLongitude?.let { long ->
-                Location(latitude = lat, longitude = long)
-            }
-        }
-        LaunchedEffect(Unit){
-            locationToSave?.updateCityCountry(context)
-            delay(500)
-        }
-
         GenericDialog(
             title = stringResource(R.string.publish_report),
             message = stringResource(R.string.publish_report_description),
@@ -251,7 +236,7 @@ fun CreateReportScreen(
                     title = title,
                     category = Category.entries.find { it.displayName == dropDownValue }!!,
                     description = description,
-                    location = locationToSave,
+                    location = Location.stringToLocation(locationVisible),
                     images = photos,
                     userId = userId?: ""
                 )
