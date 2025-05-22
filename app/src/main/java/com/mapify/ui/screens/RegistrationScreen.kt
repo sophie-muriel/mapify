@@ -4,22 +4,24 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Patterns
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Replay
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -36,10 +38,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.mapify.R
@@ -102,30 +102,38 @@ fun RegistrationScreen(
 
     var userLocationLongitude by rememberSaveable { mutableStateOf<Double?>(null) }
     var userLocationLatitude by rememberSaveable { mutableStateOf<Double?>(null) }
+    var locationText by rememberSaveable { mutableStateOf("") }
 
-    var locationText by rememberSaveable { mutableStateOf("Loading...") }
+    var isRefreshingLocation by rememberSaveable { mutableStateOf(false) }
 
-//    val permissionLauncher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.RequestPermission()
-//    ) { isGranted ->
-//        hasPermission = isGranted
-//        if (isGranted) {
-//            Toast.makeText(context, locationAccessPermissionGranted, Toast.LENGTH_SHORT).show()
-//
-//            CoroutineScope(Dispatchers.Main).launch {
-//                val fetchedLocation = fetchUserLocation(context)
-//
-//                userPositionLongitude = fetchedLocation?.longitude
-//                userPositionLatitude = fetchedLocation?.latitude
-//                locationShared = true
-//                val locationName = getLocationName(context, userPositionLatitude!!, userPositionLongitude!!)
-//                locationText = locationName.second?.plus(", ")?.plus(locationName.first)?.plus(", Latitude: ")
-//                    .plus(userPositionLatitude).plus(", Longitude: ").plus(userPositionLongitude)
-//            }
-//        } else {
-//            Toast.makeText(context, locationAccessPermissionDenied, Toast.LENGTH_SHORT).show()
-//        }
-//    }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasPermission = isGranted
+        if (isGranted) {
+            Toast.makeText(context, locationAccessPermissionGranted, Toast.LENGTH_SHORT).show()
+
+            CoroutineScope(Dispatchers.Main).launch {
+                val fetchedLocation = fetchUserLocation(context)
+
+                userLocationLongitude = fetchedLocation?.longitude
+                userLocationLatitude = fetchedLocation?.latitude
+                locationShared = true
+                if (userLocationLatitude != null && userLocationLongitude != null) {
+                    val locationName =
+                        getLocationName(context, userLocationLatitude!!, userLocationLongitude!!)
+                    locationText = listOfNotNull(
+                        locationName.second,
+                        locationName.first,
+                        "Latitude: $userLocationLatitude",
+                        "Longitude: $userLocationLongitude"
+                    ).joinToString(", ")
+                }
+            }
+        } else {
+            Toast.makeText(context, locationAccessPermissionDenied, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     fun resetFields() {
         name = ""
@@ -138,9 +146,35 @@ fun RegistrationScreen(
         passwordConfirmationTouched = false
     }
 
-    if (locationForm) {
-        BackHandler(enabled = true) {
-            locationForm = false
+    fun refreshLocation() {
+        isRefreshingLocation = true
+        if (hasPermission) {
+            CoroutineScope(Dispatchers.Main).launch {
+                val fetchedLocation = fetchUserLocation(context)
+
+                userLocationLatitude = fetchedLocation?.latitude
+                userLocationLongitude = fetchedLocation?.longitude
+
+                if (userLocationLatitude != null && userLocationLongitude != null) {
+                    val locationName =
+                        getLocationName(context, userLocationLatitude!!, userLocationLongitude!!)
+                    locationText = listOfNotNull(
+                        locationName.second,
+                        locationName.first,
+                        "Latitude: $userLocationLatitude",
+                        "Longitude: $userLocationLongitude"
+                    ).joinToString(", ")
+
+                    locationShared = true
+                } else {
+                    locationText = "Unable to get location"
+                }
+
+                isRefreshingLocation = false
+            }
+        } else {
+            isRefreshingLocation = false
+            permissionLauncher.launch(permission)
         }
     }
 
@@ -156,155 +190,108 @@ fun RegistrationScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (!locationForm) {
-                Spacer(modifier = Modifier.height(Spacing.TopBottomScreen + 15.dp))
+            Spacer(modifier = Modifier.height(Spacing.TopBottomScreen + 15.dp))
 
-                LogoTitle(3.5f)
+            Text(
+                text = stringResource(id = R.string.app_name),
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
 
-                Spacer(modifier = Modifier.height(Spacing.Large * 2.8f))
+            Spacer(modifier = Modifier.height(Spacing.Large * 3.7f))
 
-                RegistrationForm(
-                    name = name,
-                    onValueChangeName = {
-                        name = it
-                        nameTouched = true
-                    },
-                    nameError = nameError,
-                    email = email,
-                    onValueChangeEmail = {
-                        email = it
-                        emailTouched = true
-                    },
-                    emailError = emailError,
-                    password = password,
-                    onValueChangePassword = {
-                        password = it
-                        passwordTouched = true
-                    },
-                    passwordError = passwordError,
-                    passwordConfirmation = passwordConfirmation,
-                    onValueChangePasswordConfirmation = {
-                        passwordConfirmation = it
-                        passwordConfirmationTouched = true
-                    },
-                    passwordConfirmationError = passwordConfirmationError,
-                    onClickRegister = {
-                        userLocationLongitude?.let { lng ->
-                            userLocationLatitude?.let { lat ->
-                                val newUser = User(
-                                    fullName = name,
-                                    email = email,
-                                    password = password,
-                                    location = Location(
-                                        latitude = lat,
-                                        longitude = lng
-                                    )
+            RegistrationForm(
+                name = name,
+                onValueChangeName = {
+                    name = it
+                    nameTouched = true
+                },
+                nameError = nameError,
+                email = email,
+                onValueChangeEmail = {
+                    email = it
+                    emailTouched = true
+                },
+                emailError = emailError,
+                password = password,
+                onValueChangePassword = {
+                    password = it
+                    passwordTouched = true
+                },
+                passwordError = passwordError,
+                location = locationText,
+                passwordConfirmation = passwordConfirmation,
+                onValueChangePasswordConfirmation = {
+                    passwordConfirmation = it
+                    passwordConfirmationTouched = true
+                },
+                passwordConfirmationError = passwordConfirmationError,
+                onClickRegister = {
+                    userLocationLongitude?.let { lng ->
+                        userLocationLatitude?.let { lat ->
+                            val newUser = User(
+                                fullName = name,
+                                email = email,
+                                password = password,
+                                location = Location(
+                                    latitude = lat,
+                                    longitude = lng
                                 )
-                                usersViewModel.create(newUser)
-                            }
+                            )
+                            usersViewModel.create(newUser)
                         }
-                        locationForm = true
-                    },
-                    navigateToLogin = {
-                        navigateBack()
+                    }
+                    locationForm = true
+                },
+                navigateToLogin = {
+                    navigateBack()
+                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                        resetFields()
+                    }, 100)
+                },
+                onRefreshLocation = { refreshLocation() },
+                isRefreshingLocation = isRefreshingLocation
+            )
+
+            when (registerResult) {
+                null -> {
+
+                }
+
+                is RequestResult.Success -> {
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(
+                            context,
+                            (registerResult as RequestResult.Success).message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        delay(2000)
+                        usersViewModel.resetRegisterResult()
                         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                             resetFields()
                         }, 100)
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
-            } else {
-                Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top,
-                    modifier = Modifier.wrapContentHeight()
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.mapify_dark),
-                        contentDescription = stringResource(id = R.string.location_icon_description),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(2f)
-                    )
-                }
-
-                Text(
-                    text = stringResource(id = R.string.enable_location_title_message),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-
-                Spacer(modifier = Modifier.height(Spacing.Large))
-
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = Spacing.Sides * 2,
-                            vertical = if (locationShared) (Spacing.Large + 4.dp) else 0.dp
-                        )
-                        .align(Alignment.CenterHorizontally),
-                    text = if (locationShared)
-                        stringResource(id = R.string.location_enabled, locationText)
-                    else
-                        stringResource(id = R.string.enable_location_access_message),
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(Spacing.Large * 18.1f))
-
-                when (registerResult) {
-                    null -> {
-
-                    }
-
-                    is RequestResult.Success -> {
-                        LaunchedEffect(Unit) {
-                            Toast.makeText(
-                                context,
-                                (registerResult as RequestResult.Success).message,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            delay(2000)
-                            usersViewModel.resetRegisterResult()
-                            navigateBack()
-                        }
-                    }
-
-                    is RequestResult.Failure -> {
-                        LaunchedEffect(Unit) {
-                            Toast.makeText(
-                                context,
-                                (registerResult as RequestResult.Failure).message,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            delay(2000)
-                            usersViewModel.resetRegisterResult()
-                        }
-                    }
-
-                    is RequestResult.Loading -> {
-                        LinearProgressIndicator()
+                        navigateBack()
                     }
                 }
 
-                ConfirmLocationForm(
-                    locationShared = locationShared,
-                    onClickConfirmLocation = {
-                        if (locationShared) {
-                            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                                resetFields()
-                            }, 100)
-                        } else {
-                            locationShared = true
-                        }
+                is RequestResult.Failure -> {
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(
+                            context,
+                            (registerResult as RequestResult.Failure).message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        delay(2000)
+                        usersViewModel.resetRegisterResult()
                     }
-                )
+                }
+
+                is RequestResult.Loading -> {
+                    LinearProgressIndicator()
+                }
             }
+
+            Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
         }
     }
     LaunchedEffect(locationForm) {
@@ -315,9 +302,12 @@ fun RegistrationScreen(
                 userLocationLongitude = fetchedLocation?.longitude
                 userLocationLatitude = fetchedLocation?.latitude
                 locationShared = true
-                val locationName = getLocationName(context, userLocationLatitude!!, userLocationLongitude!!)
-                locationText = locationName.second?.plus(", ")?.plus(locationName.first)?.plus(", Latitude: ")
-                    .plus(userLocationLatitude).plus(", Longitude: ").plus(userLocationLongitude)
+                val locationName =
+                    getLocationName(context, userLocationLatitude!!, userLocationLongitude!!)
+                locationText =
+                    locationName.second?.plus(", ")?.plus(locationName.first)?.plus(", Latitude: ")
+                        .plus(userLocationLatitude).plus(", Longitude: ")
+                        .plus(userLocationLongitude)
             }
 //            else {
 //                permissionLauncher.launch(permission)
@@ -335,11 +325,14 @@ fun RegistrationForm(
     onValueChangeEmail: (String) -> Unit,
     emailError: Boolean,
     password: String,
+    location: String,
     onValueChangePassword: (String) -> Unit,
     passwordError: Boolean,
     passwordConfirmation: String,
     onValueChangePasswordConfirmation: (String) -> Unit,
     passwordConfirmationError: Boolean,
+    onRefreshLocation: () -> Unit,
+    isRefreshingLocation: Boolean,
     onClickRegister: () -> Unit,
     navigateToLogin: () -> Unit
 ) {
@@ -424,6 +417,42 @@ fun RegistrationForm(
             showTrailingIcon = false
         )
 
+        GenericTextField(
+            value = location,
+            label = stringResource(id = R.string.location),
+            onValueChange = {},
+            isError = false,
+            readOnly = true,
+            isSingleLine = true,
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.LocationOn,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            showTrailingIcon = true,
+            trailingIcon = {
+                IconButton(
+                    onClick = onRefreshLocation,
+                    enabled = !isRefreshingLocation
+                ) {
+                    if (isRefreshingLocation) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(
+                            Icons.Outlined.Replay,
+                            contentDescription = "Refresh location",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+        )
+
         Spacer(modifier = Modifier.padding(Spacing.Inline))
 
         Button(
@@ -436,7 +465,8 @@ fun RegistrationForm(
                 .height(40.dp),
             enabled = name.isNotEmpty() && email.isNotEmpty()
                     && password.isNotEmpty() && passwordConfirmation.isNotEmpty()
-                    && !emailError && !passwordError && !passwordConfirmationError,
+                    && !emailError && !passwordError && !passwordConfirmationError
+                    && location.isNotEmpty() && !isRefreshingLocation,
             onClick = onClickRegister,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -458,50 +488,4 @@ fun RegistrationForm(
             )
         }
     }
-}
-
-@Composable
-fun ConfirmLocationForm(
-    locationShared: Boolean, onClickConfirmLocation: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = Spacing.Sides),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Spacing.Sides)
-                .height(40.dp),
-            enabled = true,
-            onClick = onClickConfirmLocation,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-        ) {
-            Text(
-                text = if (locationShared)
-                    stringResource(id = R.string.finish_registration)
-                else stringResource(id = R.string.enable_location_access),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }
-
-    Spacer(modifier = Modifier.padding(Spacing.Inline))
-
-    TextButton(
-        onClick = {},
-        enabled = false
-    ) {
-        Text(
-            text = "",
-            style = MaterialTheme.typography.labelSmall
-        )
-    }
-
-    Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
 }
