@@ -51,6 +51,7 @@ import com.mapify.ui.theme.Spacing
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.utils.RequestResult
 import fetchUserLocation
+import getLocationName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -99,27 +100,32 @@ fun RegistrationScreen(
     val locationAccessPermissionDenied =
         stringResource(id = R.string.location_access_permission_denied)
 
-    var userLocation by remember { mutableStateOf<Location?>(null) }
+    var userLocationLongitude by rememberSaveable { mutableStateOf<Double?>(null) }
+    var userLocationLatitude by rememberSaveable { mutableStateOf<Double?>(null) }
+
     var locationText by rememberSaveable { mutableStateOf("Loading...") }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        hasPermission = isGranted
-        if (isGranted) {
-            Toast.makeText(context, locationAccessPermissionGranted, Toast.LENGTH_SHORT).show()
-
-            CoroutineScope(Dispatchers.Main).launch {
-                val fetchedLocation = fetchUserLocation(context)
-
-                userLocation = fetchedLocation
-                locationShared = true
-                locationText = userLocation?.toString() ?: "Unable to get location"
-            }
-        } else {
-            Toast.makeText(context, locationAccessPermissionDenied, Toast.LENGTH_SHORT).show()
-        }
-    }
+//    val permissionLauncher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.RequestPermission()
+//    ) { isGranted ->
+//        hasPermission = isGranted
+//        if (isGranted) {
+//            Toast.makeText(context, locationAccessPermissionGranted, Toast.LENGTH_SHORT).show()
+//
+//            CoroutineScope(Dispatchers.Main).launch {
+//                val fetchedLocation = fetchUserLocation(context)
+//
+//                userPositionLongitude = fetchedLocation?.longitude
+//                userPositionLatitude = fetchedLocation?.latitude
+//                locationShared = true
+//                val locationName = getLocationName(context, userPositionLatitude!!, userPositionLongitude!!)
+//                locationText = locationName.second?.plus(", ")?.plus(locationName.first)?.plus(", Latitude: ")
+//                    .plus(userPositionLatitude).plus(", Longitude: ").plus(userPositionLongitude)
+//            }
+//        } else {
+//            Toast.makeText(context, locationAccessPermissionDenied, Toast.LENGTH_SHORT).show()
+//        }
+//    }
 
     fun resetFields() {
         name = ""
@@ -183,14 +189,19 @@ fun RegistrationScreen(
                     },
                     passwordConfirmationError = passwordConfirmationError,
                     onClickRegister = {
-                        userLocation?.let {
-                            val newUser = User(
-                                fullName = name,
-                                email = email,
-                                password = password,
-                                location = it
-                            )
-                            usersViewModel.create(newUser)
+                        userLocationLongitude?.let { lng ->
+                            userLocationLatitude?.let { lat ->
+                                val newUser = User(
+                                    fullName = name,
+                                    email = email,
+                                    password = password,
+                                    location = Location(
+                                        latitude = lat,
+                                        longitude = lng
+                                    )
+                                )
+                                usersViewModel.create(newUser)
+                            }
                         }
                         locationForm = true
                     },
@@ -299,12 +310,18 @@ fun RegistrationScreen(
     LaunchedEffect(locationForm) {
         if (locationForm) {
             if (hasPermission) {
-                userLocation = fetchUserLocation(context)
+                val fetchedLocation = fetchUserLocation(context)
+
+                userLocationLongitude = fetchedLocation?.longitude
+                userLocationLatitude = fetchedLocation?.latitude
                 locationShared = true
-                locationText = userLocation?.toString() ?: "Unable to get location"
-            } else {
-                permissionLauncher.launch(permission)
+                val locationName = getLocationName(context, userLocationLatitude!!, userLocationLongitude!!)
+                locationText = locationName.second?.plus(", ")?.plus(locationName.first)?.plus(", Latitude: ")
+                    .plus(userLocationLatitude).plus(", Longitude: ").plus(userLocationLongitude)
             }
+//            else {
+//                permissionLauncher.launch(permission)
+//            }
         }
     }
 }
