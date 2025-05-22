@@ -177,7 +177,7 @@ fun ReportForm(
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp),
                     strokeWidth = 2.dp
                 )

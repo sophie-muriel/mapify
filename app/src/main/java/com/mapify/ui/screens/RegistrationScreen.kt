@@ -22,7 +22,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,7 +45,6 @@ import com.mapify.R
 import com.mapify.model.Location
 import com.mapify.model.User
 import com.mapify.ui.components.GenericTextField
-import com.mapify.ui.components.LogoTitle
 import com.mapify.ui.theme.Spacing
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.utils.RequestResult
@@ -105,6 +103,8 @@ fun RegistrationScreen(
     var locationText by rememberSaveable { mutableStateOf("") }
 
     var isRefreshingLocation by rememberSaveable { mutableStateOf(false) }
+
+    var isLoading by rememberSaveable { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -250,16 +250,18 @@ fun RegistrationScreen(
                     }, 100)
                 },
                 onRefreshLocation = { refreshLocation() },
-                isRefreshingLocation = isRefreshingLocation
+                isRefreshingLocation = isRefreshingLocation,
+                isLoading = isLoading
             )
 
             when (registerResult) {
                 null -> {
-
+                    isLoading = false
                 }
 
                 is RequestResult.Success -> {
-                    LaunchedEffect(Unit) {
+                    isLoading = false
+                    LaunchedEffect(registerResult) {
                         Toast.makeText(
                             context,
                             (registerResult as RequestResult.Success).message,
@@ -275,7 +277,8 @@ fun RegistrationScreen(
                 }
 
                 is RequestResult.Failure -> {
-                    LaunchedEffect(Unit) {
+                    isLoading = false
+                    LaunchedEffect(registerResult) {
                         Toast.makeText(
                             context,
                             (registerResult as RequestResult.Failure).message,
@@ -287,7 +290,7 @@ fun RegistrationScreen(
                 }
 
                 is RequestResult.Loading -> {
-                    LinearProgressIndicator()
+                    isLoading = true
                 }
             }
 
@@ -334,7 +337,8 @@ fun RegistrationForm(
     onRefreshLocation: () -> Unit,
     isRefreshingLocation: Boolean,
     onClickRegister: () -> Unit,
-    navigateToLogin: () -> Unit
+    navigateToLogin: () -> Unit,
+    isLoading: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -466,17 +470,26 @@ fun RegistrationForm(
             enabled = name.isNotEmpty() && email.isNotEmpty()
                     && password.isNotEmpty() && passwordConfirmation.isNotEmpty()
                     && !emailError && !passwordError && !passwordConfirmationError
-                    && location.isNotEmpty() && !isRefreshingLocation,
+                    && location.isNotEmpty() && !isRefreshingLocation
+                    && location != "Unable to get location",
             onClick = onClickRegister,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ),
         ) {
-            Text(
-                text = stringResource(id = R.string.registration_label),
-                style = MaterialTheme.typography.bodyMedium
-            )
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = stringResource(id = R.string.registration_label),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
 
         Spacer(modifier = Modifier.padding(Spacing.Inline))
