@@ -60,7 +60,8 @@ fun LoginScreen(
     var recoveryEmail by rememberSaveable { mutableStateOf("") }
     var recoveryEmailTouched by rememberSaveable { mutableStateOf(false) }
 
-    val recoveryEmailError = recoveryEmailTouched && !Patterns.EMAIL_ADDRESS.matcher(recoveryEmail).matches()
+    val recoveryEmailError =
+        recoveryEmailTouched && !Patterns.EMAIL_ADDRESS.matcher(recoveryEmail).matches()
 
     fun resetFields() {
         email = ""
@@ -72,9 +73,13 @@ fun LoginScreen(
         recoveryEmailTouched = false
     }
 
+    var isLoading by rememberSaveable { mutableStateOf(false) }
+
     Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
@@ -91,7 +96,8 @@ fun LoginScreen(
                 },
                 onClickRegistration = {
                     navigateToRegistration()
-                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ resetFields() }, 100)
+                    android.os.Handler(android.os.Looper.getMainLooper())
+                        .postDelayed({ resetFields() }, 100)
                 },
                 recoveryEmail = recoveryEmail,
                 onValueChangeRecoveryEmail = {
@@ -102,15 +108,17 @@ fun LoginScreen(
                     Toast.makeText(context, R.string.recovery_email_sent, Toast.LENGTH_SHORT).show()
                 },
                 recoveryEmailError = recoveryEmailError,
-                resetRecoveryFields = { resetRecoveryFields() }
+                resetRecoveryFields = { resetRecoveryFields() },
+                isLoading = isLoading
             )
 
             when (registerResult) {
                 null -> {
-
+                    isLoading = false
                 }
 
                 is RequestResult.Success -> {
+                    isLoading = false
                     LaunchedEffect(Unit) {
                         Toast.makeText(
                             context,
@@ -126,6 +134,7 @@ fun LoginScreen(
                 }
 
                 is RequestResult.Failure -> {
+                    isLoading = false
                     LaunchedEffect(Unit) {
                         Toast.makeText(
                             context,
@@ -138,7 +147,7 @@ fun LoginScreen(
                 }
 
                 is RequestResult.Loading -> {
-                    LinearProgressIndicator()
+                    isLoading = true
                 }
             }
 
@@ -159,12 +168,15 @@ fun LoginForm(
     onValueChangeRecoveryEmail: (String) -> Unit,
     onClickRecovery: () -> Unit,
     recoveryEmailError: Boolean,
-    resetRecoveryFields: () -> Unit
+    resetRecoveryFields: () -> Unit,
+    isLoading: Boolean
 ) {
     var dialogVisible by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.Sides),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Spacing.Sides),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         GenericTextField(
@@ -173,7 +185,11 @@ fun LoginForm(
             onValueChange = onValueChangeEmail,
             isError = false,
             leadingIcon = {
-                Icon(Icons.Rounded.Email, contentDescription = stringResource(R.string.email_icon_description), tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    Icons.Rounded.Email,
+                    contentDescription = stringResource(R.string.email_icon_description),
+                    tint = MaterialTheme.colorScheme.primary
+                )
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
@@ -184,22 +200,34 @@ fun LoginForm(
             onValueChange = onValueChangePassword,
             isError = false,
             leadingIcon = {
-                Icon(Icons.Rounded.Lock, contentDescription = stringResource(R.string.password_icon_description), tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    Icons.Rounded.Lock,
+                    contentDescription = stringResource(R.string.password_icon_description),
+                    tint = MaterialTheme.colorScheme.primary
+                )
             },
             isPassword = true
         )
 
         TextButton(
-            modifier = Modifier.padding(end = 36.dp).align(Alignment.End),
+            modifier = Modifier
+                .padding(end = 36.dp)
+                .align(Alignment.End),
             onClick = { dialogVisible = true }
         ) {
-            Text(stringResource(id = R.string.forgot_password), style = MaterialTheme.typography.labelSmall)
+            Text(
+                stringResource(id = R.string.forgot_password),
+                style = MaterialTheme.typography.labelSmall
+            )
         }
 
         Spacer(modifier = Modifier.height(Spacing.Inline))
 
         Button(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.Sides).height(40.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.Sides)
+                .height(40.dp),
             enabled = email.isNotBlank() && password.isNotBlank(),
             onClick = onClickLogin,
             colors = ButtonDefaults.buttonColors(
@@ -207,13 +235,27 @@ fun LoginForm(
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
-            Text(stringResource(id = R.string.login_label), style = MaterialTheme.typography.bodyMedium)
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    stringResource(id = R.string.login_label),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(Spacing.Inline))
 
         TextButton(onClick = onClickRegistration) {
-            Text(stringResource(id = R.string.register_account), style = MaterialTheme.typography.labelSmall)
+            Text(
+                stringResource(id = R.string.register_account),
+                style = MaterialTheme.typography.labelSmall
+            )
         }
     }
 
@@ -240,7 +282,11 @@ fun LoginForm(
                     onValueChange = onValueChangeRecoveryEmail,
                     isError = recoveryEmailError,
                     leadingIcon = {
-                        Icon(Icons.Rounded.Email, contentDescription = stringResource(id = R.string.email_icon_description), tint = MaterialTheme.colorScheme.primary)
+                        Icon(
+                            Icons.Rounded.Email,
+                            contentDescription = stringResource(id = R.string.email_icon_description),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
                 )
