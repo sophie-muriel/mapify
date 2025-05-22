@@ -4,15 +4,15 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 class Report(
-    var id: String,
-    var title: String,
-    var category: Category,
-    var description: String,
-    var images: List<String>,
+    var id: String = "",
+    var title: String = "",
+    var category: Category = Category.SECURITY,
+    var description: String = "",
+    var images: List<String> = mutableListOf(),
     var location: Location? = null,
-    var status: ReportStatus,
-    var userId: String,
-    var date: LocalDateTime,
+    var status: ReportStatus = ReportStatus.NOT_VERIFIED,
+    var userId: String = "",
+    var date: LocalDateTime = LocalDateTime.now(),
     var isResolved: Boolean = false,
     var priorityCounter: Int = 0,
     var rejectionDate: LocalDateTime? = null,
