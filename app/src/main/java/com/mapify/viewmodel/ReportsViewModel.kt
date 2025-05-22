@@ -1,27 +1,64 @@
 package com.mapify.viewmodel
 
-import android.location.Location
 import androidx.lifecycle.ViewModel
-import com.mapify.model.Category
-import com.mapify.model.Comment
+import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.ktx.firestore
 import com.mapify.model.Report
-import com.mapify.model.ReportStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.time.LocalDateTime
+import com.google.firebase.ktx.Firebase
+import com.mapify.utils.RequestResult
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class ReportsViewModel: ViewModel() {
+
+    private val db = Firebase.firestore
 
     private val _reports = MutableStateFlow(emptyList<Report>())
     val reports: StateFlow<List<Report>> = _reports.asStateFlow()
 
-    init{
-        _reports.value = getReports()
-    }
+    private val _reportRequestResult = MutableStateFlow<RequestResult?>(null)
+    val reportRequestResult: StateFlow<RequestResult?> = _reportRequestResult.asStateFlow()
+
+//    init{
+//        loadReports()
+//    }
+//
+//    fun loadReports(){
+//        viewModelScope.launch {
+//            _reports.value = findAllFirebase()
+//        }
+//    }
+//
+//    private suspend fun findAllFirebase(id: String): List<Report> {
+//        val query = db.collection("reports")
+//            .get()
+//            .await()
+//
+//        return query.documents.mapNotNull {
+//            it.toObject(Report::class.java)?.apply {
+//                id = it.id
+//            }
+//        }
+//    }
 
     fun create(report: Report) {
-        _reports.value += report
+        viewModelScope.launch {
+            _reportRequestResult.value = RequestResult.Loading
+            _reportRequestResult.value = kotlin.runCatching { createReportFirebase(report) }
+                .fold(
+                    onSuccess = { RequestResult.Success("Report created successfully") },
+                    onFailure = { RequestResult.Failure(it.message ?: "Error creating report") }
+                )
+        }
+    }
+
+    private suspend fun createReportFirebase(report: Report){
+        db.collection("reports")
+            .add(report)
+            .await()
     }
 
     fun edit(updatedReport: Report) {
