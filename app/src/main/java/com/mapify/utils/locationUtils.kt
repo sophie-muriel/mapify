@@ -145,8 +145,7 @@ fun LocationPermissionWrapper(
     content: @Composable () -> Unit
 ) {
     val excludedRoutes = listOf(
-        RouteScreen.Login::class.qualifiedName,
-        RouteScreen.Registration::class.qualifiedName
+        RouteScreen.Login::class.qualifiedName
     )
     if (currentRoute in excludedRoutes || currentRoute == null) {
         content()

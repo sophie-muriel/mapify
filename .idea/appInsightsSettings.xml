@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.mapify" />
+                  <option name="mobileSdkAppId" value="1:336127356590:android:136649d6695193f72a873f" />
+                  <option name="projectId" value="mapify-35d2e" />
+                  <option name="projectNumber" value="336127356590" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
