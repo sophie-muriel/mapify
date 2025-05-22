@@ -62,7 +62,8 @@ fun Map(
 ){
     val context = LocalContext.current
 
-    var userLocation by rememberSaveable { mutableStateOf<Location?>(null) }
+    var userLocationLongitude by rememberSaveable { mutableStateOf<Double?>(null) }
+    var userLocationLatitude by rememberSaveable { mutableStateOf<Double?>(null) }
 
     val permission = android.Manifest.permission.ACCESS_FINE_LOCATION
 
@@ -191,8 +192,12 @@ fun Map(
                             allOf = [android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION]
                         ) {
                             val fetchedLocation = fetchUserLocation(context)
-                            userLocation = fetchedLocation
-                            val point = userLocation?.let { Point.fromLngLat(it.longitude, it.latitude) }
+                            userLocationLongitude = fetchedLocation?.longitude
+                            userLocationLatitude = fetchedLocation?.latitude
+                            val point = userLocationLongitude?.let { lng ->
+                                userLocationLatitude?.let { lat ->
+                                Point.fromLngLat(lng, lat)
+                            } }
                             mapViewportState.easeTo(
                                 cameraOptions = CameraOptions.Builder()
                                     .center(point)
