@@ -29,6 +29,7 @@ import java.time.LocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.utils.SharedPreferencesUtils
+import okhttp3.internal.wait
 import updateCityCountry
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -121,7 +122,9 @@ fun CreateReportScreen(
 
     BackHandler { exitDialogVisible = true }
     var locationVisible by rememberSaveable { mutableStateOf("") }
-    var locationNotVisible by remember { mutableStateOf<Location?>(null) }
+
+    var locationLongitude by rememberSaveable { mutableStateOf<Double?>(null) }
+    var locationLatitude by rememberSaveable { mutableStateOf<Double?>(null) }
 
     BackHandler(enabled = true) {
         exitDialogVisible = true
@@ -131,9 +134,9 @@ fun CreateReportScreen(
         if (latitude != null && longitude != null) {
             val loc = Location(latitude, longitude)
             loc.updateCityCountry(context)
-
-            locationNotVisible = loc
             locationVisible = loc.toString()
+            locationLongitude = loc.longitude
+            locationLatitude = loc.latitude
         }
     }
 
@@ -228,6 +231,16 @@ fun CreateReportScreen(
     }
 
     if (publishReportVisible) {
+        val locationToSave = locationLatitude?.let { lat ->
+            locationLongitude?.let { long ->
+                Location(latitude = lat, longitude = long)
+            }
+        }
+        LaunchedEffect(Unit){
+            locationToSave?.updateCityCountry(context)
+            delay(500)
+        }
+
         GenericDialog(
             title = stringResource(R.string.publish_report),
             message = stringResource(R.string.publish_report_description),
@@ -238,9 +251,8 @@ fun CreateReportScreen(
                     title = title,
                     category = Category.entries.find { it.displayName == dropDownValue }!!,
                     description = description,
-                    location = locationNotVisible,
+                    location = locationToSave,
                     images = photos,
-                    status = ReportStatus.NOT_VERIFIED,
                     userId = userId?: ""
                 )
                 reportsViewModel.create(newReport)
