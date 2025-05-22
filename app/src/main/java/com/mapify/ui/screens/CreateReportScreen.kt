@@ -46,6 +46,7 @@ fun CreateReportScreen(
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
+    val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
 
     var isValidating by remember { mutableStateOf(false) }
 
@@ -234,15 +235,13 @@ fun CreateReportScreen(
             onExit = {
                 publishReportVisible = false
                 val newReport = Report(
-                    id = (reportsIdCounter + 1).toString(),
                     title = title,
                     category = Category.entries.find { it.displayName == dropDownValue }!!,
                     description = description,
                     location = locationNotVisible,
                     images = photos,
                     status = ReportStatus.NOT_VERIFIED,
-                    userId = userId?: "",
-                    date = LocalDateTime.now()
+                    userId = userId?: ""
                 )
                 reportsViewModel.create(newReport)
                 navigateToReportView(newReport.id)
