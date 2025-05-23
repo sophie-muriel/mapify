@@ -363,7 +363,7 @@ fun ReportViewScreen(
                         date = LocalDateTime.now()
                     )
                     report.comments.add(newComment)
-                    reportsViewModel.edit(report)
+                    reportsViewModel.update(report)
                     comment = ""
                 },
                 users = users,
@@ -409,7 +409,7 @@ fun ReportViewScreen(
                     }
                     reportStatus = ReportStatus.VERIFIED
                     report.status = ReportStatus.VERIFIED
-                    reportsViewModel.edit(report)
+                    reportsViewModel.update(report)
                 },
                 onCloseText =stringResource(id = R.string.cancel),
                 onExitText = stringResource(id = R.string.verify)
@@ -439,7 +439,7 @@ fun ReportViewScreen(
                     reportStatus = ReportStatus.PENDING_VERIFICATION
                     report.status = ReportStatus.PENDING_VERIFICATION
                     report.rejectionDate = LocalDateTime.now()
-                    reportsViewModel.edit(report)
+                    reportsViewModel.update(report)
                     rejectionMessage = ""
                 },
                 onCloseText =stringResource(id = R.string.cancel),
@@ -469,7 +469,7 @@ fun ReportViewScreen(
             Toast.makeText(context, reportBoosted, Toast.LENGTH_SHORT).show()
             report.priorityCounter++
             report.reportBoosters.add(userId?: "")
-            reportsViewModel.edit(report)
+            reportsViewModel.update(report)
             boosted = true
             showBoostToast = false
         }else if(showBoostToast && (!canBoost || boosted)){
