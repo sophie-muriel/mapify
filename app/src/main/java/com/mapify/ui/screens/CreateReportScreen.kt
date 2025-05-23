@@ -225,6 +225,7 @@ fun CreateReportScreen(
                                 Toast.LENGTH_SHORT
                             ).show()
                             delay(1500)
+                            reportsViewModel.resetReportRequestResult()
 //                            usersViewModel.resetRegisterResult()
 //                            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
 //                                resetFields()
@@ -242,6 +243,7 @@ fun CreateReportScreen(
                                 Toast.LENGTH_SHORT
                             ).show()
                             delay(2000)
+                            reportsViewModel.resetReportRequestResult()
                             //usersViewModel.resetRegisterResult()
                         }
                     }
