@@ -1,6 +1,7 @@
 package com.mapify.ui.screens
 
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.mapify.ui.navigation.LocalMainViewModel
+import com.mapify.utils.RequestResult
 import com.mapify.utils.SharedPreferencesUtils
 import okhttp3.internal.wait
 import updateCityCountry
@@ -50,6 +52,7 @@ fun CreateReportScreen(
     val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
 
     var isValidating by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
 
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
@@ -203,10 +206,50 @@ fun CreateReportScreen(
                     onValueChangePhotos = onValueChangePhotos,
                     onAddPhoto = onAddPhoto,
                     onRemovePhoto = onRemovePhoto,
-                    isLoading = isValidating,
+                    isLoading = !isValidating && isLoading,
                     latitude = latitude,
                     longitude = longitude
                 )
+
+                when (reportRequestResult) {
+                    null -> {
+                        isLoading = false
+                    }
+
+                    is RequestResult.Success -> {
+                        isLoading = false
+                        LaunchedEffect(reportRequestResult) {
+                            Toast.makeText(
+                                context,
+                                (reportRequestResult as RequestResult.Success).message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            delay(1500)
+//                            usersViewModel.resetRegisterResult()
+//                            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+//                                resetFields()
+//                            }, 100)
+                            //navigateBack()
+                        }
+                    }
+
+                    is RequestResult.Failure -> {
+                        isLoading = false
+                        LaunchedEffect(reportRequestResult) {
+                            Toast.makeText(
+                                context,
+                                (reportRequestResult as RequestResult.Failure).message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            delay(2000)
+                            //usersViewModel.resetRegisterResult()
+                        }
+                    }
+
+                    is RequestResult.Loading -> {
+                        isLoading = true
+                    }
+                }
             }
         }
     }
@@ -241,7 +284,7 @@ fun CreateReportScreen(
                     userId = userId?: ""
                 )
                 reportsViewModel.create(newReport)
-                navigateToReportView(newReport.id)
+                //navigateToReportView(newReport.id)
             },
             onCloseText = stringResource(R.string.cancel),
             onExitText = stringResource(R.string.publish)
