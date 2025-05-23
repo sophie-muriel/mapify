@@ -45,37 +45,7 @@ class ReportsViewModel: ViewModel() {
     }
 
     private suspend fun createFirebase(report: Report){
-        val reportMap = mapOf(
-            "id" to report.id,
-            "title" to report.title,
-            "category" to report.category.name,
-            "description" to report.description,
-            "images" to report.images,
-            "location" to report.location?.let {
-                mapOf(
-                    "latitude" to it.latitude,
-                    "longitude" to it.longitude
-                )
-            },
-            "status" to report.status.name,
-            "userId" to report.userId,
-            "date" to report.date.toString(),
-            "isResolved" to report.isResolved,
-            "priorityCounter" to report.priorityCounter,
-            "rejectionDate" to report.rejectionDate?.toString(),
-            "isDeletedManually" to report.isDeletedManually,
-            "rejectionMessage" to report.rejectionMessage,
-            "reportBoosters" to report.reportBoosters,
-            "comments" to report.comments.map { comment ->
-                mapOf(
-                    "id" to comment.id,
-                    "content" to comment.content,
-                    "userId" to comment.userId,
-                    "date" to comment.date.toString()
-                )
-            }
-        )
-
+        val reportMap = mapReport(report)
         db.collection("reports")
             .add(reportMap)
             .await()
@@ -170,6 +140,39 @@ class ReportsViewModel: ViewModel() {
 
     fun resetReportRequestResult() {
         _reportRequestResult.value = null
+    }
+    
+    private fun mapReport(report: Report): Map<String, Any?> {
+        return mapOf(
+            "id" to report.id,
+            "title" to report.title,
+            "category" to report.category.name,
+            "description" to report.description,
+            "images" to report.images,
+            "location" to report.location?.let {
+                mapOf(
+                    "latitude" to it.latitude,
+                    "longitude" to it.longitude
+                )
+            },
+            "status" to report.status.name,
+            "userId" to report.userId,
+            "date" to report.date.toString(),
+            "isResolved" to report.isResolved,
+            "priorityCounter" to report.priorityCounter,
+            "rejectionDate" to report.rejectionDate?.toString(),
+            "isDeletedManually" to report.isDeletedManually,
+            "rejectionMessage" to report.rejectionMessage,
+            "reportBoosters" to report.reportBoosters,
+            "comments" to report.comments.map { comment ->
+                mapOf(
+                    "id" to comment.id,
+                    "content" to comment.content,
+                    "userId" to comment.userId,
+                    "date" to comment.date.toString()
+                )
+            }
+        )
     }
 
     private fun Map<*, *>?.toLocation(): Location {
