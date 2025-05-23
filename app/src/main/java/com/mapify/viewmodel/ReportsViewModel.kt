@@ -51,24 +51,6 @@ class ReportsViewModel: ViewModel() {
             .await()
     }
 
-    fun delete(reportId: String) {
-        viewModelScope.launch {
-            _reportRequestResult.value = RequestResult.Loading
-            _reportRequestResult.value = kotlin.runCatching { deleteFirebase(reportId) }
-                .fold (
-                    onSuccess = { RequestResult.Success("Report deleted successfully") },
-                    onFailure = { RequestResult.Failure(it.message?: "Error deleting report") }
-                )
-        }
-    }
-
-    private suspend fun deleteFirebase(reportId: String) {
-        db.collection("reports")
-            .document(reportId)
-            .delete()
-            .await()
-    }
-
     private fun getReports() {
         viewModelScope.launch {
             _reports.value = findAllFirebase()
@@ -112,17 +94,63 @@ class ReportsViewModel: ViewModel() {
         }
     }
 
+    fun findById(reportId: String): Report? {
+        return _reports.value.find { it.id == reportId }
+    }
+
     fun update(updatedReport: Report) {
-        _reports.value = _reports.value.map { report ->
-            if (report.id == updatedReport.id) updatedReport else report
+        viewModelScope.launch {
+            _reportRequestResult.value = RequestResult.Loading
+            _reportRequestResult.value = kotlin.runCatching { updateFirebase(updatedReport) }
+                .fold (
+                    onSuccess = { RequestResult.Success("Report updated successfully") },
+                    onFailure = { RequestResult.Failure(it.message?: "Error updating report") }
+                )
         }
+    }
+
+    private suspend fun updateFirebase(updatedReport: Report) {
+        db.collection("reports")
+            .document(updatedReport.id)
+            .set(mapReport(updatedReport))
+            .await()
     }
 
     fun deactivate(deactivatedReport: Report) {
         deactivatedReport.isDeletedManually = true
-        _reports.value = _reports.value.map { report ->
-            if (report.id == deactivatedReport.id) deactivatedReport else report
+        viewModelScope.launch {
+            _reportRequestResult.value = RequestResult.Loading
+            _reportRequestResult.value = kotlin.runCatching { deactivateFirebase(deactivatedReport) }
+                .fold (
+                    onSuccess = { RequestResult.Success("Report deleted successfully") },
+                    onFailure = { RequestResult.Failure(it.message?: "Error deleting report") }
+                )
         }
+    }
+
+    private suspend fun deactivateFirebase(deactivatedReport: Report) {
+        db.collection("reports")
+            .document(deactivatedReport.id)
+            .set(mapReport(deactivatedReport))
+            .await()
+    }
+
+    fun delete(reportId: String) {
+        viewModelScope.launch {
+            _reportRequestResult.value = RequestResult.Loading
+            _reportRequestResult.value = kotlin.runCatching { deleteFirebase(reportId) }
+                .fold (
+                    onSuccess = { RequestResult.Success("Report deleted successfully") },
+                    onFailure = { RequestResult.Failure(it.message?: "Error deleting report") }
+                )
+        }
+    }
+
+    private suspend fun deleteFirebase(reportId: String) {
+        db.collection("reports")
+            .document(reportId)
+            .delete()
+            .await()
     }
 
     fun count(): Int {
@@ -134,9 +162,14 @@ class ReportsViewModel: ViewModel() {
         return report?.comments?.size ?: 0
     }
 
-    fun findById(reportId: String): Report? {
-        return _reports.value.find { it.id == reportId }
-    }
+//    private suspend fun findByIdFirebase(reportId: String) {
+//        db.collection("reports")
+//            .document(updatedReport.id)
+//            .set(mapReport(updatedReport))
+//            .await()
+//
+//        val
+//    }
 
     fun resetReportRequestResult() {
         _reportRequestResult.value = null
