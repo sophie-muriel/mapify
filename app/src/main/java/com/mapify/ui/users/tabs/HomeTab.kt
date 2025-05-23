@@ -14,7 +14,6 @@ fun HomeTab(
     navigateToDetail: (String) -> Unit
 ) {
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
-    reportsViewModel.reloadReports()
     val reports by reportsViewModel.reports.collectAsState()
 
     Map(
