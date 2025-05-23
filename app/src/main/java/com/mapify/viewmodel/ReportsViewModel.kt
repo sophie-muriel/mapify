@@ -1,16 +1,23 @@
 package com.mapify.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.mapify.model.Report
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.google.firebase.ktx.Firebase
+import com.mapify.model.Category
+import com.mapify.model.Comment
+import com.mapify.model.Location
+import com.mapify.model.ReportStatus
 import com.mapify.utils.RequestResult
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDateTime
 
 class ReportsViewModel: ViewModel() {
 
@@ -19,35 +26,20 @@ class ReportsViewModel: ViewModel() {
     private val _reports = MutableStateFlow(emptyList<Report>())
     val reports: StateFlow<List<Report>> = _reports.asStateFlow()
 
+    private val _reportsTest = MutableStateFlow(emptyList<Report>())
+    val reportsTest: StateFlow<List<Report>> = _reportsTest.asStateFlow()
+
     private val _reportRequestResult = MutableStateFlow<RequestResult?>(null)
     val reportRequestResult: StateFlow<RequestResult?> = _reportRequestResult.asStateFlow()
 
-//    init{
-//        loadReports()
-//    }
-//
-//    fun loadReports(){
-//        viewModelScope.launch {
-//            _reports.value = findAllFirebase()
-//        }
-//    }
-//
-//    private suspend fun findAllFirebase(id: String): List<Report> {
-//        val query = db.collection("reports")
-//            .get()
-//            .await()
-//
-//        return query.documents.mapNotNull {
-//            it.toObject(Report::class.java)?.apply {
-//                id = it.id
-//            }
-//        }
-//    }
+    init{
+        //getReports()
+    }
 
     fun create(report: Report) {
         viewModelScope.launch {
             _reportRequestResult.value = RequestResult.Loading
-            _reportRequestResult.value = kotlin.runCatching { createReportFirebase(report) }
+            _reportRequestResult.value = kotlin.runCatching { createFirebase(report) }
                 .fold(
                     onSuccess = { RequestResult.Success("Report created successfully") },
                     onFailure = { RequestResult.Failure(it.message ?: "Error creating report") }
@@ -55,7 +47,7 @@ class ReportsViewModel: ViewModel() {
         }
     }
 
-    private suspend fun createReportFirebase(report: Report){
+    private suspend fun createFirebase(report: Report){
         val reportMap = mapOf(
             "id" to report.id,
             "title" to report.title,
@@ -92,6 +84,46 @@ class ReportsViewModel: ViewModel() {
             .await()
     }
 
+    fun delete(reportId: String) {
+        viewModelScope.launch {
+            _reportRequestResult.value = RequestResult.Loading
+            _reportRequestResult.value = kotlin.runCatching { deleteFirebase(reportId) }
+                .fold (
+                    onSuccess = { RequestResult.Success("Report deleted successfully") },
+                    onFailure = { RequestResult.Failure(it.message?: "Error deleting report") }
+                )
+        }
+    }
+
+    private suspend fun deleteFirebase(reportId: String) {
+        db.collection("reports")
+            .document(reportId)
+            .delete()
+            .await()
+    }
+
+    private fun getReports() {
+        viewModelScope.launch {
+            _reportsTest.value = findAllFirebase()
+        }
+    }
+
+    private suspend fun findAllFirebase(): List<Report> {
+        val query = db.collection("reports")
+            .get()
+            .await()
+
+        return query.documents.mapNotNull { document ->
+            document.toObject(Report::class.java)?.apply {
+                id = document.id
+                location = document.getLocationFromFirebase()
+                comments = parseCommentsListFromMap(document.get("comments"))
+                rejectionDate = document.getString("rejectionDate")?.let { LocalDateTime.parse(it) }
+                date = document.getString("date")?.let { LocalDateTime.parse(it) } ?: LocalDateTime.now()
+            }
+        }
+    }
+
     fun edit(updatedReport: Report) {
         _reports.value = _reports.value.map { report ->
             if (report.id == updatedReport.id) updatedReport else report
@@ -114,10 +146,6 @@ class ReportsViewModel: ViewModel() {
         return report?.comments?.size ?: 0
     }
 
-    fun delete(reportId: String) {
-        _reports.value = _reports.value.filter { it.id != reportId }
-    }
-
     fun findById(reportId: String): Report? {
         return _reports.value.find { it.id == reportId }
     }
@@ -126,8 +154,40 @@ class ReportsViewModel: ViewModel() {
         return _reports.value.filter { it.userId == userId }
     }
 
-    private fun getReports(): List<Report> {
-        return mutableListOf()
+    fun resetReportRequestResult() {
+        _reportRequestResult.value = null
+    }
+
+    private fun Map<*, *>?.toLocation(): Location {
+        return Location().apply {
+            this@toLocation?.let {
+                latitude = (it["latitude"] as? Double) ?: 0.0
+                longitude = (it["longitude"] as? Double) ?: 0.0
+                city = (it["city"] as? String) ?: ""
+                country = (it["country"] as? String) ?: ""
+            }
+        }
+    }
+
+    private fun DocumentSnapshot.getLocationFromFirebase(): Location {
+        val locMap = this.get("location") as? Map<*, *>
+        return locMap.toLocation()
+    }
+
+    private fun parseCommentsListFromMap(rawComments: Any?): MutableList<Comment> {
+        return (rawComments as? List<*>)?.mapNotNull { item ->
+            val commentMap = item as? Map<*, *> ?: return@mapNotNull null
+            Comment(
+                id = commentMap["id"] as? String ?: "",
+                content = commentMap["content"] as? String ?: "",
+                userId = commentMap["userId"] as? String ?: "",
+                date = LocalDateTime.parse(commentMap["date"] as? String ?: "")
+            )
+        }?.toMutableList() ?: mutableListOf()
+    }
+
+//    private fun getReports(): List<Report> {
+//        return mutableListOf()
 //        val location1 = Location("gps")
 //        location1.latitude = 4.547765
 //        location1.longitude = -75.661503
@@ -304,5 +364,5 @@ class ReportsViewModel: ViewModel() {
 //                priorityCounter = 3
 //            )
 //        )
-    }
+//    }
 }
