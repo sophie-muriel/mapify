@@ -158,33 +158,33 @@ class ReportsViewModel: ViewModel() {
         _reportRequestResult.value = null
     }
 
-    private fun Map<*, *>?.toLocation(): Location {
-        return Location().apply {
-            this@toLocation?.let {
-                latitude = (it["latitude"] as? Double) ?: 0.0
-                longitude = (it["longitude"] as? Double) ?: 0.0
-                city = (it["city"] as? String) ?: ""
-                country = (it["country"] as? String) ?: ""
+        private fun Map<*, *>?.toLocation(): Location {
+            return Location().apply {
+                this@toLocation?.let {
+                    latitude = (it["latitude"] as? Double) ?: 0.0
+                    longitude = (it["longitude"] as? Double) ?: 0.0
+                    city = (it["city"] as? String) ?: ""
+                    country = (it["country"] as? String) ?: ""
+                }
             }
         }
-    }
 
-    private fun DocumentSnapshot.getLocationFromFirebase(): Location {
-        val locMap = this.get("location") as? Map<*, *>
-        return locMap.toLocation()
-    }
+        private fun DocumentSnapshot.getLocationFromFirebase(): Location {
+            val locMap = this.get("location") as? Map<*, *>
+            return locMap.toLocation()
+        }
 
-    private fun parseCommentsListFromMap(rawComments: Any?): MutableList<Comment> {
-        return (rawComments as? List<*>)?.mapNotNull { item ->
-            val commentMap = item as? Map<*, *> ?: return@mapNotNull null
-            Comment(
-                id = commentMap["id"] as? String ?: "",
-                content = commentMap["content"] as? String ?: "",
-                userId = commentMap["userId"] as? String ?: "",
-                date = LocalDateTime.parse(commentMap["date"] as? String ?: "")
-            )
-        }?.toMutableList() ?: mutableListOf()
-    }
+        private fun parseCommentsListFromMap(rawComments: Any?): MutableList<Comment> {
+            return (rawComments as? List<*>)?.mapNotNull { item ->
+                val commentMap = item as? Map<*, *> ?: return@mapNotNull null
+                Comment(
+                    id = commentMap["id"] as? String ?: "",
+                    content = commentMap["content"] as? String ?: "",
+                    userId = commentMap["userId"] as? String ?: "",
+                    date = LocalDateTime.parse(commentMap["date"] as? String ?: "")
+                )
+            }?.toMutableList() ?: mutableListOf()
+        }
 
 //    private fun getReports(): List<Report> {
 //        return mutableListOf()
