@@ -1,6 +1,5 @@
 package com.mapify.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.DocumentSnapshot
@@ -42,6 +41,7 @@ class ReportsViewModel: ViewModel() {
                     onFailure = { RequestResult.Failure(it.message ?: "Error creating report") }
                 )
         }
+        reloadReports()
     }
 
     private suspend fun createFirebase(report: Report){
@@ -141,7 +141,11 @@ class ReportsViewModel: ViewModel() {
     fun resetReportRequestResult() {
         _reportRequestResult.value = null
     }
-    
+
+    private fun reloadReports() {
+        getReports()
+    }
+
     private fun mapReport(report: Report): Map<String, Any?> {
         return mapOf(
             "id" to report.id,
