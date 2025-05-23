@@ -26,14 +26,11 @@ class ReportsViewModel: ViewModel() {
     private val _reports = MutableStateFlow(emptyList<Report>())
     val reports: StateFlow<List<Report>> = _reports.asStateFlow()
 
-    private val _reportsTest = MutableStateFlow(emptyList<Report>())
-    val reportsTest: StateFlow<List<Report>> = _reportsTest.asStateFlow()
-
     private val _reportRequestResult = MutableStateFlow<RequestResult?>(null)
     val reportRequestResult: StateFlow<RequestResult?> = _reportRequestResult.asStateFlow()
 
     init{
-        //getReports()
+        getReports()
     }
 
     fun create(report: Report) {
@@ -104,7 +101,7 @@ class ReportsViewModel: ViewModel() {
 
     private fun getReports() {
         viewModelScope.launch {
-            _reportsTest.value = findAllFirebase()
+            _reports.value = findAllFirebase()
         }
     }
 
@@ -114,12 +111,33 @@ class ReportsViewModel: ViewModel() {
             .await()
 
         return query.documents.mapNotNull { document ->
-            document.toObject(Report::class.java)?.apply {
-                id = document.id
-                location = document.getLocationFromFirebase()
-                comments = parseCommentsListFromMap(document.get("comments"))
-                rejectionDate = document.getString("rejectionDate")?.let { LocalDateTime.parse(it) }
-                date = document.getString("date")?.let { LocalDateTime.parse(it) } ?: LocalDateTime.now()
+            try {
+                val report = Report(
+                    id = document.id,
+                    title = document.getString("title") ?: "",
+                    category = document.getString("category")?.let { categoryStr ->
+                        Category.entries.firstOrNull { it.name == categoryStr }
+                    } ?: Category.SECURITY,
+                    description = document.getString("description") ?: "",
+                    images = document.get("images") as? List<String> ?: emptyList(),
+                    location = document.getLocationFromFirebase(),
+                    status = document.getString("status")?.let { statusStr ->
+                        ReportStatus.entries.firstOrNull { it.name == statusStr }
+                    } ?: ReportStatus.NOT_VERIFIED,
+                    userId = document.getString("userId") ?: "",
+                    date = document.getString("date")?.let { parseDate(it) } ?: LocalDateTime.now(),
+                    isResolved = document.getBoolean("isResolved") ?: false,
+                    priorityCounter = (document.getLong("priorityCounter") ?: 0L).toInt(),
+                    rejectionDate = document.getString("rejectionDate")?.let { parseDate(it) },
+                    isDeletedManually = document.getBoolean("isDeletedManually") ?: false,
+                    rejectionMessage = document.getString("rejectionMessage"),
+                    reportBoosters = document.get("reportBoosters") as? MutableList<String> ?: mutableListOf(),
+                    comments = parseCommentsListFromMap(document.get("comments"))
+                )
+                report
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
             }
         }
     }
@@ -150,41 +168,45 @@ class ReportsViewModel: ViewModel() {
         return _reports.value.find { it.id == reportId }
     }
 
-    fun findByUserId(userId: String): List<Report> {
-        return _reports.value.filter { it.userId == userId }
-    }
-
     fun resetReportRequestResult() {
         _reportRequestResult.value = null
     }
 
-        private fun Map<*, *>?.toLocation(): Location {
-            return Location().apply {
-                this@toLocation?.let {
-                    latitude = (it["latitude"] as? Double) ?: 0.0
-                    longitude = (it["longitude"] as? Double) ?: 0.0
-                    city = (it["city"] as? String) ?: ""
-                    country = (it["country"] as? String) ?: ""
-                }
+    private fun Map<*, *>?.toLocation(): Location {
+        return Location().apply {
+            this@toLocation?.let {
+                latitude = (it["latitude"] as? Double) ?: 0.0
+                longitude = (it["longitude"] as? Double) ?: 0.0
+                city = (it["city"] as? String) ?: ""
+                country = (it["country"] as? String) ?: ""
             }
         }
+    }
 
-        private fun DocumentSnapshot.getLocationFromFirebase(): Location {
-            val locMap = this.get("location") as? Map<*, *>
-            return locMap.toLocation()
-        }
+    private fun DocumentSnapshot.getLocationFromFirebase(): Location {
+        val locMap = this.get("location") as? Map<*, *>
+        return locMap.toLocation()
+    }
 
-        private fun parseCommentsListFromMap(rawComments: Any?): MutableList<Comment> {
-            return (rawComments as? List<*>)?.mapNotNull { item ->
-                val commentMap = item as? Map<*, *> ?: return@mapNotNull null
-                Comment(
-                    id = commentMap["id"] as? String ?: "",
-                    content = commentMap["content"] as? String ?: "",
-                    userId = commentMap["userId"] as? String ?: "",
-                    date = LocalDateTime.parse(commentMap["date"] as? String ?: "")
-                )
-            }?.toMutableList() ?: mutableListOf()
+    private fun parseCommentsListFromMap(rawComments: Any?): MutableList<Comment> {
+        return (rawComments as? List<*>)?.mapNotNull { item ->
+            val commentMap = item as? Map<*, *> ?: return@mapNotNull null
+            Comment(
+                id = commentMap["id"] as? String ?: "",
+                content = commentMap["content"] as? String ?: "",
+                userId = commentMap["userId"] as? String ?: "",
+                date = LocalDateTime.parse(commentMap["date"] as? String ?: "")
+            )
+        }?.toMutableList() ?: mutableListOf()
+    }
+
+    private fun parseDate(dateStr: String): LocalDateTime? {
+        return try {
+            LocalDateTime.parse(dateStr)
+        } catch (e: Exception) {
+            null
         }
+    }
 
 //    private fun getReports(): List<Report> {
 //        return mutableListOf()
