@@ -112,7 +112,7 @@ class ReportsViewModel: ViewModel() {
         }
     }
 
-    fun edit(updatedReport: Report) {
+    fun update(updatedReport: Report) {
         _reports.value = _reports.value.map { report ->
             if (report.id == updatedReport.id) updatedReport else report
         }
