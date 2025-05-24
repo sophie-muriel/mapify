@@ -34,23 +34,7 @@ class ReportsViewModel: ViewModel() {
     init{
         getReports()
     }
-
-//    fun create(report: Report) {
-//        viewModelScope.launch {
-//            _reportRequestResult.value = RequestResult.Loading
-//            _createdReportId.value = kotlin.runCatching { createFirebase(report) }
-//                .fold(
-//                    onSuccess = {
-//                        //RequestResult.Success("Report created successfully")
-//                        _reportRequestResult.value = RequestResult.Success("Report created successfully")
-//                    },
-//                    onFailure = {
-//                        _reportRequestResult.value = RequestResult.Success("Error creating report")
-//                    }
-//                ).toString()
-//        }
-//        reloadReports()
-//    }
+    
     fun create(report: Report) {
         viewModelScope.launch {
             _reportRequestResult.value = RequestResult.Loading
@@ -69,8 +53,6 @@ class ReportsViewModel: ViewModel() {
         }
         reloadReports()
     }
-
-
 
     private suspend fun createFirebase(report: Report): String{
         val reportMap = mapReport(report)
