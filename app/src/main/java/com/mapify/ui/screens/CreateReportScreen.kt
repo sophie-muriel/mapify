@@ -76,13 +76,23 @@ fun CreateReportScreen(
     var photos by rememberSaveable { mutableStateOf(listOf("")) }
     var photoTouchedList by rememberSaveable { mutableStateOf(List(photos.size) { false }) }
     var photoErrors by remember { mutableStateOf(List(photos.size) { false }) }
+    var validatingImageIndex by remember { mutableStateOf<Int?>(null) }
+    var changedPhotoIndex by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(photos, photoTouchedList) {
         isValidating = true
-        delay(100)
-        photoErrors = photos.mapIndexed { i, url ->
-            val touched = photoTouchedList.getOrElse(i) { false }
-            touched && !isImageValid(context, url)
+        val index = changedPhotoIndex
+        if (index != null && index in photos.indices) {
+            validatingImageIndex = index
+            delay(100)
+
+            val isInvalid = !isImageValid(context, photos[index])
+            photoErrors = photoErrors.toMutableList().also {
+                if (index < it.size) it[index] = isInvalid
+            }
+
+            validatingImageIndex = null
+            changedPhotoIndex = null
         }
         isValidating = false
     }
@@ -116,6 +126,7 @@ fun CreateReportScreen(
         photoErrors = photoErrors.toMutableList().apply {
             while (size < updatedList.size) add(false)
         }
+        changedPhotoIndex = changedIndex
     }
 
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
@@ -204,6 +215,7 @@ fun CreateReportScreen(
                     onValueChangePhotos = onValueChangePhotos,
                     onAddPhoto = onAddPhoto,
                     onRemovePhoto = onRemovePhoto,
+                    validatingImageIndex = validatingImageIndex,
                     isLoading = !isValidating && isLoading,
                     latitude = latitude,
                     longitude = longitude
