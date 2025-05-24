@@ -36,6 +36,16 @@ fun MessagesTab(
 
     conversationsViewModel.getVisibleConversationsForUser(userId ?: "")
 
+    LaunchedEffect(userId) {
+        conversationsViewModel.observeAllConversations(userId!!)
+    }
+
+    DisposableEffect(userId) {
+        onDispose {
+            conversationsViewModel.stopObservingConversations()
+        }
+    }
+
     val conversations by conversationsViewModel.conversations.collectAsState()
     var loadingConversationId by remember { mutableStateOf<String?>(null) }
 

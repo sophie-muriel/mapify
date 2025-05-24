@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.mapify.model.Conversation
@@ -138,7 +139,8 @@ class ConversationsViewModel(private val usersViewModel: UsersViewModel) : ViewM
                 Participant(it["id"]!!, it["name"]!!)
             } ?: emptyList()
 
-            val isReadMap = (data["isRead"] as? Map<String, Boolean>)?.toMutableMap() ?: mutableMapOf()
+            val isReadMap =
+                (data["isRead"] as? Map<String, Boolean>)?.toMutableMap() ?: mutableMapOf()
             val deletedForList = data["deletedFor"] as? MutableList<String> ?: mutableListOf()
 
             Conversation(
@@ -188,8 +190,17 @@ class ConversationsViewModel(private val usersViewModel: UsersViewModel) : ViewM
             )
 
             val conversation = find(conversationId) ?: return@launch
+
+            val updatedIsRead = conversation.isRead.toMutableMap().apply {
+                conversation.participants
+                    .map { it.id }
+                    .filter { it != senderId }
+                    .forEach { this[it] = false }
+            }
+
             val updatedConversation = conversation.copy(
-                messages = conversation.messages + newMessage
+                messages = conversation.messages + newMessage,
+                isRead = updatedIsRead
             )
 
             updateFirebaseConversation(updatedConversation)
@@ -264,6 +275,111 @@ class ConversationsViewModel(private val usersViewModel: UsersViewModel) : ViewM
                 .await()
         }
     }
+
+    fun observeMessages(conversationId: String) {
+        db.collection("conversations")
+            .document(conversationId)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w("Firestore", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val data = snapshot.data
+                    val messagesRaw =
+                        data?.get("messages") as? List<Map<String, Any?>> ?: emptyList()
+                    val formatter = java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+
+                    val messages = messagesRaw.mapNotNull { msg ->
+                        try {
+                            Message(
+                                id = msg["id"] as String,
+                                senderId = msg["senderId"] as String,
+                                senderName = msg["senderName"] as String,
+                                content = msg["content"] as String,
+                                timestamp = LocalDateTime.parse(
+                                    msg["timestamp"] as String,
+                                    formatter
+                                )
+                            )
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
+
+                    _messages.value = messages.reversed()
+                } else {
+                    Log.d("Firestore", "Current data: null")
+                }
+            }
+    }
+
+    private var conversationsListener: ListenerRegistration? = null
+
+    fun observeAllConversations(userId: String) {
+        conversationsListener?.remove()
+
+        conversationsListener = db.collection("conversations")
+            .addSnapshotListener { snapshots, e ->
+                if (e != null) {
+                    Log.w("Firestore", "Listen failed for conversations.", e)
+                    return@addSnapshotListener
+                }
+
+                if (snapshots != null) {
+                    val formatter = java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+
+                    val conversationsList = snapshots.documents.mapNotNull { doc ->
+                        val data = doc.data ?: return@mapNotNull null
+
+                        val messagesRaw =
+                            data["messages"] as? List<Map<String, Any?>> ?: emptyList()
+                        val messages = messagesRaw.mapNotNull { msg ->
+                            try {
+                                Message(
+                                    id = msg["id"] as String,
+                                    senderId = msg["senderId"] as String,
+                                    senderName = msg["senderName"] as String,
+                                    content = msg["content"] as String,
+                                    timestamp = LocalDateTime.parse(
+                                        msg["timestamp"] as String,
+                                        formatter
+                                    )
+                                )
+                            } catch (e: Exception) {
+                                null
+                            }
+                        }
+
+                        val participants =
+                            (data["participants"] as? List<Map<String, String>>)?.map {
+                                Participant(it["id"]!!, it["name"]!!)
+                            } ?: emptyList()
+
+                        val isReadMap = (data["isRead"] as? Map<String, Boolean>)?.toMutableMap()
+                            ?: mutableMapOf()
+                        val deletedForList =
+                            data["deletedFor"] as? MutableList<String> ?: mutableListOf()
+
+                        Conversation(
+                            id = doc.id,
+                            participants = participants,
+                            messages = messages,
+                            isRead = isReadMap,
+                            deletedFor = deletedForList
+                        )
+                    }
+
+                    _conversations.value = conversationsList
+                }
+            }
+    }
+
+    fun stopObservingConversations() {
+        conversationsListener?.remove()
+    }
+
 
     private fun getConversations() {
         viewModelScope.launch {
