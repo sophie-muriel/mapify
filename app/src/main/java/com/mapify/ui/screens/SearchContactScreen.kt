@@ -41,6 +41,8 @@ fun SearchContactScreen(
     var searchQuery by remember { mutableStateOf("") }
     usersViewModel.loadUser(userId)
 
+    conversationsViewModel.getVisibleConversationsForUser(userId ?: "")
+
     val conversations = conversationsViewModel.conversations.collectAsState().value
     val recentSearches = conversationsViewModel.recentSearches
 
