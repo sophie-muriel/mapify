@@ -747,7 +747,7 @@ fun Carousel(
         itemSpacing = 8.dp,
         contentPadding = PaddingValues(horizontal = Spacing.Large),
     ) {
-        val item = list[it]
+        val item = list.getOrNull(it) ?: return@HorizontalUncontainedCarousel
         AsyncImage(
             modifier = Modifier
                 .height(248.dp)
