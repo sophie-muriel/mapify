@@ -1,13 +1,14 @@
 package com.mapify.model
 
 data class Conversation(
-    val id: String,
-    val participants: List<Participant>,
-    val messages: List<Message>,
-    var isRead: MutableMap<String, Boolean>
+    var id: String = "",
+    var participants: List<Participant> = emptyList(),
+    var messages: List<Message> = emptyList(),
+    var isRead: MutableMap<String, Boolean> = mutableMapOf(),
+    var deletedFor: MutableList<String> = mutableListOf()
 )
 
 data class Participant(
-    val id: String,
-    val name: String
+    val id: String = "",
+    val name: String = ""
 )
