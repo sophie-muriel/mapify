@@ -99,10 +99,15 @@ fun EditReportScreen(
         if (latitude != null && longitude != null) {
             val loc = Location(latitude, longitude)
             loc.updateCityCountry(context)
-
             locationNotVisible = loc
             locationVisible = loc.toString()
+        }else{
+            val loc = report.location
+            loc?.updateCityCountry(context)
+            locationNotVisible = loc
+            locationVisible = loc?.toString().orEmpty()
         }
+        delay(2000)
     }
 
     val onAddPhoto = {
@@ -196,7 +201,7 @@ fun EditReportScreen(
                         descriptionTouched = true
                     },
                     descriptionError = descriptionError,
-                    location = if (latitude != null && longitude != null) locationVisible else report.location.toString(),
+                    location = locationVisible,//if (latitude != null && longitude != null) locationVisible else report.location.toString(),
                     onValueChangeLocation = { },
                     locationError = locationError,
                     navigateToReportLocation = {
