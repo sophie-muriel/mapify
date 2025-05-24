@@ -1,21 +1,31 @@
 package com.mapify.viewmodel
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.mapify.model.Conversation
 import com.mapify.model.Message
 import com.mapify.model.Participant
 import com.mapify.model.User
+import com.mapify.utils.RequestResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
 import java.util.UUID
 
 class ConversationsViewModel(private val usersViewModel: UsersViewModel) : ViewModel() {
+
+    private val db = Firebase.firestore
 
     private val _conversations = MutableStateFlow<List<Conversation>>(emptyList())
     val conversations: StateFlow<List<Conversation>> = _conversations
@@ -26,17 +36,57 @@ class ConversationsViewModel(private val usersViewModel: UsersViewModel) : ViewM
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages.asStateFlow()
 
+    private val _conversationResult = MutableStateFlow<RequestResult?>(null)
+    val conversationResult: StateFlow<RequestResult?> = _conversationResult.asStateFlow()
+
     init {
-        _conversations.value = getConversations()
+        getConversations()
     }
 
     private fun create(conversation: Conversation) {
-        _conversations.update { currentList -> currentList + conversation }
+        viewModelScope.launch {
+            _conversationResult.value = RequestResult.Loading
+            _conversationResult.value = runCatching { createFirebase(conversation) }
+                .fold(
+                    onSuccess = { RequestResult.Success("Conversation created successfully") },
+                    onFailure = {
+                        Log.e("CreateConversation", "Failed to create: ${it.message}", it)
+                        RequestResult.Failure(it.message ?: "Error creating conversation")
+                    }
+                )
+        }
+    }
+
+    private suspend fun createFirebase(conversation: Conversation) {
+        val conversationRef = db.collection("conversations").document()
+        val conversationId = conversationRef.id
+
+        val conversationCopy = conversation.copy(id = conversationId)
+
+        val conversationMap = mapOf(
+            "id" to conversationCopy.id,
+            "participants" to conversationCopy.participants.map { participant ->
+                mapOf(
+                    "id" to participant.id,
+                    "name" to participant.name
+                )
+            },
+            "messages" to conversationCopy.messages.map { message ->
+                mapOf(
+                    "id" to message.id,
+                    "senderId" to message.senderId,
+                    "content" to message.content,
+                    "timestamp" to message.timestamp
+                )
+            },
+            "isRead" to conversationCopy.isRead
+        )
+
+        conversationRef.set(conversationMap).await()
     }
 
     fun createConversation(sender: Participant, recipient: Participant): Conversation {
         val newConversation = Conversation(
-            id = UUID.randomUUID().toString(),
             participants = listOf(
                 Participant(sender.id, sender.name),
                 Participant(recipient.id, recipient.name)
@@ -62,23 +112,64 @@ class ConversationsViewModel(private val usersViewModel: UsersViewModel) : ViewM
         return _conversations.value.find { it.id == id }
     }
 
-    fun deleteForUser(conversationId: String, userId: String) {
-        _conversations.update { currentList ->
-            currentList.map { conversation ->
-                if (conversation.id == conversationId) {
-                    if (conversation.participants.any { it.id == userId }) {
-                        conversation.copy(
-                            messages = emptyList(),
-                            participants = conversation.participants.filter { it.id != userId }
-                        )
-                    } else {
-                        conversation
-                    }
-                } else {
-                    conversation
+    private suspend fun findAllFirebase(): List<Conversation> {
+        val formatter = java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+
+        val query = db.collection("conversations").get().await()
+
+        return query.documents.mapNotNull { doc ->
+            val data = doc.data ?: return@mapNotNull null
+            val messagesRaw = data["messages"] as? List<Map<String, Any?>> ?: emptyList()
+            val messages = messagesRaw.mapNotNull { msg ->
+                try {
+                    Message(
+                        id = msg["id"] as String,
+                        senderId = msg["senderId"] as String,
+                        senderName = msg["senderName"] as String,
+                        content = msg["content"] as String,
+                        timestamp = LocalDateTime.parse(msg["timestamp"] as String, formatter)
+                    )
+                } catch (e: Exception) {
+                    null
                 }
             }
+
+            val participants = (data["participants"] as? List<Map<String, String>>)?.map {
+                Participant(it["id"]!!, it["name"]!!)
+            } ?: emptyList()
+
+            val isReadMap = (data["isRead"] as? Map<String, Boolean>)?.toMutableMap() ?: mutableMapOf()
+            val deletedForList = data["deletedFor"] as? MutableList<String> ?: mutableListOf()
+
+            Conversation(
+                id = doc.id,
+                participants = participants,
+                messages = messages,
+                isRead = isReadMap,
+                deletedFor = deletedForList
+            )
         }
+    }
+
+
+    private suspend fun updateFirebaseConversation(conversation: Conversation) {
+        val conversationMap = mapOf(
+            "id" to conversation.id,
+            "participants" to conversation.participants.map {
+                mapOf("id" to it.id, "name" to it.name)
+            },
+            "messages" to conversation.messages.map {
+                mapOf(
+                    "id" to it.id,
+                    "senderId" to it.senderId,
+                    "senderName" to it.senderName,
+                    "content" to it.content,
+                    "timestamp" to it.timestamp.toString()
+                )
+            },
+            "isRead" to conversation.isRead
+        )
+        db.collection("conversations").document(conversation.id).set(conversationMap).await()
     }
 
     fun getMessages(conversationId: String) {
@@ -86,111 +177,101 @@ class ConversationsViewModel(private val usersViewModel: UsersViewModel) : ViewM
         _messages.value = conversation?.messages?.reversed() ?: emptyList()
     }
 
-    fun sendMessage(conversationId: String, senderId: String, senderName:String, content: String) {
+    fun sendMessage(conversationId: String, senderId: String, senderName: String, content: String) {
+        viewModelScope.launch {
+            val newMessage = Message(
+                id = UUID.randomUUID().toString(),
+                senderId = senderId,
+                senderName = senderName,
+                content = content,
+                timestamp = LocalDateTime.now()
+            )
+
+            val conversation = find(conversationId) ?: return@launch
+            val updatedConversation = conversation.copy(
+                messages = conversation.messages + newMessage
+            )
+
+            updateFirebaseConversation(updatedConversation)
+
+            _conversations.update { list ->
+                list.map { if (it.id == conversationId) updatedConversation else it }
+            }
+            getMessages(conversationId)
+        }
+    }
+
+    fun deleteForUser(conversationId: String, userId: String) {
         _conversations.update { currentList ->
             currentList.map { conversation ->
                 if (conversation.id == conversationId) {
-                    val newMessage = Message(
-                        id = UUID.randomUUID().toString(),
-                        senderId = senderId,
-                        senderName = senderName,
-                        content = content,
-                        timestamp = LocalDateTime.now()
-                    )
-                    conversation.copy(messages = conversation.messages + newMessage)
+                    val updatedDeletedFor = conversation.deletedFor.toMutableList()
+                    if (!updatedDeletedFor.contains(userId)) {
+                        updatedDeletedFor.add(userId)
+                    }
+                    conversation.copy(deletedFor = updatedDeletedFor)
                 } else {
                     conversation
                 }
             }
         }
-        getMessages(conversationId)
+
+        viewModelScope.launch {
+            db.collection("conversations").document(conversationId)
+                .update("deletedFor", FieldValue.arrayUnion(userId))
+                .await()
+        }
     }
 
     fun markAsRead(id: String, userId: String) {
-        val conversation = find(id)!!
-        val updatedConversation = conversation.copy(
-            isRead = conversation.isRead.toMutableMap().apply {
-                this[userId] = true
-            }
-        )
+        val conversation = find(id) ?: return
+        val updatedIsRead = conversation.isRead.toMutableMap().apply {
+            this[userId] = true
+        }
+        val updatedConversation = conversation.copy(isRead = updatedIsRead)
 
         _conversations.update { currentList ->
-            currentList.map { existingConversation ->
-                if (existingConversation.id == conversation.id) updatedConversation
-                else existingConversation
+            currentList.map {
+                if (it.id == id) updatedConversation else it
             }
+        }
+
+        viewModelScope.launch {
+            db.collection("conversations")
+                .document(id)
+                .update("isRead.${userId}", true)
+                .await()
         }
     }
 
     fun markAsUnread(id: String, userId: String) {
-        val conversation = find(id)!!
-        val updatedConversation = conversation.copy(
-            isRead = conversation.isRead.toMutableMap().apply {
-                this[userId] = false
-            }
-        )
+        val conversation = find(id) ?: return
+        val updatedIsRead = conversation.isRead.toMutableMap().apply {
+            this[userId] = false
+        }
+        val updatedConversation = conversation.copy(isRead = updatedIsRead)
 
         _conversations.update { currentList ->
-            currentList.map { existingConversation ->
-                if (existingConversation.id == conversation.id) updatedConversation
-                else existingConversation
+            currentList.map {
+                if (it.id == id) updatedConversation else it
             }
+        }
+
+        viewModelScope.launch {
+            db.collection("conversations")
+                .document(id)
+                .update("isRead.${userId}", false)
+                .await()
         }
     }
 
+    private fun getConversations() {
+        viewModelScope.launch {
+            _conversations.value = findAllFirebase()
+        }
+    }
 
-    private fun getConversations(): List<Conversation> {
-        val allUsers = usersViewModel.users.value
-
-        return listOf(
-//            Conversation(
-//                id = UUID.randomUUID().toString(),
-//                participants = listOf(allUsers[1], allUsers[0]),
-//                messages = listOf(
-//                    Message(
-//                        id = "msg1",
-//                        senderId = allUsers[0].id,
-//                        content = "Hi, just checking if there are any updates on the report.",
-//                        timestamp = LocalDateTime.now().minusMinutes(5)
-//                    )
-//                ),
-//                isRead = mutableMapOf(
-//                    allUsers[0].id to true,
-//                    allUsers[1].id to false
-//                )
-//            ),
-//            Conversation(
-//                id = UUID.randomUUID().toString(),
-//                participants = listOf(allUsers[2], allUsers[0]),
-//                messages = listOf(
-//                    Message(
-//                        id = "msg2",
-//                        senderId = allUsers[2].id,
-//                        content = "Thanks for your response.",
-//                        timestamp = LocalDateTime.now().minusHours(2)
-//                    )
-//                ),
-//                isRead = mutableMapOf(
-//                    allUsers[2].id to true,
-//                    allUsers[0].id to false
-//                )
-//            ),
-//            Conversation(
-//                id = UUID.randomUUID().toString(),
-//                participants = listOf(allUsers[1], allUsers[2]),
-//                messages = listOf(
-//                    Message(
-//                        id = "msg3",
-//                        senderId = allUsers[2].id,
-//                        content = "Could you take a look at the file I sent you?",
-//                        timestamp = LocalDateTime.now().minusDays(5)
-//                    )
-//                ),
-//                isRead = mutableMapOf(
-//                    allUsers[2].id to true,
-//                    allUsers[1].id to false
-//                )
-//            )
-        )
+    fun getVisibleConversationsForUser(userId: String): List<Conversation> {
+        return _conversations.value.filter { !it.deletedFor.contains(userId) }
     }
 }
