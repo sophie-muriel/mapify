@@ -69,7 +69,7 @@ fun EditReportScreen(
 
     val locationError = false
 
-    var photos by rememberSaveable { mutableStateOf(report.images) }
+    var photos by rememberSaveable { mutableStateOf(report.images.toMutableList()) }
     var photoTouchedList by rememberSaveable { mutableStateOf(List(photos.size) { false }) }
     var photoErrors by remember { mutableStateOf(List(photos.size) { false }) }
 
@@ -111,8 +111,9 @@ fun EditReportScreen(
     }
 
     val onAddPhoto = {
-        photos = photos + ""
-        photoTouchedList = photoTouchedList + false
+        photos = photos.toMutableList().apply { add("") }
+        photoTouchedList = photoTouchedList.toMutableList().apply { add(false) }
+        photoErrors = photoErrors.toMutableList().apply { add(false) }
     }
 
     val onRemovePhoto: (Int) -> Unit = { index ->
@@ -121,12 +122,15 @@ fun EditReportScreen(
             photoTouchedList = photoTouchedList.toMutableList().also {
                 if (index < it.size) it.removeAt(index)
             }
+            photoErrors = photoErrors.toMutableList().also {
+                if (index < it.size) it.removeAt(index)
+            }
         }
     }
 
     val onValueChangePhotos: (List<String>) -> Unit = { updatedList ->
         val changedIndex = updatedList.indexOfFirstIndexed { i, url -> url != photos.getOrNull(i) }
-        photos = updatedList
+        photos = updatedList.toMutableList()
         photoTouchedList = photoTouchedList.toMutableList().also {
             if (changedIndex in updatedList.indices) {
                 while (it.size < updatedList.size) it.add(false)
