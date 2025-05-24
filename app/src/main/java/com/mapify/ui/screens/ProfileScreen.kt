@@ -30,10 +30,12 @@ import androidx.core.content.ContextCompat
 import com.mapify.model.Location
 import com.mapify.model.User
 import com.mapify.ui.navigation.LocalMainViewModel
+import com.mapify.utils.RequestResult
 import com.mapify.utils.SharedPreferencesUtils
 import fetchUserLocation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import updateCityCountry
 
@@ -46,9 +48,14 @@ fun ProfileScreen(
     val context = LocalContext.current
     val usersViewModel = LocalMainViewModel.current.usersViewModel
     var userLocation by remember { mutableStateOf<Location?>(null) }
-    var locationText by rememberSaveable { mutableStateOf("Loading...") }
+    val registerResult by usersViewModel.registerResult.collectAsState()
 
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
+    val user by usersViewModel.user.collectAsState()
+
+    var name by rememberSaveable { mutableStateOf( "Loading...") }
+    var email by rememberSaveable { mutableStateOf("Loading...") }
+    var locationText by rememberSaveable { mutableStateOf("Loading...") }
 
     LaunchedEffect(Unit) {
         usersViewModel.resetFoundUser()
@@ -62,12 +69,6 @@ fun ProfileScreen(
         }
     }
 
-    val user by usersViewModel.user.collectAsState()
-
-    var name by rememberSaveable { mutableStateOf( "Loading...") }
-    var email by rememberSaveable { mutableStateOf("Loading...") }
-    var password by rememberSaveable { mutableStateOf("Loading...") }
-
     var nameTouched by rememberSaveable { mutableStateOf(false) }
     var emailTouched by rememberSaveable { mutableStateOf(false) }
     var passwordTouched by rememberSaveable { mutableStateOf(false) }
@@ -76,13 +77,11 @@ fun ProfileScreen(
 
     val nameError = nameTouched && name.isBlank()
     val emailError = emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
-    val passwordError = passwordTouched && password.length < 6
 
     LaunchedEffect(user) {
         user?.let {
             name = it.fullName
             email = it.email
-            password = it.password
             it.location?.updateCityCountry(context)
             locationText = it.location.toString()
         }
@@ -98,7 +97,7 @@ fun ProfileScreen(
     val locationAccessPermissionDenied = stringResource(id = R.string.location_access_permission_denied)
 
     var isRefreshingLocation by rememberSaveable { mutableStateOf(false) }
-
+    var isLoading by rememberSaveable { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -119,7 +118,6 @@ fun ProfileScreen(
                             id = user!!.id,
                             fullName = user!!.fullName,
                             email = user!!.email,
-                            password = user!!.password,
                             role = user!!.role,
                             location = location
                         )
@@ -149,7 +147,6 @@ fun ProfileScreen(
                             id = user!!.id,
                             fullName = user!!.fullName,
                             email = user!!.email,
-                            password = user!!.password,
                             role = user!!.role,
                             location = location
                         )
@@ -211,19 +208,16 @@ fun ProfileScreen(
             ProfileContent(
                 name = name,
                 email = email,
-                password = password,
                 location = locationText,
                 isEditMode = editMode,
                 onValueChangeName = { name = it; nameTouched = true },
                 onValueChangeEmail = { email = it; emailTouched = true },
-                onValueChangePassword = { password = it; passwordTouched = true },
                 onClickEdit = {
                     user!!.let {
                         val updatedUser = User(
                             id = it.id,
                             fullName = name,
                             email = email,
-                            password = password,
                             role = it.role,
                             location = userLocation ?: it.location
                         )
@@ -232,16 +226,52 @@ fun ProfileScreen(
                     nameTouched = false
                     emailTouched = false
                     passwordTouched = false
-                    editMode = false
                 },
                 nameError = nameError,
                 emailError = emailError,
-                passwordError = passwordError,
                 onRefreshLocation = { refreshLocation() },
-                isRefreshingLocation = isRefreshingLocation
+                isRefreshingLocation = isRefreshingLocation,
+                isLoading = isLoading
             )
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen / 2))
+
+            when (registerResult) {
+                null -> {
+                    isLoading = false
+                }
+
+                is RequestResult.Success -> {
+                    isLoading = false
+                    LaunchedEffect(registerResult) {
+                        Toast.makeText(
+                            context,
+                            (registerResult as RequestResult.Success).message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        editMode = false
+                        delay(2000)
+                        usersViewModel.resetRegisterResult()
+                    }
+                }
+
+                is RequestResult.Failure -> {
+                    isLoading = false
+                    LaunchedEffect(registerResult) {
+                        Toast.makeText(
+                            context,
+                            (registerResult as RequestResult.Failure).message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        delay(2000)
+                        usersViewModel.resetRegisterResult()
+                    }
+                }
+
+                is RequestResult.Loading -> {
+                    isLoading = true
+                }
+            }
         }
     }
 
@@ -256,7 +286,6 @@ fun ProfileScreen(
                     if(user!=null) {
                         name = user!!.fullName
                         email = user!!.email
-                        password = user!!.password
                         editMode = false
                     }
                 } else {
@@ -273,18 +302,16 @@ fun ProfileScreen(
 fun ProfileContent(
     name: String,
     email: String,
-    password: String,
     location: String,
     isEditMode: Boolean,
     onValueChangeName: (String) -> Unit,
     onValueChangeEmail: (String) -> Unit,
-    onValueChangePassword: (String) -> Unit,
     onClickEdit: () -> Unit,
     nameError: Boolean,
     emailError: Boolean,
-    passwordError: Boolean,
     onRefreshLocation: () -> Unit,
-    isRefreshingLocation: Boolean
+    isRefreshingLocation: Boolean,
+    isLoading: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -342,20 +369,6 @@ fun ProfileContent(
         )
 
         GenericTextField(
-            value = password,
-            supportingText = stringResource(id = R.string.password_supporting_text),
-            label = stringResource(id = R.string.password_label),
-            onValueChange = onValueChangePassword,
-            isError = passwordError,
-            isPassword = true,
-            readOnly = !isEditMode,
-            isSingleLine = true,
-            leadingIcon = {
-                Icon(Icons.Outlined.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-            }
-        )
-
-        GenericTextField(
             value = location,
             label = stringResource(id = R.string.location),
             onValueChange = {},
@@ -387,17 +400,25 @@ fun ProfileContent(
             Spacer(modifier = Modifier.height(Spacing.Inline * 2))
             Button(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.Sides).height(40.dp),
-                enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && !emailError && !passwordError,
+                enabled = name.isNotEmpty() && email.isNotEmpty(),
                 onClick = onClickEdit,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(
-                    text = stringResource(id = R.string.save_changes_label),
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.save_changes_label),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
     }
