@@ -50,6 +50,8 @@ fun CreateReportScreen(
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
     val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
+    var navigateAfterCreate by remember { mutableStateOf(false) }
+    val createdReportId by reportsViewModel.createdReportId.collectAsState()
 
     var isValidating by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
@@ -115,10 +117,6 @@ fun CreateReportScreen(
             while (size < updatedList.size) add(false)
         }
     }
-
-    var reportsIdCounter by rememberSaveable { mutableIntStateOf(0) }
-
-    reportsIdCounter = reportsViewModel.count()
 
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
     var publishReportVisible by rememberSaveable { mutableStateOf(false) }
@@ -226,11 +224,8 @@ fun CreateReportScreen(
                             ).show()
                             delay(1500)
                             reportsViewModel.resetReportRequestResult()
-//                            usersViewModel.resetRegisterResult()
-//                            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-//                                resetFields()
-//                            }, 100)
-                            //navigateBack()
+                            reportsViewModel.resetCreatedReportId()
+                            createdReportId?.let { navigateToReportView(it) }
                         }
                     }
 
@@ -244,7 +239,6 @@ fun CreateReportScreen(
                             ).show()
                             delay(2000)
                             reportsViewModel.resetReportRequestResult()
-                            //usersViewModel.resetRegisterResult()
                         }
                     }
 
@@ -286,7 +280,7 @@ fun CreateReportScreen(
                     userId = userId?: ""
                 )
                 reportsViewModel.create(newReport)
-                //navigateToReportView(newReport.id)
+                navigateAfterCreate = true
             },
             onCloseText = stringResource(R.string.cancel),
             onExitText = stringResource(R.string.publish)
