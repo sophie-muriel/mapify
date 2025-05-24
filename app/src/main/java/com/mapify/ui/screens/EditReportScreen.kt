@@ -92,24 +92,6 @@ fun EditReportScreen(
         }
     }
 
-    var locationVisible by rememberSaveable { mutableStateOf("") }
-    var locationNotVisible by remember { mutableStateOf<Location?>(null) }
-
-    LaunchedEffect(Unit) {
-        if (latitude != null && longitude != null) {
-            val loc = Location(latitude, longitude)
-            loc.updateCityCountry(context)
-            locationNotVisible = loc
-            locationVisible = loc.toString()
-        }else{
-            val loc = report.location
-            loc?.updateCityCountry(context)
-            locationNotVisible = loc
-            locationVisible = loc?.toString().orEmpty()
-        }
-        delay(2000)
-    }
-
     val onAddPhoto = {
         photos = photos.toMutableList().apply { add("") }
         photoTouchedList = photoTouchedList.toMutableList().apply { add(false) }
@@ -137,6 +119,24 @@ fun EditReportScreen(
                 it[changedIndex] = true
             }
         }
+    }
+
+    var locationVisible by rememberSaveable { mutableStateOf("") }
+    var locationNotVisible by remember { mutableStateOf<Location?>(null) }
+
+    LaunchedEffect(Unit) {
+        if (latitude != null && longitude != null) {
+            val loc = Location(latitude, longitude)
+            loc.updateCityCountry(context)
+            locationNotVisible = loc
+            locationVisible = loc.toString()
+        }else{
+            val loc = report.location
+            loc?.updateCityCountry(context)
+            locationNotVisible = loc
+            locationVisible = loc?.toString().orEmpty()
+        }
+        delay(2000)
     }
 
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
