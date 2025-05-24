@@ -44,6 +44,7 @@ import androidx.core.content.ContextCompat
 import com.mapify.R
 import com.mapify.model.Location
 import com.mapify.model.User
+import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.theme.Spacing
 import com.mapify.ui.navigation.LocalMainViewModel
@@ -105,6 +106,9 @@ fun RegistrationScreen(
     var isRefreshingLocation by rememberSaveable { mutableStateOf(false) }
 
     var isLoading by rememberSaveable { mutableStateOf(false) }
+    var dialogVisible by remember { mutableStateOf(false) }
+    var dialogTitle by remember { mutableStateOf("") }
+    var dialogMessage by remember { mutableStateOf("") }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -279,11 +283,10 @@ fun RegistrationScreen(
                 is RequestResult.Failure -> {
                     isLoading = false
                     LaunchedEffect(registerResult) {
-                        Toast.makeText(
-                            context,
-                            (registerResult as RequestResult.Failure).message,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        dialogTitle = "Oops... an error occurred"
+                        dialogMessage = (registerResult as RequestResult.Failure).message
+                        dialogVisible = true
+
                         delay(2000)
                         usersViewModel.resetRegisterResult()
                     }
@@ -292,6 +295,17 @@ fun RegistrationScreen(
                 is RequestResult.Loading -> {
                     isLoading = true
                 }
+            }
+
+            if (dialogVisible) {
+                GenericDialog(
+                    title = dialogTitle,
+                    message = dialogMessage,
+                    onExit = {
+                        dialogVisible = false
+                    },
+                    onExitText = stringResource(id = R.string.ok),
+                )
             }
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen))
