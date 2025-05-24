@@ -1,6 +1,7 @@
 package com.mapify.ui.screens
 
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import com.mapify.utils.isImageValid
 import kotlinx.coroutines.delay
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.mapify.ui.navigation.LocalMainViewModel
+import com.mapify.utils.RequestResult
 import updateCityCountry
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -41,8 +43,11 @@ fun EditReportScreen(
 ) {
     val context = LocalContext.current
     var isValidating by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var navigateAfterUpdate by remember { mutableStateOf(false) }
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
+    val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
     val storedReports by reportsViewModel.reports.collectAsState()
 
     val report = storedReports.find { it.id == reportId } ?: return
@@ -214,11 +219,49 @@ fun EditReportScreen(
                     switchCheckedOnClick = {
                         switchChecked = it
                     },
-                    isLoading = isValidating,
+                    isLoading = !isValidating && isLoading,
                     latitude = latitude,
                     longitude = longitude,
                     isEditing = true
                 )
+                when (reportRequestResult) {
+                    null -> {
+                        isLoading = false
+                    }
+
+                    is RequestResult.Success -> {
+                        isLoading = false
+                        LaunchedEffect(reportRequestResult) {
+                            Toast.makeText(
+                                context,
+                                (reportRequestResult as RequestResult.Success).message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            delay(1000)
+                            reportsViewModel.resetReportRequestResult()
+                            if(navigateAfterUpdate){
+                                navigateBack()
+                            }
+                        }
+                    }
+
+                    is RequestResult.Failure -> {
+                        isLoading = false
+                        LaunchedEffect(reportRequestResult) {
+                            Toast.makeText(
+                                context,
+                                (reportRequestResult as RequestResult.Failure).message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            delay(1000)
+                            reportsViewModel.resetReportRequestResult()
+                        }
+                    }
+
+                    is RequestResult.Loading -> {
+                        isLoading = true
+                    }
+                }
             }
         }
     }
@@ -254,7 +297,7 @@ fun EditReportScreen(
                     report.rejectionDate = null
                 }
                 reportsViewModel.update(report)
-                navigateBack() //TODO: add proper navigation when saving the report
+                navigateAfterUpdate = true
             },
             onCloseText = stringResource(id = R.string.cancel),
             onExitText = stringResource(id = R.string.edit)
