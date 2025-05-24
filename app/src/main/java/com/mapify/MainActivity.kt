@@ -21,17 +21,7 @@ class MainActivity : ComponentActivity() {
 
     private val usersViewModel: UsersViewModel by viewModels()
     private val reportsViewModel: ReportsViewModel by viewModels()
-    private val conversationsViewModel: ConversationsViewModel by viewModels {
-        object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                if (modelClass.isAssignableFrom(ConversationsViewModel::class.java)) {
-                    @Suppress("UNCHECKED_CAST")
-                    return ConversationsViewModel(usersViewModel) as T
-                }
-                throw IllegalArgumentException("Unknown ViewModel class")
-            }
-        }
-    }
+    private val conversationsViewModel: ConversationsViewModel by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     override fun onCreate(savedInstanceState: Bundle?) {
