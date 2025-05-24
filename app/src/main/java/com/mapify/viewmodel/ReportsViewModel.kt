@@ -28,6 +28,9 @@ class ReportsViewModel: ViewModel() {
     private val _reportRequestResult = MutableStateFlow<RequestResult?>(null)
     val reportRequestResult: StateFlow<RequestResult?> = _reportRequestResult.asStateFlow()
 
+    private val _createdReportId = MutableStateFlow<String?>(null)
+    val createdReportId: StateFlow<String?> = _createdReportId.asStateFlow()
+
     init{
         getReports()
     }
@@ -35,20 +38,28 @@ class ReportsViewModel: ViewModel() {
     fun create(report: Report) {
         viewModelScope.launch {
             _reportRequestResult.value = RequestResult.Loading
-            _reportRequestResult.value = kotlin.runCatching { createFirebase(report) }
-                .fold(
-                    onSuccess = { RequestResult.Success("Report created successfully") },
-                    onFailure = { RequestResult.Failure(it.message ?: "Error creating report") }
-                )
+
+            val result = runCatching { createFirebase(report) }
+
+            result.fold(
+                onSuccess = { id ->
+                    _createdReportId.value = id
+                    _reportRequestResult.value = RequestResult.Success("Report created successfully")
+                },
+                onFailure = { e ->
+                    _reportRequestResult.value = RequestResult.Failure(e.message ?: "Error creating report")
+                }
+            )
         }
         reloadReports()
     }
-
-    private suspend fun createFirebase(report: Report){
+    
+    private suspend fun createFirebase(report: Report): String{
         val reportMap = mapReport(report)
-        db.collection("reports")
+        val createdReportDocument = db.collection("reports")
             .add(reportMap)
             .await()
+        return createdReportDocument.id
     }
 
     private fun getReports() {
@@ -153,15 +164,6 @@ class ReportsViewModel: ViewModel() {
             .await()
     }
 
-    fun count(): Int {
-        return _reports.value.size
-    }
-
-    fun countComments(reportId: String): Int {
-        val report =_reports.value.find { it.id == reportId }
-        return report?.comments?.size ?: 0
-    }
-
 //    private suspend fun findByIdFirebase(reportId: String) {
 //        db.collection("reports")
 //            .document(updatedReport.id)
@@ -173,6 +175,10 @@ class ReportsViewModel: ViewModel() {
 
     fun resetReportRequestResult() {
         _reportRequestResult.value = null
+    }
+
+    fun resetCreatedReportId() {
+        _createdReportId.value = null
     }
 
     private fun reloadReports() {
