@@ -124,6 +124,8 @@ class UsersViewModel : ViewModel() {
             .set(userMap)
             .await()
 
+
+
         val authUser = auth.currentUser
         if (authUser != null && authUser.uid == user.id) {
             if (authUser.email != user.email) {
@@ -213,7 +215,7 @@ class UsersViewModel : ViewModel() {
                 loginFirebase(email, password)
             }
             _registerResult.value = result.fold(
-                onSuccess = { RequestResult.Success("Logged in") },
+                onSuccess = { RequestResult.Success("Logged in successfully") },
                 onFailure = { RequestResult.Failure(it.message ?: "Invalid email or password") }
             )
         }
