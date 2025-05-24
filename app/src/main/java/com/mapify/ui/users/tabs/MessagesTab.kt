@@ -34,6 +34,8 @@ fun MessagesTab(
         user?.let { userName = it.fullName }
     }
 
+    conversationsViewModel.getVisibleConversationsForUser(userId ?: "")
+
     val conversations by conversationsViewModel.conversations.collectAsState()
     var loadingConversationId by remember { mutableStateOf<String?>(null) }
 
