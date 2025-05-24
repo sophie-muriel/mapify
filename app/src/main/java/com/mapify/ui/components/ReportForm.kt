@@ -8,9 +8,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -50,7 +55,8 @@ fun ReportForm(
     isLoading: Boolean,
     latitude: Double? = null,
     longitude: Double? = null,
-    isEditing: Boolean = false
+    isEditing: Boolean = false,
+    validatingImageIndex: Int? = null
 ) {
     Column(
         modifier = Modifier
@@ -131,10 +137,18 @@ fun ReportForm(
                             },
                             enabled = if (index == 0) photos.size < 5 else true
                         ) {
-                            Icon(
-                                imageVector = if (index == 0) Icons.Outlined.Add else Icons.Outlined.Remove,
-                                contentDescription = null
-                            )
+                            if (validatingImageIndex == index) {
+                                CircularProgressIndicator(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = if (index == 0) Icons.Outlined.Add else Icons.Outlined.Remove,
+                                    contentDescription = null
+                                )
+                            }
                         }
                     }
                 )
