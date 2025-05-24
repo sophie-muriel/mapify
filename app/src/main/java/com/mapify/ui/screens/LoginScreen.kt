@@ -108,7 +108,16 @@ fun LoginScreen(
                     recoveryEmailTouched = true
                 },
                 onClickRecovery = {
-                    Toast.makeText(context, R.string.recovery_email_sent, Toast.LENGTH_SHORT).show()
+                    usersViewModel.sendPasswordReset(recoveryEmail) { success, error ->
+                        if (success) {
+                            dialogTitle = context.getString(R.string.email_sent)
+                            dialogMessage = context.getString(R.string.check_email_instructions)
+                        } else {
+                            dialogTitle = context.getString(R.string.email_error)
+                            dialogMessage = error ?: context.getString(R.string.unknown_error)
+                        }
+                        dialogVisible = true
+                    }
                 },
                 recoveryEmailError = recoveryEmailError,
                 resetRecoveryFields = { resetRecoveryFields() },

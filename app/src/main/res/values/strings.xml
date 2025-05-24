@@ -193,6 +193,11 @@
 
     <string name="location_access_permission_granted">Location access permission granted</string>
     <string name="location_access_permission_denied">Location access permission denied</string>
-    
+
     <string name="center_on_user_location_icon">Center on user\'s location Icon</string>
+    <string name="email_sent">Email Sent!</string>
+    <string name="check_email_instructions">Please check your email for password reset instructions.</string>
+    <string name="email_error">Failed to Send Email</string>
+    <string name="unknown_error">An unknown error occurred.</string>
+
 </resources>

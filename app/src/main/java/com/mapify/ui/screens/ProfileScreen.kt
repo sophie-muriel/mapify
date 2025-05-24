@@ -234,7 +234,19 @@ fun ProfileScreen(
                 emailError = emailError,
                 onRefreshLocation = { refreshLocation() },
                 isRefreshingLocation = isRefreshingLocation,
-                isLoading = isLoading
+                isLoading = isLoading,
+                onClickRecoverPassword = {
+                    usersViewModel.sendPasswordReset(user!!.email) { success, error ->
+                        if (success) {
+                            dialogTitle = context.getString(R.string.email_sent)
+                            dialogMessage = context.getString(R.string.check_email_instructions)
+                        } else {
+                            dialogTitle = context.getString(R.string.email_error)
+                            dialogMessage = error ?: context.getString(R.string.unknown_error)
+                        }
+                        dialogVisible = true
+                    }
+                }
             )
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen / 2))
@@ -324,7 +336,8 @@ fun ProfileContent(
     emailError: Boolean,
     onRefreshLocation: () -> Unit,
     isRefreshingLocation: Boolean,
-    isLoading: Boolean
+    isLoading: Boolean,
+    onClickRecoverPassword: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -408,6 +421,30 @@ fun ProfileContent(
                 }
             }
         )
+
+        Spacer(modifier = Modifier.height(Spacing.Inline * 2))
+        Button(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.Sides).height(40.dp),
+            enabled = true,
+            onClick = onClickRecoverPassword,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = "Reset password",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
 
         if (isEditMode) {
             Spacer(modifier = Modifier.height(Spacing.Inline * 2))
