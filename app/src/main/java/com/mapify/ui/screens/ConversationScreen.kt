@@ -98,6 +98,10 @@ fun ConversationScreen(
         }
     }
 
+    LaunchedEffect(conversationId) {
+        conversationsViewModel.observeMessages(conversationId!!)
+    }
+
     if (isLoading || conversationId == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
