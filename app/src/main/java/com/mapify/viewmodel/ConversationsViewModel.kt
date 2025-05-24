@@ -24,7 +24,7 @@ import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
 import java.util.UUID
 
-class ConversationsViewModel(private val usersViewModel: UsersViewModel) : ViewModel() {
+class ConversationsViewModel() : ViewModel() {
 
     private val db = Firebase.firestore
 
