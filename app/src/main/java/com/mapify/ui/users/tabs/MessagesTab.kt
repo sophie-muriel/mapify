@@ -34,8 +34,6 @@ fun MessagesTab(
         user?.let { userName = it.fullName }
     }
 
-    conversationsViewModel.getVisibleConversationsForUser(userId ?: "")
-
     LaunchedEffect(userId) {
         conversationsViewModel.observeAllConversations(userId!!)
     }
@@ -49,8 +47,8 @@ fun MessagesTab(
     val conversations by conversationsViewModel.conversations.collectAsState()
     var loadingConversationId by remember { mutableStateOf<String?>(null) }
 
-    val filteredConversations = conversations.filter { conversation ->
-        userId in conversation.participants.map { it.id } && conversation.messages.isNotEmpty()
+    val filteredConversations = conversations.filter {
+        userId in it.participants.map { p -> p.id } && it.messages.isNotEmpty()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
