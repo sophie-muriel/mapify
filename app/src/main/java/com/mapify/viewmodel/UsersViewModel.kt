@@ -1,9 +1,5 @@
 package com.mapify.viewmodel
 
-import android.content.Context
-import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -13,7 +9,6 @@ import com.google.firebase.ktx.Firebase
 import com.mapify.model.Location
 import com.mapify.model.User
 import com.mapify.utils.RequestResult
-import com.mapify.utils.SharedPreferencesUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -129,7 +124,7 @@ class UsersViewModel : ViewModel() {
         val authUser = auth.currentUser
         if (authUser != null && authUser.uid == user.id) {
             if (authUser.email != user.email) {
-                authUser.updateEmail(user.email).await()
+                authUser.verifyBeforeUpdateEmail(user.email).await()
             }
 
             if (user.password.isNotEmpty()) {
@@ -230,6 +225,17 @@ class UsersViewModel : ViewModel() {
         val responseUser = auth.signInWithEmailAndPassword(email, password).await()
         val userId = responseUser.user?.uid ?: ""
         findByIdFirebase(userId, true)
+    }
+
+    fun sendPasswordReset(email: String, onComplete: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                auth.sendPasswordResetEmail(email).await()
+                onComplete(true, null)
+            } catch (e: Exception) {
+                onComplete(false, e.message)
+            }
+        }
     }
 
     private fun getUsers() {
