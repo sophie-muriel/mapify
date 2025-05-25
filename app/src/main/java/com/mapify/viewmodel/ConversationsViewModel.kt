@@ -362,6 +362,8 @@ class ConversationsViewModel() : ViewModel() {
                         val deletedForList =
                             data["deletedFor"] as? MutableList<String> ?: mutableListOf()
 
+                        if (userId in deletedForList) return@mapNotNull null
+
                         Conversation(
                             id = doc.id,
                             participants = participants,
