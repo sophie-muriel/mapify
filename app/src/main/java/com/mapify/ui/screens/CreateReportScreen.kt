@@ -6,6 +6,7 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -147,6 +148,12 @@ fun CreateReportScreen(
         }
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            reportsViewModel.resetCreatedReportId()
+        }
+    }
+
     Scaffold(
         topBar = {
             SimpleTopBar(
@@ -167,10 +174,12 @@ fun CreateReportScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .systemBarsPadding()
+                .consumeWindowInsets(innerPadding)
         ) {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .imePadding(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 ReportForm(
@@ -236,8 +245,10 @@ fun CreateReportScreen(
                             ).show()
                             delay(1500)
                             reportsViewModel.resetReportRequestResult()
-                            reportsViewModel.resetCreatedReportId()
-                            createdReportId?.let { navigateToReportView(it) }
+                            //reportsViewModel.resetCreatedReportId()
+                            if (navigateAfterCreate) {
+                                createdReportId?.let { navigateToReportView(it) }
+                            }
                         }
                     }
 
