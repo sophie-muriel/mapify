@@ -75,28 +75,7 @@ class ReportsViewModel: ViewModel() {
 
         return query.documents.mapNotNull { document ->
             try {
-                val report = Report(
-                    id = document.id,
-                    title = document.getString("title") ?: "",
-                    category = document.getString("category")?.let { categoryStr ->
-                        Category.entries.firstOrNull { it.name == categoryStr }
-                    } ?: Category.SECURITY,
-                    description = document.getString("description") ?: "",
-                    images = document.get("images") as? List<String> ?: emptyList(),
-                    location = document.getLocationFromFirebase(),
-                    status = document.getString("status")?.let { statusStr ->
-                        ReportStatus.entries.firstOrNull { it.name == statusStr }
-                    } ?: ReportStatus.NOT_VERIFIED,
-                    userId = document.getString("userId") ?: "",
-                    date = document.getString("date")?.let { parseDate(it) } ?: LocalDateTime.now(),
-                    isResolved = document.getBoolean("isResolved") ?: false,
-                    priorityCounter = (document.getLong("priorityCounter") ?: 0L).toInt(),
-                    rejectionDate = document.getString("rejectionDate")?.let { parseDate(it) },
-                    isDeletedManually = document.getBoolean("isDeletedManually") ?: false,
-                    rejectionMessage = document.getString("rejectionMessage"),
-                    reportBoosters = document.get("reportBoosters") as? MutableList<String> ?: mutableListOf(),
-                    comments = parseCommentsListFromMap(document.get("comments"))
-                )
+                val report = deserializeReport(document)
                 report
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -211,6 +190,31 @@ class ReportsViewModel: ViewModel() {
                     "date" to comment.date.toString()
                 )
             }
+        )
+    }
+
+    private fun deserializeReport(document: DocumentSnapshot): Report{
+        return Report(
+            id = document.id,
+            title = document.getString("title") ?: "",
+            category = document.getString("category")?.let { categoryStr ->
+                Category.entries.firstOrNull { it.name == categoryStr }
+            } ?: Category.SECURITY,
+            description = document.getString("description") ?: "",
+            images = document.get("images") as? List<String> ?: emptyList(),
+            location = document.getLocationFromFirebase(),
+            status = document.getString("status")?.let { statusStr ->
+                ReportStatus.entries.firstOrNull { it.name == statusStr }
+            } ?: ReportStatus.NOT_VERIFIED,
+            userId = document.getString("userId") ?: "",
+            date = document.getString("date")?.let { parseDate(it) } ?: LocalDateTime.now(),
+            isResolved = document.getBoolean("isResolved") ?: false,
+            priorityCounter = (document.getLong("priorityCounter") ?: 0L).toInt(),
+            rejectionDate = document.getString("rejectionDate")?.let { parseDate(it) },
+            isDeletedManually = document.getBoolean("isDeletedManually") ?: false,
+            rejectionMessage = document.getString("rejectionMessage"),
+            reportBoosters = document.get("reportBoosters") as? MutableList<String> ?: mutableListOf(),
+            comments = parseCommentsListFromMap(document.get("comments"))
         )
     }
 
