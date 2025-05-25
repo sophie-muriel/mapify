@@ -163,6 +163,8 @@ fun Navigation(
                             reportId = args.reportId,
                             reportStatusP = args.reportStatus,
                             navigateBack = {
+                                latitude.value = null
+                                longitude.value = null
                                 navController.popBackStack()
                             },
                             navigateToReportEdit = {
