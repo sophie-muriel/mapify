@@ -83,8 +83,11 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Unpublished
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.draw.drawBehind
@@ -114,7 +117,31 @@ fun ReportViewScreen(
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
 
-    val storedReports by reportsViewModel.reports.collectAsState()
+    LaunchedEffect(reportId) {
+        reportsViewModel.findById(reportId)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            reportsViewModel.resetCurrentReport()
+        }
+    }
+
+    val report by reportsViewModel.currentReport.collectAsState()
+
+    if (report == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(40.dp),
+                strokeWidth = 4.dp
+            )
+        }
+        return
+    }
 
     val users by usersViewModel.users.collectAsState()
 
@@ -141,30 +168,29 @@ fun ReportViewScreen(
 
     var storedComments by remember { mutableStateOf(emptyList<Comment>()) }
 
-    val report = storedReports.find { it.id == reportId } ?: return
-    var reportStatus by remember { mutableStateOf(report.status) }
+    var reportStatus by remember { mutableStateOf(report!!.status) }
 
-    val starIcon = if (report.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline
-    val starIconDescription = if (report.isHighPriority)
+    val starIcon = if (report!!.isHighPriority) Icons.Filled.Star else Icons.Filled.StarOutline
+    val starIconDescription = if (report!!.isHighPriority)
         stringResource(id = R.string.star_icon_prioritized) else stringResource(id = R.string.star_icon_not_prioritized)
     val tint =
-        if (report.isHighPriority) MaterialTheme.colorScheme.primary else LocalContentColor.current
+        if (report!!.isHighPriority) MaterialTheme.colorScheme.primary else LocalContentColor.current
 
 
-    val state = rememberCarouselState { report.images.count() }
+    val state = rememberCarouselState { report!!.images.count() }
     val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     var showComments by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var comment by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
 
-    val isCreator = userId == report.userId
+    val isCreator = userId == report!!.userId
     var showDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
     var showVerifyDialog by rememberSaveable { mutableStateOf(false) }
     var showRejectionInputDialog by rememberSaveable { mutableStateOf(false) }
     var rejectionMessage by remember { mutableStateOf("") }
     var canBoost by rememberSaveable { mutableStateOf(false) }
-    if(userId !in report.reportBoosters){
+    if(userId !in report!!.reportBoosters){
         canBoost = true
     }
 
@@ -285,7 +311,7 @@ fun ReportViewScreen(
         ) {
             Carousel(
                 state = state,
-                list = report.images
+                list = report!!.images
             )
 
             Column(
@@ -295,7 +321,7 @@ fun ReportViewScreen(
                 verticalArrangement = Arrangement.spacedBy(Spacing.Sides)
             ) {
                 TitleAndVerified(
-                    report = report,
+                    report = report!!,
                     reportStatus = reportStatus
                 )
 
@@ -304,7 +330,7 @@ fun ReportViewScreen(
                     horizontalArrangement = Arrangement.spacedBy(Spacing.Inline),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (report.isResolved) {
+                    if (report!!.isResolved) {
                         InfoChip(
                             icon = Icons.Outlined.Check,
                             text = stringResource(id = R.string.resolved),
@@ -313,14 +339,14 @@ fun ReportViewScreen(
                     }
                     InfoChip(
                         icon = Icons.Outlined.Sell,
-                        text = report.category.displayName,
+                        text = report!!.category.displayName,
                         onClick = { }
                     )
                     InfoChip(
                         icon = Icons.Default.Place,
                         text = "1.2KM",
                         onClick = {
-                            navigateToReportLocation(report.location?.latitude, report.location?.longitude)
+                            navigateToReportLocation(report!!.location?.latitude, report!!.location?.longitude)
                         },
                         isClickable = true
                     )
@@ -329,24 +355,24 @@ fun ReportViewScreen(
                 ItemDetailReport(
                     icon = Icons.Default.Person,
                     iconDescription = stringResource(id = R.string.person_icon),
-                    text = users.find { it.id == report.userId }?.fullName ?: ""
+                    text = users.find { it.id == report!!.userId }?.fullName ?: ""
                 )
 
                 ItemDetailReport(
                     icon = Icons.Filled.Today,
                     iconDescription = stringResource(id = R.string.date_icon),
-                    text = report.date.format(dateFormat)
+                    text = report!!.date.format(dateFormat)
                 )
 
                 DescriptionText(
-                    text = report.description,
+                    text = report!!.description,
                     scrollState = scrollState
                 )
             }
         }
 
         if (showComments) {
-            storedComments = reportsViewModel.findById(reportId)?.comments ?: emptyList()
+            storedComments = report!!.comments//reportsViewModel.findById(reportId)?.comments ?: emptyList()
             Comments(
                 state = bottomSheetState,
                 onDismissRequest = {
@@ -362,8 +388,26 @@ fun ReportViewScreen(
                         userId = userId?: "",
                         date = LocalDateTime.now()
                     )
-                    report.comments.add(newComment)
-                    reportsViewModel.update(report)
+                    val updatedReport = Report(
+                        id = report!!.id,
+                        title = report!!.title,
+                        category = report!!.category,
+                        description = report!!.description,
+                        images = report!!.images,
+                        location = report!!.location,
+                        status = report!!.status,
+                        userId = report!!.userId,
+                        date = report!!.date,
+                        isResolved = report!!.isResolved,
+                        priorityCounter = report!!.priorityCounter,
+                        rejectionDate = report!!.rejectionDate,
+                        isDeletedManually = report!!.isDeletedManually,
+                        rejectionMessage = report!!.rejectionMessage,
+                        reportBoosters = report!!.reportBoosters,
+                        comments = (report!!.comments + newComment).toMutableList()
+                    )
+                    reportsViewModel.update(updatedReport)
+                    storedComments = report!!.comments
                     comment = ""
                 },
                 users = users,
@@ -382,7 +426,25 @@ fun ReportViewScreen(
                 message = stringResource(id = R.string.delete_report_description),
                 onClose = { showDeleteDialogVisible = false },
                 onExit = {
-                    reportsViewModel.deactivate(report)
+                    val deactivatedReport = Report(
+                        id = report!!.id,
+                        title = report!!.title,
+                        category = report!!.category,
+                        description = report!!.description,
+                        images = report!!.images,
+                        location = report!!.location,
+                        status = report!!.status,
+                        userId = report!!.userId,
+                        date = report!!.date,
+                        isResolved = report!!.isResolved,
+                        priorityCounter = report!!.priorityCounter,
+                        rejectionDate = report!!.rejectionDate,
+                        isDeletedManually = report!!.isDeletedManually,
+                        rejectionMessage = report!!.rejectionMessage,
+                        reportBoosters = report!!.reportBoosters,
+                        comments = report!!.comments
+                    )
+                    reportsViewModel.deactivate(deactivatedReport)
                     Toast.makeText(context, reportDeleted, Toast.LENGTH_SHORT).show()
                     showDeleteDialogVisible = false
                     navigateBack()
@@ -403,13 +465,33 @@ fun ReportViewScreen(
                 onExit = {
                     Toast.makeText(context, reportVerified, Toast.LENGTH_SHORT).show()
                     showVerifyDialog = false
-                    if(report.rejectionMessage != null){
-                        report.rejectionMessage = null
-                        report.rejectionDate = null
+                    val updatedReport = Report(
+                        id = report!!.id,
+                        title = report!!.title,
+                        category = report!!.category,
+                        description = report!!.description,
+                        images = report!!.images,
+                        location = report!!.location,
+                        status = report!!.status,
+                        userId = report!!.userId,
+                        date = report!!.date,
+                        isResolved = report!!.isResolved,
+                        priorityCounter = report!!.priorityCounter,
+                        rejectionDate = report!!.rejectionDate,
+                        isDeletedManually = report!!.isDeletedManually,
+                        rejectionMessage = report!!.rejectionMessage,
+                        reportBoosters = report!!.reportBoosters,
+                        comments = report!!.comments
+                    )
+                    if(report!!.rejectionMessage != null){
+                        updatedReport.rejectionMessage = null
+                        //report!!.rejectionMessage = null
+                        updatedReport.rejectionDate = null
+                        //report!!.rejectionDate = null
                     }
                     reportStatus = ReportStatus.VERIFIED
-                    report.status = ReportStatus.VERIFIED
-                    reportsViewModel.update(report)
+                    updatedReport.status = ReportStatus.VERIFIED
+                    reportsViewModel.update(updatedReport)
                 },
                 onCloseText =stringResource(id = R.string.cancel),
                 onExitText = stringResource(id = R.string.verify)
@@ -435,11 +517,29 @@ fun ReportViewScreen(
                     }
                     Toast.makeText(context, rejectionMessageSend, Toast.LENGTH_SHORT).show()
                     showRejectionInputDialog = false
-                    report.rejectionMessage = rejectionMessage
+                    val updatedReport = Report(
+                        id = report!!.id,
+                        title = report!!.title,
+                        category = report!!.category,
+                        description = report!!.description,
+                        images = report!!.images,
+                        location = report!!.location,
+                        status = report!!.status,
+                        userId = report!!.userId,
+                        date = report!!.date,
+                        isResolved = report!!.isResolved,
+                        priorityCounter = report!!.priorityCounter,
+                        rejectionDate = report!!.rejectionDate,
+                        isDeletedManually = report!!.isDeletedManually,
+                        rejectionMessage = report!!.rejectionMessage,
+                        reportBoosters = report!!.reportBoosters,
+                        comments = report!!.comments
+                    )
+                    updatedReport.rejectionMessage = rejectionMessage
                     reportStatus = ReportStatus.PENDING_VERIFICATION
-                    report.status = ReportStatus.PENDING_VERIFICATION
-                    report.rejectionDate = LocalDateTime.now()
-                    reportsViewModel.update(report)
+                    updatedReport.status = ReportStatus.PENDING_VERIFICATION
+                    updatedReport.rejectionDate = LocalDateTime.now()
+                    reportsViewModel.update(updatedReport)
                     rejectionMessage = ""
                 },
                 onCloseText =stringResource(id = R.string.cancel),
@@ -467,9 +567,27 @@ fun ReportViewScreen(
 
         if(showBoostToast && canBoost && !boosted){
             Toast.makeText(context, reportBoosted, Toast.LENGTH_SHORT).show()
-            report.priorityCounter++
-            report.reportBoosters.add(userId?: "")
-            reportsViewModel.update(report)
+            val updatedReport = Report(
+                id = report!!.id,
+                title = report!!.title,
+                category = report!!.category,
+                description = report!!.description,
+                images = report!!.images,
+                location = report!!.location,
+                status = report!!.status,
+                userId = report!!.userId,
+                date = report!!.date,
+                isResolved = report!!.isResolved,
+                priorityCounter = report!!.priorityCounter,
+                rejectionDate = report!!.rejectionDate,
+                isDeletedManually = report!!.isDeletedManually,
+                rejectionMessage = report!!.rejectionMessage,
+                reportBoosters = report!!.reportBoosters,
+                comments = report!!.comments
+            )
+            updatedReport.priorityCounter++
+            updatedReport.reportBoosters.add(userId?: "")
+            reportsViewModel.update(updatedReport)
             boosted = true
             showBoostToast = false
         }else if(showBoostToast && (!canBoost || boosted)){
