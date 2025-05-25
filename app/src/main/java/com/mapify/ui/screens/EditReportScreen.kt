@@ -48,28 +48,31 @@ fun EditReportScreen(
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
     val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
-    val storedReports by reportsViewModel.reports.collectAsState()
 
-    val report = storedReports.find { it.id == reportId } ?: return
+    LaunchedEffect(reportId) {
+        reportsViewModel.findById(reportId)
+    }
 
-    var switchChecked by rememberSaveable { mutableStateOf(report.isResolved) }
-    var title by rememberSaveable { mutableStateOf(report.title) }
+    val report by reportsViewModel.currentReport.collectAsState()
+
+    var switchChecked by rememberSaveable { mutableStateOf(report!!.isResolved) }
+    var title by rememberSaveable { mutableStateOf(report!!.title) }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
     val titleError = titleTouched && title.isBlank()
 
-    var dropDownValue by rememberSaveable { mutableStateOf(report.category.displayName) }
+    var dropDownValue by rememberSaveable { mutableStateOf(report!!.category.displayName) }
     var dropDownExpanded by rememberSaveable { mutableStateOf(false) }
     var dropDownTouched by rememberSaveable { mutableStateOf(false) }
     val categories = Category.entries.map { it.displayName }
     val dropDownError = dropDownValue.isBlank()
 
-    var description by rememberSaveable { mutableStateOf(report.description) }
+    var description by rememberSaveable { mutableStateOf(report!!.description) }
     var descriptionTouched by rememberSaveable { mutableStateOf(false) }
     val descriptionError = descriptionTouched && (description.isBlank() || description.length < 10)
 
     val locationError = false
 
-    var photos by rememberSaveable { mutableStateOf(report.images.toMutableList()) }
+    var photos by rememberSaveable { mutableStateOf(report!!.images.toMutableList()) }
     var photoTouchedList by rememberSaveable { mutableStateOf(List(photos.size) { false }) }
     var photoErrors by remember { mutableStateOf(List(photos.size) { false }) }
     var validatingImageIndex by remember { mutableStateOf<Int?>(null) }
@@ -144,7 +147,7 @@ fun EditReportScreen(
             locationNotVisible = loc
             locationVisible = loc.toString()
         }else{
-            val loc = report.location
+            val loc = report!!.location
             loc?.updateCityCountry(context)
             locationNotVisible = loc
             locationVisible = loc?.toString().orEmpty()
@@ -225,7 +228,7 @@ fun EditReportScreen(
                         if(latitude != null && longitude != null){
                             navigateToReportLocation(latitude, longitude)
                         }else{
-                            navigateToReportLocation(report.location?.latitude, report.location?.longitude)
+                            navigateToReportLocation(report!!.location?.latitude, report!!.location?.longitude)
                         }
                     },
                     onClickCreate = {
@@ -311,22 +314,40 @@ fun EditReportScreen(
             onExit = {
                 saveReportVisible = false
                 try {
-                    report.title = title
-                    report.category = Category.entries.first { it.displayName == dropDownValue }
-                    report.description = description
-                    report.isResolved = switchChecked
-                    report.location = locationNotVisible
-                    report.images = photos.toList()
+                    val updatedReport = Report(
+                        id = report!!.id,
+                        title = title,
+                        category = Category.entries.first { it.displayName == dropDownValue },
+                        description = description,
+                        images = photos.toList(),
+                        location = locationNotVisible,
+                        status = report!!.status,
+                        userId = report!!.userId,
+                        date = report!!.date,
+                        isResolved = switchChecked,
+                        priorityCounter = report!!.priorityCounter,
+                        rejectionDate = report!!.rejectionDate,
+                        isDeletedManually = report!!.isDeletedManually,
+                        rejectionMessage = report!!.rejectionMessage,
+                        reportBoosters = report!!.reportBoosters,
+                        comments = report!!.comments
+                    )
+//                    report!!.title = title
+//                    report!!.category = Category.entries.first { it.displayName == dropDownValue }
+//                    report!!.description = description
+//                    report!!.isResolved = switchChecked
+//                    report!!.location = locationNotVisible
+//                    report!!.images = photos.toList()
 
-                    if ((titleTouched || dropDownTouched || descriptionTouched || photoTouchedList.any { it }) && report.rejectionDate != null) {
-                        report.rejectionDate = null
+                    if ((titleTouched || dropDownTouched || descriptionTouched || photoTouchedList.any { it }) && report!!.rejectionDate != null) {
+                        updatedReport.rejectionDate = null
                     }
 
-                    reportsViewModel.update(report)
+                    reportsViewModel.update(updatedReport)
                     navigateAfterUpdate = true
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Toast.makeText(context, "Error al guardar el reporte: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Report saving error: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             },
             onCloseText = stringResource(id = R.string.cancel),
