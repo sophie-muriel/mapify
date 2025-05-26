@@ -118,6 +118,8 @@ fun Navigation(
                         )
                     }
                     composable<RouteScreen.CreateReport> {
+                        latitude.value = null
+                        longitude.value = null
                         CreateReportScreen(
                             latitude = latitude.value,
                             longitude = longitude.value,
