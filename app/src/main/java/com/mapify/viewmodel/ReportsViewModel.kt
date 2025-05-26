@@ -3,6 +3,7 @@ package com.mapify.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.mapify.model.Report
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,11 +35,10 @@ class ReportsViewModel: ViewModel() {
     private val _currentReport = MutableStateFlow<Report?>(null)
     val currentReport: StateFlow<Report?> = _currentReport.asStateFlow()
 
-    private val _refreshTrigger = MutableStateFlow(0)
-    val refreshTrigger = _refreshTrigger.asStateFlow()
+    private var reportListener: ListenerRegistration? = null
 
     init{
-        getReports()
+        listenToReportsRealtime()
     }
     
     fun create(report: Report) {
@@ -52,7 +52,6 @@ class ReportsViewModel: ViewModel() {
             result.fold(
                 onSuccess = { id ->
                     _createdReportId.value = id
-                    triggerRefresh()
                     _reportRequestResult.value = RequestResult.Success("Report created successfully")
                 },
                 onFailure = { e ->
@@ -92,6 +91,30 @@ class ReportsViewModel: ViewModel() {
         }
     }
 
+    private fun listenToReportsRealtime() {
+        reportListener?.remove()
+        reportListener = db.collection("reports")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null || snapshot == null) {
+                    return@addSnapshotListener
+                }
+                val reportsList = snapshot.documents.mapNotNull { document ->
+                    try {
+                        deserializeReport(document)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        null
+                    }
+                }
+                _reports.value = reportsList
+            }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        reportListener?.remove()
+    }
+
     fun findById(reportId: String) {
         viewModelScope.launch {
             _currentReport.value = findByIdFirebase(reportId)
@@ -116,7 +139,6 @@ class ReportsViewModel: ViewModel() {
             }.fold(
                 onSuccess = {
                     _currentReport.value = it
-                    triggerRefresh()
                     RequestResult.Success("Report updated successfully")
                 },
                 onFailure = {
@@ -140,7 +162,6 @@ class ReportsViewModel: ViewModel() {
             _reportRequestResult.value = kotlin.runCatching { updateFirebase(deactivatedReport) }
                 .fold (
                     onSuccess = {
-                        triggerRefresh()
                         RequestResult.Success("Report deleted successfully")
                     },
                     onFailure = { RequestResult.Failure(it.message?: "Error deleting report") }
@@ -154,7 +175,6 @@ class ReportsViewModel: ViewModel() {
             _reportRequestResult.value = kotlin.runCatching { deleteFirebase(reportId) }
                 .fold (
                     onSuccess = {
-                        triggerRefresh()
                         RequestResult.Success("Report deleted successfully")
                     },
                     onFailure = { RequestResult.Failure(it.message?: "Error deleting report") }
@@ -184,14 +204,6 @@ class ReportsViewModel: ViewModel() {
 
     fun resetCurrentReport() {
         _currentReport.value = null
-    }
-
-    fun reloadReports() {
-        getReports()
-    }
-
-    private fun triggerRefresh() {
-        _refreshTrigger.value += 1
     }
 
     private fun mapReport(report: Report): Map<String, Any?> {
