@@ -34,6 +34,9 @@ class ReportsViewModel: ViewModel() {
     private val _currentReport = MutableStateFlow<Report?>(null)
     val currentReport: StateFlow<Report?> = _currentReport.asStateFlow()
 
+    private val _refreshTrigger = MutableStateFlow(0)
+    val refreshTrigger = _refreshTrigger.asStateFlow()
+
     init{
         getReports()
     }
@@ -49,6 +52,7 @@ class ReportsViewModel: ViewModel() {
             result.fold(
                 onSuccess = { id ->
                     _createdReportId.value = id
+                    triggerRefresh()
                     _reportRequestResult.value = RequestResult.Success("Report created successfully")
                 },
                 onFailure = { e ->
@@ -112,6 +116,7 @@ class ReportsViewModel: ViewModel() {
             }.fold(
                 onSuccess = {
                     _currentReport.value = it
+                    triggerRefresh()
                     RequestResult.Success("Report updated successfully")
                 },
                 onFailure = {
@@ -134,7 +139,10 @@ class ReportsViewModel: ViewModel() {
             _reportRequestResult.value = RequestResult.Loading
             _reportRequestResult.value = kotlin.runCatching { updateFirebase(deactivatedReport) }
                 .fold (
-                    onSuccess = { RequestResult.Success("Report deleted successfully") },
+                    onSuccess = {
+                        triggerRefresh()
+                        RequestResult.Success("Report deleted successfully")
+                    },
                     onFailure = { RequestResult.Failure(it.message?: "Error deleting report") }
                 )
         }
@@ -145,7 +153,10 @@ class ReportsViewModel: ViewModel() {
             _reportRequestResult.value = RequestResult.Loading
             _reportRequestResult.value = kotlin.runCatching { deleteFirebase(reportId) }
                 .fold (
-                    onSuccess = { RequestResult.Success("Report deleted successfully") },
+                    onSuccess = {
+                        triggerRefresh()
+                        RequestResult.Success("Report deleted successfully")
+                    },
                     onFailure = { RequestResult.Failure(it.message?: "Error deleting report") }
                 )
         }
@@ -177,6 +188,10 @@ class ReportsViewModel: ViewModel() {
 
     fun reloadReports() {
         getReports()
+    }
+
+    private fun triggerRefresh() {
+        _refreshTrigger.value += 1
     }
 
     private fun mapReport(report: Report): Map<String, Any?> {
