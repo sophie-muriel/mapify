@@ -440,7 +440,7 @@ fun ReportViewScreen(
                     val updatedReport = createUpdatedReport(report)
                     if (updatedReport != null && comment.isNotBlank()) {
                         updatedReport.comments += newComment
-                        reportsViewModel.postComment(updatedReport)
+                        reportsViewModel.update(updatedReport, 2)
                         storedComments = report!!.comments
                         comment = ""
                     }
@@ -492,7 +492,7 @@ fun ReportViewScreen(
                     reportStatus = ReportStatus.VERIFIED
                     if (updatedReport != null) {
                         updatedReport.status = ReportStatus.VERIFIED
-                        reportsViewModel.verify(updatedReport)
+                        reportsViewModel.update(updatedReport, 3)
                     }
                 },
                 onCloseText =stringResource(id = R.string.cancel),
@@ -525,7 +525,7 @@ fun ReportViewScreen(
                         reportStatus = ReportStatus.PENDING_VERIFICATION
                         updatedReport.status = ReportStatus.PENDING_VERIFICATION
                         updatedReport.rejectionDate = LocalDateTime.now()
-                        reportsViewModel.reject(updatedReport)
+                        reportsViewModel.update(updatedReport, 4)
                     }
                     rejectionMessage = ""
                 },
@@ -558,7 +558,7 @@ fun ReportViewScreen(
             if (updatedReport != null) {
                 updatedReport.priorityCounter++
                 updatedReport.reportBoosters.add(userId?: "")
-                reportsViewModel.update(updatedReport)
+                reportsViewModel.update(updatedReport, 5)
                 boosted = true
                 showBoostToast = false
             }
