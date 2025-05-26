@@ -257,7 +257,7 @@ fun EditReportScreen(
 
                     is RequestResult.Success -> {
                         isLoading = false
-                        LaunchedEffect(reportRequestResult) {
+                        LaunchedEffect(Unit) {
                             Toast.makeText(
                                 context,
                                 (reportRequestResult as RequestResult.Success).message,
@@ -273,7 +273,7 @@ fun EditReportScreen(
 
                     is RequestResult.Failure -> {
                         isLoading = false
-                        LaunchedEffect(reportRequestResult) {
+                        LaunchedEffect(Unit) {
                             Toast.makeText(
                                 context,
                                 (reportRequestResult as RequestResult.Failure).message,
