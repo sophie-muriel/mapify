@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -99,7 +100,9 @@ import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.navigation.LocalMainViewModel
+import com.mapify.utils.RequestResult
 import com.mapify.utils.SharedPreferencesUtils
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,6 +119,7 @@ fun ReportViewScreen(
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
+    val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
 
     LaunchedEffect(reportId) {
         reportsViewModel.findById(reportId)
@@ -124,10 +128,14 @@ fun ReportViewScreen(
     DisposableEffect(Unit) {
         onDispose {
             reportsViewModel.resetCurrentReport()
+            reportsViewModel.resetReportRequestResult()
         }
     }
 
     val report by reportsViewModel.currentReport.collectAsState()
+
+    var isLoading by rememberSaveable { mutableStateOf(false) }
+    var isDeleting by rememberSaveable { mutableStateOf(false) }
 
     if (report == null) {
         Box(
@@ -368,11 +376,52 @@ fun ReportViewScreen(
                     text = report!!.description,
                     scrollState = scrollState
                 )
+
+                LaunchedEffect(reportRequestResult) {
+                    when (reportRequestResult) {
+                        null -> {
+                            Log.d("ReportResult", "Result is null")
+                            isLoading = false
+                        }
+                        is RequestResult.Success -> {
+                            isLoading = false
+                            Log.d("ReportResult", "Success result detected")
+                            Toast.makeText(
+                                context,
+                                (reportRequestResult as RequestResult.Success).message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            delay(1000)
+                            reportsViewModel.resetReportRequestResult()
+                            if (isDeleting) {
+                                isDeleting = false
+                                navigateBack()
+                            }
+                        }
+                        is RequestResult.Failure -> {
+                            isLoading = false
+                            Log.d("ReportResult", "Failure result detected")
+                            Toast.makeText(
+                                context,
+                                (reportRequestResult as RequestResult.Failure).message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            delay(1000)
+                            reportsViewModel.resetReportRequestResult()
+                        }
+                        is RequestResult.Loading -> {
+                            Log.d("ReportResult", "Loading result detected")
+                            isLoading = true
+                        }
+                    }
+                }
             }
         }
 
         if (showComments) {
-            storedComments = report!!.comments//reportsViewModel.findById(reportId)?.comments ?: emptyList()
+            storedComments = report!!.comments
             Comments(
                 state = bottomSheetState,
                 onDismissRequest = {
@@ -389,19 +438,17 @@ fun ReportViewScreen(
                         date = LocalDateTime.now()
                     )
                     val updatedReport = createUpdatedReport(report)
-                    if (updatedReport != null) {
+                    if (updatedReport != null && comment.isNotBlank()) {
                         updatedReport.comments += newComment
-                        reportsViewModel.update(updatedReport)
+                        reportsViewModel.postComment(updatedReport)
+                        storedComments = report!!.comments
+                        comment = ""
                     }
-                    storedComments = report!!.comments
-                    comment = ""
                 },
                 users = users,
                 userId = userId?: ""
             )
         }
-
-        val reportDeleted = stringResource(id = R.string.report_deleted)
 
         if(showDeleteDialogVisible){
             GenericDialog(
@@ -414,18 +461,17 @@ fun ReportViewScreen(
                 onExit = {
                     val deactivatedReport = createUpdatedReport(report)
                     if (deactivatedReport != null) {
+                        isDeleting = true
                         reportsViewModel.deactivate(deactivatedReport)
                     }
-                    Toast.makeText(context, reportDeleted, Toast.LENGTH_SHORT).show()
                     showDeleteDialogVisible = false
-                    navigateBack()
                 },
                 onCloseText = stringResource(id = R.string.cancel),
                 onExitText = stringResource(id = R.string.delete)
             )
         }
 
-        val reportVerified = stringResource(id = R.string.report_verified)
+        //val reportVerified = stringResource(id = R.string.report_verified)
         val reportVerifiedMessage = stringResource(id = R.string.report_already_verified)
 
         if(showVerifyDialog && reportStatus != ReportStatus.VERIFIED){
@@ -434,7 +480,7 @@ fun ReportViewScreen(
                 message = stringResource(id = R.string.verify_report_description),
                 onClose = { showVerifyDialog = false },
                 onExit = {
-                    Toast.makeText(context, reportVerified, Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(context, reportVerified, Toast.LENGTH_SHORT).show()
                     showVerifyDialog = false
                     val updatedReport = createUpdatedReport(report)
                     if(report!!.rejectionMessage != null){
@@ -446,7 +492,7 @@ fun ReportViewScreen(
                     reportStatus = ReportStatus.VERIFIED
                     if (updatedReport != null) {
                         updatedReport.status = ReportStatus.VERIFIED
-                        reportsViewModel.update(updatedReport)
+                        reportsViewModel.verify(updatedReport)
                     }
                 },
                 onCloseText =stringResource(id = R.string.cancel),
@@ -457,7 +503,7 @@ fun ReportViewScreen(
             showVerifyDialog = false
         }
 
-        val rejectionMessageSend = stringResource(id = R.string.rejection_message_send)
+        //val rejectionMessageSend = stringResource(id = R.string.rejection_message_send)
         val rejectionMessageToast = stringResource(id = R.string.ten_characters_message)
         val reportAlreadyRejected = stringResource(id = R.string.report_already_rejected)
 
@@ -471,7 +517,7 @@ fun ReportViewScreen(
                         Toast.makeText(context, rejectionMessageToast, Toast.LENGTH_SHORT).show()
                         return@GenericDialog
                     }
-                    Toast.makeText(context, rejectionMessageSend, Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(context, rejectionMessageSend, Toast.LENGTH_SHORT).show()
                     showRejectionInputDialog = false
                     val updatedReport = createUpdatedReport(report)
                     if (updatedReport != null) {
@@ -479,7 +525,7 @@ fun ReportViewScreen(
                         reportStatus = ReportStatus.PENDING_VERIFICATION
                         updatedReport.status = ReportStatus.PENDING_VERIFICATION
                         updatedReport.rejectionDate = LocalDateTime.now()
-                        reportsViewModel.update(updatedReport)
+                        reportsViewModel.reject(updatedReport)
                     }
                     rejectionMessage = ""
                 },
