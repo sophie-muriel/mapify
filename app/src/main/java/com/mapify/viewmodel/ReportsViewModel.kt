@@ -148,6 +148,60 @@ class ReportsViewModel: ViewModel() {
         }
     }
 
+    fun postComment(updatedReport: Report) {
+        viewModelScope.launch {
+            _reportRequestResult.value = RequestResult.Loading
+            _reportRequestResult.value = kotlin.runCatching {
+                updateFirebase(updatedReport)
+                findByIdFirebase(updatedReport.id)
+            }.fold(
+                onSuccess = {
+                    _currentReport.value = it
+                    RequestResult.Success("Comment posted successfully")
+                },
+                onFailure = {
+                    RequestResult.Failure(it.message ?: "Error posting comment")
+                }
+            )
+        }
+    }
+
+    fun verify(updatedReport: Report) {
+        viewModelScope.launch {
+            _reportRequestResult.value = RequestResult.Loading
+            _reportRequestResult.value = kotlin.runCatching {
+                updateFirebase(updatedReport)
+                findByIdFirebase(updatedReport.id)
+            }.fold(
+                onSuccess = {
+                    _currentReport.value = it
+                    RequestResult.Success("Report verified successfully")
+                },
+                onFailure = {
+                    RequestResult.Failure(it.message ?: "Error verifying report")
+                }
+            )
+        }
+    }
+
+    fun reject(updatedReport: Report) {
+        viewModelScope.launch {
+            _reportRequestResult.value = RequestResult.Loading
+            _reportRequestResult.value = kotlin.runCatching {
+                updateFirebase(updatedReport)
+                findByIdFirebase(updatedReport.id)
+            }.fold(
+                onSuccess = {
+                    _currentReport.value = it
+                    RequestResult.Success("Report rejected, rejection message sent")
+                },
+                onFailure = {
+                    RequestResult.Failure(it.message ?: "Error verifying report")
+                }
+            )
+        }
+    }
+
     private suspend fun updateFirebase(updatedReport: Report) {
         db.collection("reports")
             .document(updatedReport.id)
@@ -160,25 +214,27 @@ class ReportsViewModel: ViewModel() {
         viewModelScope.launch {
             _reportRequestResult.value = RequestResult.Loading
             _reportRequestResult.value = kotlin.runCatching { updateFirebase(deactivatedReport) }
-                .fold (
-                    onSuccess = {
-                        RequestResult.Success("Report deleted successfully")
-                    },
-                    onFailure = { RequestResult.Failure(it.message?: "Error deleting report") }
-                )
+                .fold(
+                onSuccess = {
+                    RequestResult.Success("Report deleted successfully")
+                },
+                onFailure = {
+                    RequestResult.Failure(it.message ?: "Error deleting report")
+                }
+            )
         }
     }
 
     fun delete(reportId: String) {
         viewModelScope.launch {
             _reportRequestResult.value = RequestResult.Loading
-            _reportRequestResult.value = kotlin.runCatching { deleteFirebase(reportId) }
-                .fold (
-                    onSuccess = {
-                        RequestResult.Success("Report deleted successfully")
-                    },
-                    onFailure = { RequestResult.Failure(it.message?: "Error deleting report") }
-                )
+            val result = runCatching {
+                deleteFirebase(reportId)
+            }
+            _reportRequestResult.value = result.fold(
+                onSuccess = { RequestResult.Success("Report deleted successfully") },
+                onFailure = { RequestResult.Failure(it.message ?: "Error deleting report") }
+            )
         }
     }
 
