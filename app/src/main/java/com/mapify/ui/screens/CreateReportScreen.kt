@@ -237,7 +237,7 @@ fun CreateReportScreen(
 
                     is RequestResult.Success -> {
                         isLoading = false
-                        LaunchedEffect(reportRequestResult) {
+                        LaunchedEffect(Unit) {
                             Toast.makeText(
                                 context,
                                 (reportRequestResult as RequestResult.Success).message,
@@ -245,7 +245,6 @@ fun CreateReportScreen(
                             ).show()
                             delay(1500)
                             reportsViewModel.resetReportRequestResult()
-                            //reportsViewModel.resetCreatedReportId()
                             if (navigateAfterCreate) {
                                 createdReportId?.let { navigateToReportView(it) }
                             }
@@ -254,7 +253,7 @@ fun CreateReportScreen(
 
                     is RequestResult.Failure -> {
                         isLoading = false
-                        LaunchedEffect(reportRequestResult) {
+                        LaunchedEffect(Unit) {
                             Toast.makeText(
                                 context,
                                 (reportRequestResult as RequestResult.Failure).message,
