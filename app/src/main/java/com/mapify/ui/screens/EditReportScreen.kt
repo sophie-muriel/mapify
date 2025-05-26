@@ -314,37 +314,20 @@ fun EditReportScreen(
             onExit = {
                 saveReportVisible = false
                 try {
-                    val updatedReport = Report(
-                        id = report!!.id,
-                        title = title,
-                        category = Category.entries.first { it.displayName == dropDownValue },
-                        description = description,
-                        images = photos.toList(),
-                        location = locationNotVisible,
-                        status = report!!.status,
-                        userId = report!!.userId,
-                        date = report!!.date,
-                        isResolved = switchChecked,
-                        priorityCounter = report!!.priorityCounter,
-                        rejectionDate = report!!.rejectionDate,
-                        isDeletedManually = report!!.isDeletedManually,
-                        rejectionMessage = report!!.rejectionMessage,
-                        reportBoosters = report!!.reportBoosters,
-                        comments = report!!.comments
-                    )
-//                    report!!.title = title
-//                    report!!.category = Category.entries.first { it.displayName == dropDownValue }
-//                    report!!.description = description
-//                    report!!.isResolved = switchChecked
-//                    report!!.location = locationNotVisible
-//                    report!!.images = photos.toList()
-
-                    if ((titleTouched || dropDownTouched || descriptionTouched || photoTouchedList.any { it }) && report!!.rejectionDate != null) {
-                        updatedReport.rejectionDate = null
+                    val updatedReport = createUpdatedReport(report)
+                    if (updatedReport != null){
+                        updatedReport.title = title
+                        updatedReport.category = Category.entries.first { it.displayName == dropDownValue }
+                        updatedReport.description = description
+                        updatedReport.images = photos.toList()
+                        updatedReport.location = locationNotVisible
+                        updatedReport.isResolved = switchChecked
+                        if ((titleTouched || dropDownTouched || descriptionTouched || photoTouchedList.any { it }) && report!!.rejectionDate != null) {
+                            updatedReport.rejectionDate = null
+                        }
+                        reportsViewModel.update(updatedReport)
+                        navigateAfterUpdate = true
                     }
-
-                    reportsViewModel.update(updatedReport)
-                    navigateAfterUpdate = true
                 } catch (e: Exception) {
                     e.printStackTrace()
                     Toast.makeText(context, "Report saving error: ${e.message}", Toast.LENGTH_LONG).show()
