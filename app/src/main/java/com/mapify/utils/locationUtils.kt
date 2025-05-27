@@ -28,6 +28,7 @@ import com.mapify.ui.navigation.RouteScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import kotlin.math.sqrt
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 suspend fun getLocationName(
@@ -171,4 +172,14 @@ suspend fun fetchUserLocation(context: Context): com.mapify.model.Location? {
     } catch (e: Exception) {
         null
     }
+}
+
+fun calculateDistanceMeters(
+    lat1: Double, lon1: Double,
+    lat2: Double, lon2: Double
+): Double {
+    val deltaLat = lat2 - lat1
+    val deltaLon = lon2 - lon1
+    val metersPerDegree = 111_320.0
+    return metersPerDegree * sqrt(deltaLat * deltaLat + deltaLon * deltaLon)
 }
