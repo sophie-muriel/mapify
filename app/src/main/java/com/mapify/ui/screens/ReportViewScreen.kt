@@ -122,7 +122,7 @@ fun ReportViewScreen(
     val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
 
     LaunchedEffect(reportId) {
-        reportsViewModel.findById(reportId)
+        reportsViewModel.listenToCurrentReportRealTime(reportId)
     }
 
     DisposableEffect(Unit) {
