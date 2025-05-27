@@ -239,6 +239,16 @@ class ReportsViewModel: ViewModel() {
         _currentReport.value = null
     }
 
+    fun resetReportsListener() {
+        reportListener?.remove()
+        reportListener = null
+    }
+
+    fun restartReportsRealtime() {
+        resetReportsListener()
+        listenToReportsRealtime()
+    }
+
     private fun mapReport(report: Report): Map<String, Any?> {
         return mapOf(
             "id" to report.id,
