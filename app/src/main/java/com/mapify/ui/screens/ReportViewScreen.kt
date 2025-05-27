@@ -1,6 +1,5 @@
 package com.mapify.ui.screens
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -100,9 +99,8 @@ import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
 import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.navigation.LocalMainViewModel
-import com.mapify.utils.RequestResult
+import com.mapify.utils.RequestResultEffectHandler
 import com.mapify.utils.SharedPreferencesUtils
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,17 +125,17 @@ fun ReportViewScreen(
 
     DisposableEffect(Unit) {
         onDispose {
-            reportsViewModel.resetCurrentReport()
+            reportsViewModel.removeCurrentReportListener()
             reportsViewModel.resetReportRequestResult()
         }
     }
 
     val report by reportsViewModel.currentReport.collectAsState()
 
-    var isLoading by rememberSaveable { mutableStateOf(false) }
-    var isDeleting by rememberSaveable { mutableStateOf(false) }
+    var isLoading = rememberSaveable { mutableStateOf(false) }
+    var isDeleting = rememberSaveable { mutableStateOf(false) }
 
-    if (report == null) {
+    if ((report?.id ?: "") != reportId) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -377,46 +375,14 @@ fun ReportViewScreen(
                     scrollState = scrollState
                 )
 
-                LaunchedEffect(reportRequestResult) {
-                    when (reportRequestResult) {
-                        null -> {
-                            Log.d("ReportResult", "Result is null")
-                            isLoading = false
-                        }
-                        is RequestResult.Success -> {
-                            isLoading = false
-                            Log.d("ReportResult", "Success result detected")
-                            Toast.makeText(
-                                context,
-                                (reportRequestResult as RequestResult.Success).message,
-                                Toast.LENGTH_SHORT
-                            ).show()
-
-                            delay(1000)
-                            reportsViewModel.resetReportRequestResult()
-                            if (isDeleting) {
-                                isDeleting = false
-                                navigateBack()
-                            }
-                        }
-                        is RequestResult.Failure -> {
-                            isLoading = false
-                            Log.d("ReportResult", "Failure result detected")
-                            Toast.makeText(
-                                context,
-                                (reportRequestResult as RequestResult.Failure).message,
-                                Toast.LENGTH_SHORT
-                            ).show()
-
-                            delay(1000)
-                            reportsViewModel.resetReportRequestResult()
-                        }
-                        is RequestResult.Loading -> {
-                            Log.d("ReportResult", "Loading result detected")
-                            isLoading = true
-                        }
-                    }
-                }
+                RequestResultEffectHandler(
+                    requestResult = reportRequestResult,
+                    context = context,
+                    isLoading = isLoading,
+                    isDeleting = isDeleting,
+                    onResetResult = { reportsViewModel.resetReportRequestResult() },
+                    onNavigateBack = { navigateBack() }
+                )
             }
         }
 
@@ -461,7 +427,7 @@ fun ReportViewScreen(
                 onExit = {
                     val deactivatedReport = createUpdatedReport(report)
                     if (deactivatedReport != null) {
-                        isDeleting = true
+                        isDeleting.value = true
                         reportsViewModel.deactivate(deactivatedReport)
                     }
                     showDeleteDialogVisible = false
