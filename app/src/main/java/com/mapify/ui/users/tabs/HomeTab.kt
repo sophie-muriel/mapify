@@ -3,6 +3,8 @@ package com.mapify.ui.users.tabs
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.mapify.ui.components.Map
@@ -14,6 +16,16 @@ fun HomeTab(
     navigateToDetail: (String) -> Unit
 ) {
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
+
+    LaunchedEffect(Unit) {
+        reportsViewModel.restartReportsRealtime()
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            reportsViewModel.resetReportsListener()
+        }
+    }
+
     val reports by reportsViewModel.reports.collectAsState()
 
     Map(
