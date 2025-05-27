@@ -5,6 +5,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +33,15 @@ fun NotificationsTab(
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
+
+    LaunchedEffect(Unit) {
+        reportsViewModel.restartReportsRealtime()
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            reportsViewModel.resetReportsListener()
+        }
+    }
 
     val storedReports by reportsViewModel.reports.collectAsState()
 
