@@ -11,9 +11,12 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,8 +31,10 @@ import com.mapify.ui.components.SimpleTopBar
 import com.mapify.utils.isImageValid
 import kotlinx.coroutines.delay
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.unit.dp
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.utils.RequestResult
+import com.mapify.utils.RequestResultEffectHandler
 import updateCityCountry
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -43,7 +48,7 @@ fun EditReportScreen(
 ) {
     val context = LocalContext.current
     var isValidating by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
+    var isLoading = rememberSaveable { mutableStateOf(false) }
     var navigateAfterUpdate by remember { mutableStateOf(false) }
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
@@ -54,6 +59,20 @@ fun EditReportScreen(
     }
 
     val report by reportsViewModel.currentReport.collectAsState()
+
+    if (report == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(40.dp),
+                strokeWidth = 4.dp
+            )
+        }
+        return
+    }
 
     var switchChecked by rememberSaveable { mutableStateOf(report!!.isResolved) }
     var title by rememberSaveable { mutableStateOf(report!!.title) }
@@ -245,49 +264,22 @@ fun EditReportScreen(
                         switchChecked = it
                     },
                     validatingImageIndex = validatingImageIndex,
-                    isLoading = !isValidating && isLoading,
+                    isLoading = !isValidating && isLoading.value,
                     latitude = latitude,
                     longitude = longitude,
                     isEditing = true
                 )
-                when (reportRequestResult) {
-                    null -> {
-                        isLoading = false
-                    }
-
-                    is RequestResult.Success -> {
-                        isLoading = false
-                        LaunchedEffect(Unit) {
-                            Toast.makeText(
-                                context,
-                                (reportRequestResult as RequestResult.Success).message,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            delay(1000)
-                            reportsViewModel.resetReportRequestResult()
-                            if(navigateAfterUpdate){
-                                navigateBack()
-                            }
+                RequestResultEffectHandler(
+                    requestResult = reportRequestResult,
+                    context = context,
+                    isLoading = isLoading,
+                    onResetResult = { reportsViewModel.resetReportRequestResult() },
+                    onNavigateBack = {
+                        if(navigateAfterUpdate){
+                            navigateBack()
                         }
                     }
-
-                    is RequestResult.Failure -> {
-                        isLoading = false
-                        LaunchedEffect(Unit) {
-                            Toast.makeText(
-                                context,
-                                (reportRequestResult as RequestResult.Failure).message,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            delay(1000)
-                            reportsViewModel.resetReportRequestResult()
-                        }
-                    }
-
-                    is RequestResult.Loading -> {
-                        isLoading = true
-                    }
-                }
+                )
             }
         }
     }
@@ -325,7 +317,7 @@ fun EditReportScreen(
                         if ((titleTouched || dropDownTouched || descriptionTouched || photoTouchedList.any { it }) && report!!.rejectionDate != null) {
                             updatedReport.rejectionDate = null
                         }
-                        reportsViewModel.update(updatedReport)
+                        reportsViewModel.update(updatedReport, 1)
                         navigateAfterUpdate = true
                     }
                 } catch (e: Exception) {
