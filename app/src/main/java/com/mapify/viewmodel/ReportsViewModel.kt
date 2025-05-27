@@ -36,6 +36,7 @@ class ReportsViewModel: ViewModel() {
     val currentReport: StateFlow<Report?> = _currentReport.asStateFlow()
 
     private var reportListener: ListenerRegistration? = null
+    private var currentReportListener: ListenerRegistration? = null
 
     init{
         listenToReportsRealtime()
@@ -96,6 +97,7 @@ class ReportsViewModel: ViewModel() {
         reportListener = db.collection("reports")
             .addSnapshotListener { snapshot, error ->
                 if (error != null || snapshot == null) {
+                    error?.printStackTrace()
                     return@addSnapshotListener
                 }
                 val reportsList = snapshot.documents.mapNotNull { document ->
@@ -110,9 +112,28 @@ class ReportsViewModel: ViewModel() {
             }
     }
 
+    fun listenToCurrentReportRealTime(reportId: String) {
+        currentReportListener?.remove()
+        currentReportListener = db.collection("reports")
+            .document(reportId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null || snapshot == null || !snapshot.exists()) {
+                    error?.printStackTrace()
+                    return@addSnapshotListener
+                }
+                try {
+                    val updatedReport = deserializeReport(snapshot)
+                    _currentReport.value = updatedReport
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+    }
+
     override fun onCleared() {
         super.onCleared()
         reportListener?.remove()
+        currentReportListener?.remove()
     }
 
     fun findById(reportId: String) {
@@ -213,6 +234,8 @@ class ReportsViewModel: ViewModel() {
     }
 
     fun resetCurrentReport() {
+        currentReportListener?.remove()
+        currentReportListener = null
         _currentReport.value = null
     }
 
