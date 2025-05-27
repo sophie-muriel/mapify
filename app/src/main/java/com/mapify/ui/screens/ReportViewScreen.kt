@@ -101,6 +101,7 @@ import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.utils.RequestResultEffectHandler
 import com.mapify.utils.SharedPreferencesUtils
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -120,6 +121,7 @@ fun ReportViewScreen(
     val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
 
     LaunchedEffect(reportId) {
+        delay(300)
         reportsViewModel.listenToCurrentReportRealTime(reportId)
     }
 
