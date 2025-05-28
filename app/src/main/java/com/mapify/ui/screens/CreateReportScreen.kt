@@ -31,6 +31,7 @@ import java.time.LocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.utils.RequestResult
+import com.mapify.utils.RequestResultEffectHandler
 import com.mapify.utils.SharedPreferencesUtils
 import okhttp3.internal.wait
 import updateCityCountry
@@ -55,7 +56,7 @@ fun CreateReportScreen(
     val createdReportId by reportsViewModel.createdReportId.collectAsState()
 
     var isValidating by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
+    var isLoading = rememberSaveable { mutableStateOf(false) }
 
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
@@ -225,49 +226,21 @@ fun CreateReportScreen(
                     onAddPhoto = onAddPhoto,
                     onRemovePhoto = onRemovePhoto,
                     validatingImageIndex = validatingImageIndex,
-                    isLoading = !isValidating && isLoading,
+                    isLoading = !isValidating && isLoading.value,
                     latitude = latitude,
                     longitude = longitude
                 )
-
-                when (reportRequestResult) {
-                    null -> {
-                        isLoading = false
-                    }
-
-                    is RequestResult.Success -> {
-                        isLoading = false
-                        LaunchedEffect(Unit) {
-                            Toast.makeText(
-                                context,
-                                (reportRequestResult as RequestResult.Success).message,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            delay(1500)
-                            reportsViewModel.resetReportRequestResult()
-                            if (navigateAfterCreate) {
-                                createdReportId?.let { navigateToReportView(it) }
-                            }
+                RequestResultEffectHandler(
+                    requestResult = reportRequestResult,
+                    context = context,
+                    isLoading = isLoading,
+                    onResetResult = { reportsViewModel.resetReportRequestResult() },
+                    onNavigate = {
+                        if (navigateAfterCreate) {
+                            createdReportId?.let { navigateToReportView(it) }
                         }
                     }
-
-                    is RequestResult.Failure -> {
-                        isLoading = false
-                        LaunchedEffect(Unit) {
-                            Toast.makeText(
-                                context,
-                                (reportRequestResult as RequestResult.Failure).message,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            delay(2000)
-                            reportsViewModel.resetReportRequestResult()
-                        }
-                    }
-
-                    is RequestResult.Loading -> {
-                        isLoading = true
-                    }
-                }
+                )
             }
         }
     }
