@@ -52,7 +52,7 @@ fun ConversationScreen(
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
 
     val user by usersViewModel.user.collectAsState()
-    var userName by rememberSaveable { mutableStateOf( "") }
+    var userName by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(user) {
         usersViewModel.resetFoundUser()
@@ -89,7 +89,7 @@ fun ConversationScreen(
     LaunchedEffect(foundUser, isConversation) {
         if (!isConversation && foundUser?.id == id) {
             val newConversation = conversationsViewModel.createConversation(
-                Participant(userId?: "", userName),
+                Participant(userId ?: "", userName),
                 Participant(foundUser?.id ?: "", foundUser?.fullName ?: "")
             )
             conversationId = newConversation.id
@@ -128,6 +128,14 @@ fun ConversationScreen(
 
     var messageText by remember { mutableStateOf(TextFieldValue("")) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (conversationId != null && userId != null) {
+                conversationsViewModel.markAsRead(conversationId!!, userId)
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -248,7 +256,7 @@ fun ConversationScreen(
                             if (messageText.text.isNotBlank()) {
                                 conversationsViewModel.sendMessage(
                                     conversation.id,
-                                    userId?: "",
+                                    userId ?: "",
                                     userName,
                                     messageText.text
                                 )
@@ -278,7 +286,7 @@ fun ConversationScreen(
             onClose = { showDeleteDialog = false },
             onExitText = stringResource(id = R.string.delete),
             onExit = {
-                conversationsViewModel.deleteForUser(conversation.id, userId?: "")
+                conversationsViewModel.deleteForUser(conversation.id, userId ?: "")
                 showDeleteDialog = false
                 navigateBack()
             }
@@ -292,8 +300,10 @@ fun ChatBubble(
     isMe: Boolean,
     senderName: String
 ) {
-    val bubbleColor = if (isMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
-    val textColor = if (isMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+    val bubbleColor =
+        if (isMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+    val textColor =
+        if (isMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
 
     Row(
         modifier = Modifier.fillMaxWidth(),
