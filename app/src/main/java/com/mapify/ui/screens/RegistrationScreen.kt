@@ -1,7 +1,10 @@
 package com.mapify.ui.screens
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -49,6 +52,7 @@ import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.theme.Spacing
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.utils.RequestResult
+import com.mapify.utils.RequestResultEffectHandler
 import fetchUserLocation
 import getLocationName
 import kotlinx.coroutines.CoroutineScope
@@ -83,7 +87,7 @@ fun RegistrationScreen(
     val passwordError = passwordTouched && password.length < 6
     val passwordConfirmationError = passwordConfirmationTouched && passwordConfirmation != password
 
-    val permission = android.Manifest.permission.ACCESS_FINE_LOCATION
+    val permission = Manifest.permission.ACCESS_FINE_LOCATION
 
     var hasPermission by remember {
         mutableStateOf(
@@ -105,7 +109,7 @@ fun RegistrationScreen(
 
     var isRefreshingLocation by rememberSaveable { mutableStateOf(false) }
 
-    var isLoading by rememberSaveable { mutableStateOf(false) }
+    var isLoading = rememberSaveable { mutableStateOf(false) }
     var dialogVisible by remember { mutableStateOf(false) }
     var dialogTitle by remember { mutableStateOf("") }
     var dialogMessage by remember { mutableStateOf("") }
@@ -249,53 +253,26 @@ fun RegistrationScreen(
                 },
                 navigateToLogin = {
                     navigateBack()
-                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    Handler(Looper.getMainLooper()).postDelayed({
                         resetFields()
                     }, 100)
                 },
                 onRefreshLocation = { refreshLocation() },
                 isRefreshingLocation = isRefreshingLocation,
-                isLoading = isLoading
+                isLoading = isLoading.value
             )
 
-            when (registerResult) {
-                null -> {
-                    isLoading = false
+            RequestResultEffectHandler(
+                requestResult = registerResult,
+                context = context,
+                isLoading = isLoading,
+                onResetResult = { usersViewModel.resetRegisterResult() },
+                onNavigate = {
+                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                            resetFields() }, 100)
+                    navigateBack()
                 }
-
-                is RequestResult.Success -> {
-                    isLoading = false
-                    LaunchedEffect(registerResult) {
-                        Toast.makeText(
-                            context,
-                            (registerResult as RequestResult.Success).message,
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        delay(2000)
-                        usersViewModel.resetRegisterResult()
-                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                            resetFields()
-                        }, 100)
-                        navigateBack()
-                    }
-                }
-
-                is RequestResult.Failure -> {
-                    isLoading = false
-                    LaunchedEffect(registerResult) {
-                        dialogTitle = "Oops... an error occurred"
-                        dialogMessage = (registerResult as RequestResult.Failure).message
-                        dialogVisible = true
-
-                        delay(2000)
-                        usersViewModel.resetRegisterResult()
-                    }
-                }
-
-                is RequestResult.Loading -> {
-                    isLoading = true
-                }
-            }
+            )
 
             if (dialogVisible) {
                 GenericDialog(
