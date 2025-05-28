@@ -134,6 +134,8 @@ class ReportsViewModel: ViewModel() {
         super.onCleared()
         reportListener?.remove()
         currentReportListener?.remove()
+        resetCurrentReport()
+        resetReports()
     }
 
     fun findById(reportId: String) {
@@ -233,10 +235,21 @@ class ReportsViewModel: ViewModel() {
         _createdReportId.value = null
     }
 
-    fun resetCurrentReport() {
+    fun removeCurrentReportListener() {
         currentReportListener?.remove()
         currentReportListener = null
-        _currentReport.value = null
+    }
+
+    fun resetCurrentReport() {
+        if (_currentReport.value != null){
+            _currentReport.value = null
+        }
+    }
+
+    fun resetReports() {
+        if (_reports.value.isNotEmpty()){
+            _reports.value = emptyList()
+        }
     }
 
     fun resetReportsListener() {
