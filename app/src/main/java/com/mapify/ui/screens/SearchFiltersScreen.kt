@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,6 +25,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CalendarLocale
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerFormatter
@@ -40,6 +42,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,7 +59,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.mapify.model.ReportFilters
+import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
+import com.mapify.utils.RequestResultEffectHandler
+import com.mapify.utils.SharedPreferencesUtils
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -67,10 +75,17 @@ fun SearchFiltersScreen(
     navigateBack: () -> Unit
 ) {
 
-    var priorityChecked by rememberSaveable { mutableStateOf(false) }
-    var resolvedChecked by rememberSaveable { mutableStateOf(false) }
-    var verifiedChecked by rememberSaveable { mutableStateOf(false) }
-    var myPostsChecked by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
+    val reportsViewModel = LocalMainViewModel.current.reportsViewModel
+    val userId = SharedPreferencesUtils.getPreference(context)["userId"]
+    val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
+    val searchFilters by reportsViewModel.searchFilters.collectAsState()
+    var isLoading = rememberSaveable { mutableStateOf(false) }
+
+    var priorityChecked by rememberSaveable { mutableStateOf(searchFilters.onlyPriority) }
+    var resolvedChecked by rememberSaveable { mutableStateOf(searchFilters.onlyResolved) }
+    var verifiedChecked by rememberSaveable { mutableStateOf(searchFilters.onlyVerified) }
+    var myPostsChecked by rememberSaveable { mutableStateOf(searchFilters.onlyMyPosts) }
     var datePressed by rememberSaveable { mutableStateOf(false) }
     var dateSelected by rememberSaveable { mutableStateOf(false) }
     var distancePressed by rememberSaveable { mutableStateOf(false) }
@@ -78,9 +93,7 @@ fun SearchFiltersScreen(
     val datePikerState = rememberDatePickerState()
     var formattedDate by rememberSaveable { mutableStateOf("") }
     var sliderPosition by rememberSaveable { mutableFloatStateOf(0f) }
-    val context = LocalContext.current
-
-    //TODO: Navigation back to ExploreScreen with variables 
+    
     Scaffold(
         topBar = {
             SimpleTopBar(
@@ -118,7 +131,18 @@ fun SearchFiltersScreen(
             Spacer(modifier = Modifier.height(Spacing.Sides))
 
             Buttons(
-                onClickApplyFilters = navigateBack,
+                onClickApplyFilters = {
+                    val filters = ReportFilters(
+                        onlyPriority = priorityChecked,
+                        onlyResolved = resolvedChecked,
+                        onlyVerified = verifiedChecked,
+                        onlyMyPosts = myPostsChecked
+                    )
+                    if (userId != null) {
+                        reportsViewModel.getReportsWithFilters(filters, userId)
+                    }
+                    //navigateBack()
+                },
                 onClickCleanFilters = {
                     priorityChecked = false
                     resolvedChecked = false
@@ -128,6 +152,17 @@ fun SearchFiltersScreen(
                     dateSelected = false
                     sliderPosition = 0f
                     distanceSelected = false
+                    reportsViewModel.clearFilters()
+                },
+                isLoading = isLoading
+            )
+            RequestResultEffectHandler(
+                requestResult = reportRequestResult,
+                context = context,
+                isLoading = isLoading,
+                onResetResult = { reportsViewModel.resetReportRequestResult() },
+                onNavigate = {
+                    navigateBack()
                 }
             )
         }
@@ -492,7 +527,8 @@ fun DistanceSelectionDialog(
 @Composable
 fun Buttons(
     onClickApplyFilters: () -> Unit,
-    onClickCleanFilters: () -> Unit
+    onClickCleanFilters: () -> Unit,
+    isLoading: MutableState<Boolean>
 ){
     Column(
         modifier = Modifier
@@ -513,10 +549,18 @@ fun Buttons(
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ),
         ) {
-            Text(
-                text = stringResource(id = R.string.apply_filters),
-                style = MaterialTheme.typography.bodyMedium
-            )
+            if (isLoading.value){
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            }else{
+                Text(
+                    text = stringResource(id = R.string.apply_filters),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
 
         Button(
