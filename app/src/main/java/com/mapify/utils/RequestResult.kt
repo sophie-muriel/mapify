@@ -39,6 +39,7 @@ fun RequestResultEffectHandler(
                 onResetResult()
                 if (isDeleting.value) {
                     isDeleting.value = false
+                    onNavigate()
                 }
                 if (!isReportViewScreen) {
                     onNavigate()
