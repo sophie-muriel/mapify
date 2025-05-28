@@ -383,7 +383,8 @@ fun ReportViewScreen(
                     isLoading = isLoading,
                     isDeleting = isDeleting,
                     onResetResult = { reportsViewModel.resetReportRequestResult() },
-                    onNavigate = { navigateBack() }
+                    onNavigate = { navigateBack() },
+                    isReportViewScreen = true
                 )
             }
         }
@@ -517,11 +518,11 @@ fun ReportViewScreen(
             showRejectionInputDialog = false
         }
 
-        val reportBoosted = stringResource(id = R.string.report_boosted)
+        //val reportBoosted = stringResource(id = R.string.report_boosted)
         val reportAlreadyBoosted = stringResource(id = R.string.report_already_boosted)
 
         if(showBoostToast && canBoost && !boosted){
-            Toast.makeText(context, reportBoosted, Toast.LENGTH_SHORT).show()
+            //Toast.makeText(context, reportBoosted, Toast.LENGTH_SHORT).show()
             val updatedReport = createUpdatedReport(report)
             if (updatedReport != null) {
                 updatedReport.priorityCounter++
