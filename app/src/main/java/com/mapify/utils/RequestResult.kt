@@ -22,35 +22,34 @@ fun RequestResultEffectHandler(
     isLoading: MutableState<Boolean>,
     isDeleting: MutableState<Boolean> = mutableStateOf(false),
     onResetResult: () -> Unit,
-    onNavigateBack: () -> Unit = {},
-    needsUnitValue: Boolean = false
+    onNavigate: () -> Unit = {}
 ) {
-    LaunchedEffect(key1 = if (needsUnitValue) Unit else requestResult) {
+    LaunchedEffect(requestResult) {
         when (requestResult) {
             null -> {
-                Log.d("ReportResult", "Result is null")
+                //Log.d("ReportResult", "Result is null")
                 isLoading.value = false
             }
             is RequestResult.Success -> {
-                Log.d("ReportResult", "Success result detected")
+                //Log.d("ReportResult", "Success result detected")
                 isLoading.value = false
                 Toast.makeText(context, requestResult.message, Toast.LENGTH_SHORT).show()
                 delay(1000)
                 onResetResult()
                 if (isDeleting.value) {
                     isDeleting.value = false
-                    onNavigateBack()
                 }
+                onNavigate()
             }
             is RequestResult.Failure -> {
-                Log.d("ReportResult", "Failure result detected")
+                //Log.d("ReportResult", "Failure result detected")
                 isLoading.value = false
                 Toast.makeText(context, requestResult.message, Toast.LENGTH_SHORT).show()
                 delay(1000)
                 onResetResult()
             }
             is RequestResult.Loading -> {
-                Log.d("ReportResult", "Loading result detected")
+                //Log.d("ReportResult", "Loading result detected")
                 isLoading.value = true
             }
         }
