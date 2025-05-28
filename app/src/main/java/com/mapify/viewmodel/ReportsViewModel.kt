@@ -1,5 +1,7 @@
 package com.mapify.viewmodel
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.DocumentSnapshot
@@ -13,6 +15,7 @@ import com.google.firebase.ktx.Firebase
 import com.mapify.model.Category
 import com.mapify.model.Comment
 import com.mapify.model.Location
+import com.mapify.model.ReportFilters
 import com.mapify.model.ReportStatus
 import com.mapify.utils.RequestResult
 import kotlinx.coroutines.launch
@@ -28,6 +31,12 @@ class ReportsViewModel: ViewModel() {
 
     private val _reportRequestResult = MutableStateFlow<RequestResult?>(null)
     val reportRequestResult: StateFlow<RequestResult?> = _reportRequestResult.asStateFlow()
+
+    private val _filteredReports = MutableStateFlow(emptyList<Report>())
+    val filteredReports: StateFlow<List<Report>> = _filteredReports.asStateFlow()
+
+    private val _searchFilters = MutableStateFlow(ReportFilters())
+    val searchFilters: StateFlow<ReportFilters> = _searchFilters.asStateFlow()
 
     private val _createdReportId = MutableStateFlow<String?>(null)
     val createdReportId: StateFlow<String?> = _createdReportId.asStateFlow()
@@ -262,6 +271,65 @@ class ReportsViewModel: ViewModel() {
         listenToReportsRealtime()
     }
 
+    fun getReportsWithFilters(filters: ReportFilters, userId: String) {
+        viewModelScope.launch {
+            _searchFilters.value = filters
+            _reportRequestResult.value = RequestResult.Loading
+
+            val result = runCatching {
+                getPrioritizedReportsFirebase(filters, userId)
+            }
+
+            _reportRequestResult.value = result.fold(
+                onSuccess = {
+                    _filteredReports.value = it
+                    Log.d("ViewModelTest", "Visible reports: ${filteredReports.value}")
+                    RequestResult.Success("Filtered reports retrieved successfully")
+                },
+                onFailure = {
+                    RequestResult.Failure(it.localizedMessage ?: "Error finding reports")
+                }
+            )
+        }
+    }
+
+    private suspend fun getPrioritizedReportsFirebase(filters: ReportFilters, userId: String): List<Report> {
+        var query = db.collection("reports")
+            .whereEqualTo("isDeleted", false)
+
+        if (filters.onlyPriority) {
+            query = query.whereGreaterThanOrEqualTo("priorityCounter", 1)
+        }
+
+        if (filters.onlyResolved) {
+            query = query.whereEqualTo("isResolved", true)
+        }
+
+        if (filters.onlyVerified) {
+            query = query.whereEqualTo("status", "VERIFIED")
+        }
+
+        if (filters.onlyMyPosts) {
+            query = query.whereEqualTo("userId", userId)
+        }
+
+        val snapshot = query.get().await()
+
+        return snapshot.documents.mapNotNull { document ->
+            try {
+                deserializeReport(document)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+    
+    fun clearFilters() {
+        _filteredReports.value = emptyList()
+        _searchFilters.value = ReportFilters()
+    }
+
     private fun mapReport(report: Report): Map<String, Any?> {
         return mapOf(
             "id" to report.id,
@@ -291,7 +359,8 @@ class ReportsViewModel: ViewModel() {
                     "userId" to comment.userId,
                     "date" to comment.date.toString()
                 )
-            }
+            },
+            "isDeleted" to report.isDeleted
         )
     }
 
@@ -316,7 +385,7 @@ class ReportsViewModel: ViewModel() {
             isDeletedManually = document.getBoolean("isDeletedManually") ?: false,
             rejectionMessage = document.getString("rejectionMessage"),
             reportBoosters = document.get("reportBoosters") as? MutableList<String> ?: mutableListOf(),
-            comments = parseCommentsListFromMap(document.get("comments"))
+            comments = parseCommentsListFromMap(document.get("comments")),
         )
     }
 
