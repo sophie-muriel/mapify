@@ -1,5 +1,6 @@
 package com.mapify.ui.users.tabs
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,11 +56,14 @@ fun ExploreTab(
     DisposableEffect(Unit) {
         onDispose {
             reportsViewModel.resetReportsListener()
+            reportsViewModel.clearFilters()
         }
     }
 
-    val storedReports by reportsViewModel.reports.collectAsState()
-    val visibleReports = storedReports.filter { !it.isDeleted }
+    val allReports by reportsViewModel.reports.collectAsState()
+    val filteredReports by reportsViewModel.filteredReports.collectAsState()
+    val reportsToDisplay = filteredReports.ifEmpty { allReports }
+    val visibleReports = reportsToDisplay.filter { !it.isDeleted }
 
     LazyColumn(
         modifier = Modifier
