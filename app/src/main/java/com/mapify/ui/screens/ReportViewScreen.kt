@@ -383,7 +383,7 @@ fun ReportViewScreen(
                     isLoading = isLoading,
                     isDeleting = isDeleting,
                     onResetResult = { reportsViewModel.resetReportRequestResult() },
-                    onNavigateBack = { navigateBack() }
+                    onNavigate = { navigateBack() }
                 )
             }
         }

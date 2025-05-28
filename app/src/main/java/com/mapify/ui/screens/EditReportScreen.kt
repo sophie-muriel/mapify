@@ -33,7 +33,6 @@ import kotlinx.coroutines.delay
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.unit.dp
 import com.mapify.ui.navigation.LocalMainViewModel
-import com.mapify.utils.RequestResult
 import com.mapify.utils.RequestResultEffectHandler
 import updateCityCountry
 
@@ -274,7 +273,7 @@ fun EditReportScreen(
                     context = context,
                     isLoading = isLoading,
                     onResetResult = { reportsViewModel.resetReportRequestResult() },
-                    onNavigateBack = {
+                    onNavigate = {
                         if(navigateAfterUpdate){
                             navigateBack()
                         }
