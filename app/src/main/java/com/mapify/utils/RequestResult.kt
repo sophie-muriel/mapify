@@ -22,7 +22,8 @@ fun RequestResultEffectHandler(
     isLoading: MutableState<Boolean>,
     isDeleting: MutableState<Boolean> = mutableStateOf(false),
     onResetResult: () -> Unit,
-    onNavigate: () -> Unit = {}
+    onNavigate: () -> Unit = {},
+    isReportViewScreen: Boolean = false
 ) {
     LaunchedEffect(requestResult) {
         when (requestResult) {
@@ -39,7 +40,9 @@ fun RequestResultEffectHandler(
                 if (isDeleting.value) {
                     isDeleting.value = false
                 }
-                onNavigate()
+                if (!isReportViewScreen) {
+                    onNavigate()
+                }
             }
             is RequestResult.Failure -> {
                 //Log.d("ReportResult", "Failure result detected")
