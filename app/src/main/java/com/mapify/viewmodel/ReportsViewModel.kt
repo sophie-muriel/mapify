@@ -1,9 +1,14 @@
 package com.mapify.viewmodel
 
-import android.content.ContentValues.TAG
+import android.Manifest
+import android.content.Context
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import calculateDistanceMeters
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
@@ -18,6 +23,7 @@ import com.mapify.model.Location
 import com.mapify.model.ReportFilters
 import com.mapify.model.ReportStatus
 import com.mapify.utils.RequestResult
+import fetchUserLocation
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
@@ -271,34 +277,40 @@ class ReportsViewModel: ViewModel() {
         listenToReportsRealtime()
     }
 
-    fun getReportsWithFilters(filters: ReportFilters, userId: String) {
+    fun getReportsWithFilters(
+        filters: ReportFilters,
+        userId: String
+    ) {
         viewModelScope.launch {
             _searchFilters.value = filters
             _reportRequestResult.value = RequestResult.Loading
 
             val result = runCatching {
-                getPrioritizedReportsFirebase(filters, userId)
+                getWithFiltersFirebase(filters, userId)
             }
 
             _reportRequestResult.value = result.fold(
                 onSuccess = {
                     _filteredReports.value = it
-                    Log.d("ViewModelTest", "Visible reports: ${filteredReports.value}")
-                    RequestResult.Success("Filtered reports retrieved successfully")
+                    //Log.d("ViewModelTest", "Visible reports: ${filteredReports.value}")
+                    RequestResult.Success("Filters applied successfully")
                 },
                 onFailure = {
-                    RequestResult.Failure(it.localizedMessage ?: "Error finding reports")
+                    RequestResult.Failure(it.localizedMessage ?: "Error applying filters")
                 }
             )
         }
     }
 
-    private suspend fun getPrioritizedReportsFirebase(filters: ReportFilters, userId: String): List<Report> {
+    private suspend fun getWithFiltersFirebase(
+        filters: ReportFilters,
+        userId: String
+    ): List<Report> {
         var query = db.collection("reports")
             .whereEqualTo("isDeleted", false)
 
         if (filters.onlyPriority) {
-            query = query.whereGreaterThanOrEqualTo("priorityCounter", 1)
+            query = query.whereEqualTo("isHighPriority", true)
         }
 
         if (filters.onlyResolved) {
@@ -313,6 +325,13 @@ class ReportsViewModel: ViewModel() {
             query = query.whereEqualTo("userId", userId)
         }
 
+        if (filters.onlyThisDate) {
+            val endDate = filters.thisDate + "T23:59:59.999999"
+
+            query = query.whereGreaterThanOrEqualTo("date", filters.thisDate)
+                .whereLessThanOrEqualTo("date", endDate)
+        }
+
         val snapshot = query.get().await()
 
         return snapshot.documents.mapNotNull { document ->
@@ -322,6 +341,28 @@ class ReportsViewModel: ViewModel() {
                 e.printStackTrace()
                 null
             }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    suspend fun reportsWithinDistance(
+        reports: List<Report>,
+        context: Context,
+        filterDistance: Double
+    ): List<Report> {
+        val userLocation = fetchUserLocation(context) ?: return emptyList()
+
+        return reports.filter { report ->
+            report.location?.let { reportLocation ->
+                val calculatedDistance = calculateDistanceMeters(
+                    lat1 = reportLocation.latitude,
+                    lon1 = reportLocation.longitude,
+                    lat2 = userLocation.latitude,
+                    lon2 = userLocation.longitude
+                )
+                calculatedDistance <= (filterDistance * 1000)
+            } ?: false
         }
     }
     
@@ -360,7 +401,8 @@ class ReportsViewModel: ViewModel() {
                     "date" to comment.date.toString()
                 )
             },
-            "isDeleted" to report.isDeleted
+            "isDeleted" to report.isDeleted,
+            "isHighPriority" to report.isHighPriority
         )
     }
 
