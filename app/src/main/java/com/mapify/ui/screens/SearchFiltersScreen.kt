@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -65,6 +66,7 @@ import com.mapify.ui.theme.Spacing
 import com.mapify.utils.RequestResultEffectHandler
 import com.mapify.utils.SharedPreferencesUtils
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -87,12 +89,19 @@ fun SearchFiltersScreen(
     var verifiedChecked by rememberSaveable { mutableStateOf(searchFilters.onlyVerified) }
     var myPostsChecked by rememberSaveable { mutableStateOf(searchFilters.onlyMyPosts) }
     var datePressed by rememberSaveable { mutableStateOf(false) }
-    var dateSelected by rememberSaveable { mutableStateOf(false) }
+    var dateSelected by rememberSaveable { mutableStateOf(searchFilters.onlyThisDate) }
     var distancePressed by rememberSaveable { mutableStateOf(false) }
-    var distanceSelected by rememberSaveable { mutableStateOf(false) }
-    val datePikerState = rememberDatePickerState()
-    var formattedDate by rememberSaveable { mutableStateOf("") }
-    var sliderPosition by rememberSaveable { mutableFloatStateOf(0f) }
+    var distanceSelected by rememberSaveable { mutableStateOf(searchFilters.onlyThisDistance) }
+    val datePikerState = rememberDatePickerState(
+        initialSelectedDateMillis = searchFilters.thisDate.takeIf { it.isNotEmpty() }?.let {
+            LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                .atStartOfDay(ZoneId.of("UTC"))
+                .toInstant()
+                .toEpochMilli()
+        }
+    )
+    var formattedDate by rememberSaveable { mutableStateOf(searchFilters.thisDate) }
+    var sliderPosition by rememberSaveable { mutableFloatStateOf(searchFilters.thisDistance.toFloat()) }
     
     Scaffold(
         topBar = {
@@ -101,7 +110,9 @@ fun SearchFiltersScreen(
                 text = stringResource(id = R.string.search_filters),
                 navIconVector = Icons.AutoMirrored.Filled.ArrowBack,
                 navIconDescription = stringResource(id = R.string.back_arrow_icon),
-                onClickNavIcon = { navigateBack() },
+                onClickNavIcon = {
+                    navigateBack()
+                },
                 actions = false
             )
         }) { padding ->
@@ -136,23 +147,30 @@ fun SearchFiltersScreen(
                         onlyPriority = priorityChecked,
                         onlyResolved = resolvedChecked,
                         onlyVerified = verifiedChecked,
-                        onlyMyPosts = myPostsChecked
+                        onlyMyPosts = myPostsChecked,
+                        onlyThisDate = dateSelected && formattedDate.isNotBlank(),
+                        thisDate = formattedDate,
+                        onlyThisDistance = distanceSelected && sliderPosition != 0f,
+                        thisDistance = sliderPosition.toDouble()
                     )
                     if (userId != null) {
                         reportsViewModel.getReportsWithFilters(filters, userId)
+                        Log.d("SearchFilters-1", sliderPosition.toDouble().toString())
                     }
-                    //navigateBack()
                 },
                 onClickCleanFilters = {
-                    priorityChecked = false
-                    resolvedChecked = false
-                    verifiedChecked = false
-                    myPostsChecked = false
-                    datePikerState.selectedDateMillis = null
-                    dateSelected = false
-                    sliderPosition = 0f
-                    distanceSelected = false
-                    reportsViewModel.clearFilters()
+                    if(priorityChecked || resolvedChecked || verifiedChecked || myPostsChecked || dateSelected || distanceSelected){
+                        reportsViewModel.clearFilters()
+                        priorityChecked = false
+                        resolvedChecked = false
+                        verifiedChecked = false
+                        myPostsChecked = false
+                        datePikerState.selectedDateMillis = null
+                        dateSelected = false
+                        sliderPosition = 0f
+                        distanceSelected = false
+                        Toast.makeText(context, "Filters cleaned", Toast.LENGTH_SHORT).show()
+                    }
                 },
                 isLoading = isLoading
             )
@@ -180,7 +198,7 @@ fun SearchFiltersScreen(
                         Instant.ofEpochMilli(it)
                             .atZone(ZoneId.of("UTC"))
                             .toLocalDate()
-                            .format(DateTimeFormatter.ofPattern("MM/dd/yyyy", Locale.getDefault()))
+                            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault()))
                     } ?: ""
                     datePressed = false
                     Toast.makeText(
@@ -224,8 +242,8 @@ fun SearchFiltersScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 class CustomDateFormatter : DatePickerFormatter {
 
-    private val dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy", Locale.getDefault())
-    private val monthYearFormatter = DateTimeFormatter.ofPattern("MM/yyyy", Locale.getDefault())
+    private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+    private val monthYearFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
 
     override fun formatDate(
         dateMillis: Long?,
