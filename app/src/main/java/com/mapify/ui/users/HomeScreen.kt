@@ -13,6 +13,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,6 +26,7 @@ import com.mapify.ui.users.navigation.UserNavigation
 import com.mapify.ui.components.BottomNavigationBar
 import com.mapify.ui.components.CreateFAB
 import com.mapify.ui.components.SimpleTopBar
+import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.users.navigation.UserRouteTab
 
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
@@ -41,6 +44,8 @@ fun HomeScreen(
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
     val currentRoute = navBackStackEntry?.destination?.route
+    val reportsViewModel = LocalMainViewModel.current.reportsViewModel
+    val searchFilters by reportsViewModel.searchFilters.collectAsState()
 
     val alignment = Alignment.Center
     val navIconVector = Icons.Filled.AccountCircle
@@ -80,7 +85,8 @@ fun HomeScreen(
                         secondAction = true,
                         secondActionIconVector = settingsIconVector,
                         secondActionIconDescription = settingsIconDescription,
-                        secondOnClickAction = { navigateToSettings() }
+                        secondOnClickAction = { navigateToSettings() },
+                        areFiltersActive = searchFilters.areSet
                     )
                 }
                 UserRouteTab.Notifications::class.qualifiedName -> {
