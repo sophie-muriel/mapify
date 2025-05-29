@@ -1,6 +1,8 @@
 package com.mapify.ui.users.tabs
 
-import android.util.Log
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,9 +29,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -37,18 +44,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.mapify.R
 import com.mapify.model.Report
+import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun ExploreTab(
     navigateToDetail: (String) -> Unit
 ) {
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
+    val context = LocalContext.current
+
+    val permission = android.Manifest.permission.ACCESS_FINE_LOCATION
+
+    var hasPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED)
+    }
 
     LaunchedEffect(Unit) {
         reportsViewModel.restartReportsRealtime()
@@ -56,14 +77,55 @@ fun ExploreTab(
     DisposableEffect(Unit) {
         onDispose {
             reportsViewModel.resetReportsListener()
-            reportsViewModel.clearFilters()
         }
     }
 
     val allReports by reportsViewModel.reports.collectAsState()
     val filteredReports by reportsViewModel.filteredReports.collectAsState()
-    val reportsToDisplay = filteredReports.ifEmpty { allReports }
-    val visibleReports = reportsToDisplay.filter { !it.isDeleted }
+    val searchFilters by reportsViewModel.searchFilters.collectAsState()
+    var reportsToDisplay by rememberSaveable { mutableStateOf(allReports) }
+    var isPopUpVisible by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(searchFilters) {
+        isPopUpVisible = searchFilters.areSet
+        if (searchFilters.areSet) {
+            reportsToDisplay = filteredReports
+            if (searchFilters.onlyThisDistance) {
+                reportsToDisplay = reportsViewModel.reportsWithinDistance(
+                    reports = reportsToDisplay,
+                    context = context,
+                    filterDistance = searchFilters.thisDistance
+                )
+            }
+        }else {
+            reportsToDisplay = allReports
+        }
+
+        if (searchFilters.isJustDistance) {
+            reportsToDisplay = reportsViewModel.reportsWithinDistance(
+                reports = reportsToDisplay,
+                context = context,
+                filterDistance = searchFilters.thisDistance
+            )
+        }
+    }
+
+    val visibleReports = reportsToDisplay
+        .filter { !it.isDeleted }
+        .sortedByDescending { it.date }
+
+    if (isPopUpVisible) {
+        if (reportsToDisplay.isEmpty()){
+            GenericDialog(
+                title = "No reports found",
+                message = "Could not find any reports with the selected filters. Change or clean your filters.",
+                onExit = {
+                    isPopUpVisible = false
+                },
+                onExitText = "Ok"
+            )
+        }
+    }
 
     LazyColumn(
         modifier = Modifier
