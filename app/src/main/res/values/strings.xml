@@ -200,4 +200,7 @@
     <string name="email_error">Failed to Send Email</string>
     <string name="unknown_error">An unknown error occurred.</string>
 
+    <string name="no_reports_found">No reports found</string>
+    <string name="no_reports_found_message">No reports could be found with the selected filters. Please change or clean your filters.</string>
+
 </resources>
