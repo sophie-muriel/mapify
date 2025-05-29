@@ -117,8 +117,8 @@ fun ExploreTab(
     if (isPopUpVisible) {
         if (reportsToDisplay.isEmpty()){
             GenericDialog(
-                title = "No reports found",
-                message = "Could not find any reports with the selected filters. Change or clean your filters.",
+                title = stringResource(id = R.string.no_reports_found),
+                message = stringResource(id = R.string.no_reports_found_message),
                 onExit = {
                     isPopUpVisible = false
                 },
