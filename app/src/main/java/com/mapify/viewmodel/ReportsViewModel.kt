@@ -3,7 +3,6 @@ package com.mapify.viewmodel
 import android.Manifest
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
@@ -292,7 +291,6 @@ class ReportsViewModel: ViewModel() {
             _reportRequestResult.value = result.fold(
                 onSuccess = {
                     _filteredReports.value = it
-                    //Log.d("ViewModelTest", "Visible reports: ${filteredReports.value}")
                     RequestResult.Success("Filters applied successfully")
                 },
                 onFailure = {
