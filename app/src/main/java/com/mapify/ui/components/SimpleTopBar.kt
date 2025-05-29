@@ -45,7 +45,8 @@ fun SimpleTopBar(
     isSearch: Boolean = false,
     searchQuery: String = "",
     onSearchQueryChange: (String) -> Unit = {},
-    secondActionContent: (@Composable () -> Unit)? = null
+    secondActionContent: (@Composable () -> Unit)? = null,
+    areFiltersActive: Boolean = false
 ) {
     TopAppBar(
         title = {
@@ -80,7 +81,7 @@ fun SimpleTopBar(
                         Icon(
                             imageVector = firstActionIconVector,
                             contentDescription = firstActionIconDescription,
-                            tint = tint
+                            tint = if (areFiltersActive) MaterialTheme.colorScheme.primary else tint
                         )
                     }
                 }
