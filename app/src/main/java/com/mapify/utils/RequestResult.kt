@@ -1,7 +1,6 @@
 package com.mapify.utils
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,14 +27,12 @@ fun RequestResultEffectHandler(
     LaunchedEffect(requestResult) {
         when (requestResult) {
             null -> {
-                //Log.d("ReportResult", "Result is null")
                 isLoading.value = false
             }
             is RequestResult.Success -> {
-                //Log.d("ReportResult", "Success result detected")
                 isLoading.value = false
                 Toast.makeText(context, requestResult.message, Toast.LENGTH_SHORT).show()
-                delay(1000)
+                delay(600)
                 onResetResult()
                 if (isDeleting.value) {
                     isDeleting.value = false
@@ -46,14 +43,12 @@ fun RequestResultEffectHandler(
                 }
             }
             is RequestResult.Failure -> {
-                //Log.d("ReportResult", "Failure result detected")
                 isLoading.value = false
                 Toast.makeText(context, requestResult.message, Toast.LENGTH_SHORT).show()
-                delay(1000)
+                delay(600)
                 onResetResult()
             }
             is RequestResult.Loading -> {
-                //Log.d("ReportResult", "Loading result detected")
                 isLoading.value = true
             }
         }
