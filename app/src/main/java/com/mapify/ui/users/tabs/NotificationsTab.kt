@@ -5,7 +5,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,21 +33,14 @@ fun NotificationsTab(
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
 
-    LaunchedEffect(Unit) {
-        reportsViewModel.restartReportsRealtime()
-    }
-    DisposableEffect(Unit) {
-        onDispose {
-            reportsViewModel.resetReportsListener()
-        }
-    }
-
-    val storedReports by reportsViewModel.reports.collectAsState()
+    val storedReports by reportsViewModel.userReports.collectAsState()
 
     val context = LocalContext.current
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
 
-    val userReports = storedReports.filter { it.userId == userId }.sortedByDescending { it.date }
+    LaunchedEffect(storedReports) {
+        reportsViewModel.getReportsByUserId(userId?: "")
+    }
 
     var remainingDays = -1
 
@@ -58,7 +50,7 @@ fun NotificationsTab(
             .padding(horizontal = Spacing.Sides),
         verticalArrangement = Arrangement.spacedBy(Spacing.Large)
     ) {
-        items(userReports) { report ->
+        items(storedReports) { report ->
             if(report.userId == userId){
                 if(report.isDeleted){
                     NotificationItem(
@@ -91,7 +83,7 @@ fun NotificationsTab(
                 }
             }
         }
-        if (userReports.isNotEmpty()) {
+        if (storedReports.isNotEmpty()) {
             item {
                 Spacer(modifier = Modifier.height(Spacing.Large))
             }
@@ -108,12 +100,6 @@ fun NotificationsTab(
             onExitText = stringResource(id = R.string.ok)
         )
     }
-//    HandleLocationPermission(
-//        onPermissionGranted = {
-//
-//        }
-//    )
-
 }
 
 @Composable
