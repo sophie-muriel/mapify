@@ -40,6 +40,9 @@ class ReportsViewModel: ViewModel() {
     private val _filteredReports = MutableStateFlow(emptyList<Report>())
     val filteredReports: StateFlow<List<Report>> = _filteredReports.asStateFlow()
 
+    private val _userReports = MutableStateFlow(emptyList<Report>())
+    val userReports: StateFlow<List<Report>> = _userReports.asStateFlow()
+
     private val _searchFilters = MutableStateFlow(ReportFilters())
     val searchFilters: StateFlow<ReportFilters> = _searchFilters.asStateFlow()
 
@@ -340,6 +343,34 @@ class ReportsViewModel: ViewModel() {
                 null
             }
         }
+    }
+
+    fun getReportsByUserId(userId: String) {
+        viewModelScope.launch {
+
+            val result = runCatching {
+                getReportsByUserIdFirebase(userId)
+            }
+
+            _userReports.value = result.getOrDefault(emptyList())
+        }
+    }
+
+    private suspend fun getReportsByUserIdFirebase(userId: String): List<Report> {
+        val query = db.collection("reports")
+            .whereEqualTo("userId", userId)
+            .get()
+            .await()
+
+        val reports = query.documents.mapNotNull { document ->
+            try {
+                deserializeReport(document)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+        return reports.sortedByDescending { it.date }
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
