@@ -82,7 +82,7 @@ fun SearchFiltersScreen(
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
     val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
     val searchFilters by reportsViewModel.searchFilters.collectAsState()
-    var isLoading = rememberSaveable { mutableStateOf(false) }
+    val isLoading = rememberSaveable { mutableStateOf(false) }
 
     var priorityChecked by rememberSaveable { mutableStateOf(searchFilters.onlyPriority) }
     var resolvedChecked by rememberSaveable { mutableStateOf(searchFilters.onlyResolved) }
@@ -179,7 +179,8 @@ fun SearchFiltersScreen(
                         Toast.makeText(context, "Filters cleaned", Toast.LENGTH_SHORT).show()
                     }
                 },
-                isLoading = isLoading
+                isLoading = isLoading,
+                filtersChanged = filtersChanged
             )
             RequestResultEffectHandler(
                 requestResult = reportRequestResult,
@@ -554,7 +555,8 @@ fun DistanceSelectionDialog(
 fun Buttons(
     onClickApplyFilters: () -> Unit,
     onClickCleanFilters: () -> Unit,
-    isLoading: MutableState<Boolean>
+    isLoading: MutableState<Boolean>,
+    filtersChanged: Boolean
 ) {
     Column(
         modifier = Modifier
