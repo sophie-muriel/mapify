@@ -1,5 +1,14 @@
 package com.mapify.ui.components
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -10,17 +19,26 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import coil.compose.AsyncImage
+import com.cloudinary.Cloudinary
+import com.cloudinary.utils.ObjectUtils
 import com.mapify.R
 import com.mapify.ui.theme.Spacing
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 
 @Composable
 fun ReportForm(
@@ -46,17 +64,15 @@ fun ReportForm(
     onClickCreate: () -> Unit,
     editMode: Boolean = false,
     photos: List<String>,
-    photoErrors: List<Boolean>,
-    onValueChangePhotos: (List<String>) -> Unit,
     switchChecked: Boolean = false,
     switchCheckedOnClick: ((Boolean) -> Unit)? = null,
-    onAddPhoto: () -> Unit,
+    onAddPhoto: (String) -> Unit,
     onRemovePhoto: (Int) -> Unit,
     isLoading: Boolean,
     latitude: Double? = null,
     longitude: Double? = null,
     isEditing: Boolean = false,
-    validatingImageIndex: Int? = null
+    context: Context,
 ) {
     Column(
         modifier = Modifier
@@ -112,48 +128,78 @@ fun ReportForm(
             },
             readOnly = true
         )
-        photos.forEachIndexed { index, photo ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+
+        Spacer(Modifier.height(Spacing.Inline))
+
+        ReportImages(
+            context = context,
+            photosCount = photos.size,
+            onPhotoSelected = { newPhotoUrl ->
+                onAddPhoto(newPhotoUrl)
+            }
+        )
+        Spacer(Modifier.height(Spacing.Large))
+
+
+        if (photos.isNotEmpty()) {
+
+            var dynamicHeight = 0
+            if (photos.size in 1..3){
+                dynamicHeight = 125
+            }else if (photos.size in 4..5){
+                dynamicHeight = 250
+            }
+
+            Text(
+                text = "Selected Photos - ${photos.size}/5",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = Spacing.Small)
+            )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(Spacing.Small),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.Small),
+                verticalArrangement = Arrangement.spacedBy(Spacing.Small),
+                modifier = Modifier
+                    .height(dynamicHeight.dp)
+                    .fillMaxWidth()
             ) {
-                GenericTextField(
-                    modifier = Modifier.weight(1f),
-                    value = photo,
-                    supportingText = stringResource(R.string.photo_supporting_text),
-                    label = stringResource(R.string.photo) + " ${index + 1}",
-                    onValueChange = {
-                        val updatedPhotos = photos.toMutableList()
-                        updatedPhotos[index] = it
-                        onValueChangePhotos(updatedPhotos)
-                    },
-                    isError = photoErrors[index],
-                    leadingIcon = { Icon(Icons.Outlined.ImageSearch, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-                    showTrailingIcon = true,
-                    trailingIcon = {
-                        IconButton(
-                            onClick = {
-                                if (index == 0) onAddPhoto() else onRemovePhoto(index)
-                            },
-                            enabled = if (index == 0) photos.size < 5 else true
+                itemsIndexed(photos) { index, photoUrl ->
+                    Card(
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .fillMaxWidth()
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            if (validatingImageIndex == index) {
-                                CircularProgressIndicator(
-                                    color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(20.dp),
-                                    strokeWidth = 2.dp
-                                )
-                            } else {
+                            AsyncImage(
+                                model = photoUrl,
+                                contentDescription = "Image" + " ${index + 1}",
+                                modifier = Modifier.fillMaxSize()
+                            )
+                            IconButton(
+                                onClick = { onRemovePhoto(index) },
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .size(32.dp)
+                                    .padding(4.dp)
+                            ) {
                                 Icon(
-                                    imageVector = if (index == 0) Icons.Outlined.Add else Icons.Outlined.Remove,
-                                    contentDescription = null
+                                    imageVector = Icons.Outlined.Cancel,
+                                    contentDescription = "Remove image",
+                                    tint = MaterialTheme.colorScheme.secondary
                                 )
                             }
                         }
                     }
-                )
+                }
             }
         }
+
         if (editMode && switchCheckedOnClick != null) {
             Row(
                 modifier = Modifier
@@ -174,9 +220,10 @@ fun ReportForm(
                 )
             }
         }
+
         Spacer(Modifier.height(Spacing.Large))
-        val arePhotosValid = photos.isEmpty() || (photos.none { it.isBlank() } && photoErrors.all { !it })
-        val isButtonEnabled = !titleError && title.isNotBlank() && !dropDownError && !descriptionError && description.isNotBlank() && arePhotosValid && !isLoading && (isEditing || latitude != null && longitude != null)
+
+        val isButtonEnabled = !titleError && title.isNotBlank() && !dropDownError && !descriptionError && description.isNotBlank() && !isLoading && photos.size > 0 && (isEditing || latitude != null && longitude != null)
         Button(
             modifier = Modifier
                 .fillMaxWidth()
@@ -203,5 +250,92 @@ fun ReportForm(
             }
         }
         Spacer(Modifier.height(Spacing.Large))
+    }
+}
+
+@Composable
+fun ReportImages(
+    context: Context,
+    photosCount: Int,
+    onPhotoSelected: (String) -> Unit
+){
+    var isLoading by remember { mutableStateOf(false) }
+
+    val config = mapOf(
+        "cloud_name" to "dz06v0ogd",
+        "api_key" to "712516261436128",
+        "api_secret" to "uIW_1ozXBxyj3TprmhDPuvIvk_I"
+    )
+    val scope = rememberCoroutineScope()
+    val cloudinary = Cloudinary(config)
+
+    val fileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            scope.launch(Dispatchers.IO) {
+                isLoading = true
+                try {
+                    val inputStream = context.contentResolver.openInputStream(it)
+                    inputStream?.let { stream ->
+                        val result = cloudinary.uploader().upload(stream, ObjectUtils.emptyMap())
+                        val photoUrl = result["secure_url"].toString()
+                        onPhotoSelected(photoUrl)
+                        isLoading = false
+                    }
+                } catch (e: Exception) {
+                    Log.e("Upload", "Error uploading image: ${e.message}", e)
+                    with(Dispatchers.Main) {
+                        Toast.makeText(context, "Error uploading image", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ){
+        if(it){
+            Toast.makeText(context, "Permission granted", Toast.LENGTH_SHORT).show()
+        }else{
+            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    Column {
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.Sides)
+                .height(40.dp),
+            onClick = {
+                val permissionCheckResult = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES)
+                }else{
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)
+                }
+                if(permissionCheckResult == PackageManager.PERMISSION_GRANTED){
+                    fileLauncher.launch("image/*")
+                }else{
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+                    }else{
+                        permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    }
+                }
+            },
+            enabled = photosCount < 5,
+        ) {
+            if (isLoading){
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            }else {
+                Text(text = "Select images")
+            }
+        }
     }
 }
