@@ -48,9 +48,10 @@ class Report(
     val isDeleted: Boolean
         get() = isDeletedManually || (remainingDaysToDeletion == 0 && rejectionDate != null)
 
-    fun generateDeletionMessage(){
+    fun generateDeletionMessage() {
         if (remainingDaysToDeletion == 0 && rejectionDate != null) {
-            deletionMessage = "Report deleted for not being corrected within 5 days after its rejection."
+            deletionMessage =
+                "Report deleted for not being corrected within 5 days after its rejection."
         }
     }
 }
