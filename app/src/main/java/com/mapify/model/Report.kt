@@ -20,7 +20,8 @@ class Report(
     var rejectionMessage: String? = null,
     var deletionMessage: String? = null,
     var reportBoosters: MutableList<String> = mutableListOf(),
-    var comments: MutableList<Comment> = mutableListOf()
+    var comments: MutableList<Comment> = mutableListOf(),
+    var lastAdminActionDate: LocalDateTime? = null
 ) {
     init {
         require(images.size in 1..5) { "A report must have between 1 and 5 images." }
