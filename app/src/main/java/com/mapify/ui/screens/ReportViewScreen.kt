@@ -419,6 +419,9 @@ fun ReportViewScreen(
             )
         }
 
+        val reportDeleted = stringResource(id = R.string.report_deleted)
+        val reportDeletedMessage = stringResource(id = R.string.report_deleted_message)
+
         if(showDeleteDialogVisible){
             GenericDialog(
                 title = if(isCreator)
@@ -431,6 +434,7 @@ fun ReportViewScreen(
                     val deactivatedReport = createUpdatedReport(report)
                     if (deactivatedReport != null) {
                         isDeleting.value = true
+                        deactivatedReport.deletionMessage = if (isCreator) reportDeleted else reportDeletedMessage
                         reportsViewModel.deactivate(deactivatedReport)
                     }
                     showDeleteDialogVisible = false
