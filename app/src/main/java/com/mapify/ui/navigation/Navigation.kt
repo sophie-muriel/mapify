@@ -137,6 +137,8 @@ fun Navigation(
                                 )
                             },
                             navigateToReportView = {
+                                latitude.value = null
+                                longitude.value = null
                                 navController.popBackStack()
                                 navController.navigate(RouteScreen.ReportView(it))
                             }
