@@ -25,7 +25,7 @@ fun MessagesTab(
 
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
     val user by usersViewModel.user.collectAsState()
-    var userName by rememberSaveable { mutableStateOf( "") }
+    var userName by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(user) {
         usersViewModel.resetFoundUser()
@@ -65,16 +65,26 @@ fun MessagesTab(
                         conversation = conversation,
                         onClick = {
                             loadingConversationId = conversation.id
-                            conversationsViewModel.markAsRead(conversation.id, userId?: "")
+                            conversationsViewModel.markAsRead(conversation.id, userId ?: "")
                             navigateToConversation(conversation.id, true)
                         },
-                        onMarkRead = { conversationsViewModel.markAsRead(conversation.id, userId?: "") },
-                        onMarkUnread = { conversationsViewModel.markAsUnread(conversation.id, userId?: "") },
+                        onMarkRead = {
+                            conversationsViewModel.markAsRead(
+                                conversation.id,
+                                userId ?: ""
+                            )
+                        },
+                        onMarkUnread = {
+                            conversationsViewModel.markAsUnread(
+                                conversation.id,
+                                userId ?: ""
+                            )
+                        },
                         onDelete = {
-                            conversationsViewModel.deleteForUser(conversation.id, userId?: "")
+                            conversationsViewModel.deleteForUser(conversation.id, userId ?: "")
                         },
                         recipient = it,
-                        sender = Participant(userId?: "", userName)
+                        sender = Participant(userId ?: "", userName)
                     )
                 }
             }
