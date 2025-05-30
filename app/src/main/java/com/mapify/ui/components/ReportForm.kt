@@ -96,7 +96,13 @@ fun ReportForm(
             label = stringResource(R.string.title),
             onValueChange = onValueChangeTitle,
             isError = titleError,
-            leadingIcon = { Icon(Icons.Outlined.Title, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.Title,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
         Spacer(Modifier.height(Spacing.Inline))
@@ -111,7 +117,13 @@ fun ReportForm(
             onExpandedChange = onExpandedChange,
             onDismissRequest = onDismissRequest,
             isTouched = isTouched,
-            leadingIcon = { Icon(Icons.Outlined.Category, contentDescription = null, tint = MaterialTheme.colorScheme.primary) }
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.Category,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         )
         GenericTextField(
             modifier = Modifier.height(160.dp),
@@ -121,7 +133,13 @@ fun ReportForm(
             isError = descriptionError,
             supportingText = stringResource(R.string.description_supporting_text),
             isSingleLine = false,
-            leadingIcon = { Icon(Icons.Outlined.Description, contentDescription = null, tint = MaterialTheme.colorScheme.primary) }
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.Description,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         )
         GenericTextField(
             value = location,
@@ -131,7 +149,11 @@ fun ReportForm(
             isError = locationError,
             leadingIcon = {
                 IconButton(onClick = navigateToReportLocation) {
-                    Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    Icon(
+                        Icons.Outlined.LocationOn,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
             },
             readOnly = true
@@ -153,9 +175,9 @@ fun ReportForm(
         if (photos.isNotEmpty()) {
 
             var dynamicHeight = 0
-            if (photos.size in 1..3){
+            if (photos.size in 1..3) {
                 dynamicHeight = 125
-            }else if (photos.size in 4..5){
+            } else if (photos.size in 4..5) {
                 dynamicHeight = 250
             }
 
@@ -188,7 +210,10 @@ fun ReportForm(
                         ) {
                             AsyncImage(
                                 model = photoUrl,
-                                contentDescription = stringResource(id = R.string.upload_image_description, index + 1),
+                                contentDescription = stringResource(
+                                    id = R.string.upload_image_description,
+                                    index + 1
+                                ),
                                 modifier = Modifier.fillMaxSize()
                             )
                             val scope = rememberCoroutineScope()
@@ -241,11 +266,12 @@ fun ReportForm(
         Spacer(Modifier.height(Spacing.Large))
 
         var isButtonEnabled = false
-        if(!internalIsLoading.value && !isLoading){
-            if(isEditing && hasChanged && photos.size > 0){
+        if (!internalIsLoading.value && !isLoading) {
+            if (isEditing && hasChanged && photos.size > 0) {
                 isButtonEnabled = true
-            }else if(!isEditing){
-                isButtonEnabled = !titleError && title.isNotBlank() && !dropDownError && !descriptionError && description.isNotBlank() && !isLoading && photos.size > 0 && (isEditing || latitude != null && longitude != null)
+            } else if (!isEditing) {
+                isButtonEnabled =
+                    !titleError && title.isNotBlank() && !dropDownError && !descriptionError && description.isNotBlank() && !isLoading && photos.size > 0 && (isEditing || latitude != null && longitude != null)
             }
         }
 
@@ -284,7 +310,7 @@ fun ReportImages(
     photosCount: Int,
     onPhotoSelected: (String) -> Unit,
     isLoading: MutableState<Boolean> = mutableStateOf(false),
-){
+) {
     val config = mapOf(
         "cloud_name" to "dz06v0ogd",
         "api_key" to "712516261436128",
@@ -322,10 +348,10 @@ fun ReportImages(
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
-    ){
-        if(it){
+    ) {
+        if (it) {
             Toast.makeText(context, imageAccessPermissionGranted, Toast.LENGTH_SHORT).show()
-        }else{
+        } else {
             Toast.makeText(context, imageAccessPermissionDenied, Toast.LENGTH_SHORT).show()
         }
     }
@@ -337,30 +363,37 @@ fun ReportImages(
                 .padding(horizontal = Spacing.Sides)
                 .height(40.dp),
             onClick = {
-                val permissionCheckResult = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES)
-                }else{
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)
-                }
-                if(permissionCheckResult == PackageManager.PERMISSION_GRANTED){
+                val permissionCheckResult =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.READ_MEDIA_IMAGES
+                        )
+                    } else {
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        )
+                    }
+                if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
                     fileLauncher.launch("image/*")
-                }else{
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                } else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         permissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
-                    }else{
+                    } else {
                         permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                     }
                 }
             },
             enabled = photosCount < 5,
         ) {
-            if (isLoading.value){
+            if (isLoading.value) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(20.dp),
                     strokeWidth = 2.dp
                 )
-            }else {
+            } else {
                 Text(text = stringResource(id = R.string.select_images))
             }
         }
