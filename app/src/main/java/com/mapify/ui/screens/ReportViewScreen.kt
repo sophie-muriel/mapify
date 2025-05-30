@@ -1,5 +1,6 @@
 package com.mapify.ui.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -128,11 +129,11 @@ fun ReportViewScreen(
     DisposableEffect(Unit) {
         onDispose {
             reportsViewModel.removeCurrentReportListener()
-            reportsViewModel.resetReportRequestResult()
         }
     }
 
     val report by reportsViewModel.currentReport.collectAsState()
+
 
     var isLoading = rememberSaveable { mutableStateOf(false) }
     var isDeleting = rememberSaveable { mutableStateOf(false) }
@@ -184,8 +185,8 @@ fun ReportViewScreen(
     val tint =
         if (report!!.isHighPriority) MaterialTheme.colorScheme.primary else LocalContentColor.current
 
-
-    val state = rememberCarouselState { report!!.images.count() }
+    Log.d("ReportViewScreen", report!!.images.size.toString())
+    var state = rememberCarouselState { report!!.images.size }
     val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     var showComments by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
