@@ -78,7 +78,12 @@ fun HandleLocationPermission(
     val permission = Manifest.permission.ACCESS_FINE_LOCATION
 
     var hasPermission by remember {
-        mutableStateOf(ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
+        )
     }
 
     var showPermissionDialog by remember { mutableStateOf(false) }
@@ -97,7 +102,10 @@ fun HandleLocationPermission(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _: LifecycleOwner, event: Lifecycle.Event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                val granted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+                val granted = ContextCompat.checkSelfPermission(
+                    context,
+                    permission
+                ) == PackageManager.PERMISSION_GRANTED
                 hasPermission = granted
                 if (!granted && !askedPermissionOnce) {
                     permissionLauncher.launch(permission)
