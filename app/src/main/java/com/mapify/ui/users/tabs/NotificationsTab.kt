@@ -1,5 +1,6 @@
 package com.mapify.ui.users.tabs
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -38,11 +40,13 @@ fun NotificationsTab(
     val context = LocalContext.current
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
 
+    var currentReportDeletionMessage by rememberSaveable { mutableStateOf("") }
+
     LaunchedEffect(storedReports) {
         reportsViewModel.getReportsByUserId(userId?: "")
     }
 
-    var remainingDays = -1
+    var remainingDays by rememberSaveable { mutableIntStateOf(-1) }
 
     LazyColumn(
         modifier = Modifier
@@ -51,36 +55,41 @@ fun NotificationsTab(
         verticalArrangement = Arrangement.spacedBy(Spacing.Large)
     ) {
         items(storedReports) { report ->
-            if(report.userId == userId){
-                if(report.isDeleted){
-                    NotificationItem(
-                        title = stringResource(id = R.string.report_deleted),
-                        status = stringResource(id = R.string.deleted),
-                        supportingText = formatNotificationOrMessageDate(LocalDateTime.now()),
-                        statusMessage = stringResource(id = R.string.report_deleted_message),
-                        onClick = {
-                            exitDialogVisible = true
-                        },
-                        statusColor = MaterialTheme.colorScheme.error
-                    )
-                }else{
-                    remainingDays = report.remainingDaysToDeletion
-                    NotificationItem(
-                        title = report.title,
-                        status = if (report.status == ReportStatus.VERIFIED)
-                            stringResource(id = R.string.verified)
-                        else
-                            stringResource(id = R.string.rejected),
-                        supportingText = formatNotificationOrMessageDate(report.date),
-                        statusMessage = if (report.status == ReportStatus.VERIFIED)
-                            stringResource(id = R.string.report_verified_message)
-                        else
-                            stringResource(id = R.string.report_rejected_days_remaining, remainingDays),
-                        imageUrl = report.images.first(),
-                        onClick = { navigateToReportView(report.id, report.status) },
-                        statusColor = if (report.status == ReportStatus.VERIFIED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-                    )
-                }
+            if(report.isDeleted){
+                report.generateDeletionMessage()
+                currentReportDeletionMessage = report.deletionMessage ?: ""
+                Log.d("NotificationsTab", "Report deletion message: $currentReportDeletionMessage")
+                NotificationItem(
+                    title = stringResource(id = R.string.report_deleted),
+                    status = stringResource(id = R.string.deleted),
+                    supportingText = formatNotificationOrMessageDate(report.lastAdminActionDate ?: LocalDateTime.now()),
+                    statusMessage = report.deletionMessage ?: "", //id = R.string.report_deleted_message
+                    onClick = {
+                        exitDialogVisible = true
+                    },
+                    statusColor = MaterialTheme.colorScheme.error
+                )
+            }else if (report.status == ReportStatus.PENDING_VERIFICATION){
+                remainingDays = report.remainingDaysToDeletion
+                NotificationItem(
+                    title = report.title,
+                    status = stringResource(id = R.string.rejected),
+                    supportingText = formatNotificationOrMessageDate(report.lastAdminActionDate ?: LocalDateTime.now()),
+                    statusMessage = stringResource(id = R.string.report_rejected_days_remaining, remainingDays),
+                    imageUrl = report.images.first(),
+                    onClick = { navigateToReportView(report.id, report.status) },
+                    statusColor = MaterialTheme.colorScheme.error
+                )
+            }else{
+                NotificationItem(
+                    title = report.title,
+                    status = stringResource(id = R.string.verified),
+                    supportingText = formatNotificationOrMessageDate(report.lastAdminActionDate ?: LocalDateTime.now()),
+                    statusMessage = stringResource(id = R.string.report_verified_message),
+                    imageUrl = report.images.first(),
+                    onClick = { navigateToReportView(report.id, report.status) },
+                    statusColor = MaterialTheme.colorScheme.primary
+                )
             }
         }
         if (storedReports.isNotEmpty()) {
@@ -93,7 +102,7 @@ fun NotificationsTab(
     if (exitDialogVisible) {
         GenericDialog(
             title = stringResource(id = R.string.report_deleted),
-            message = stringResource(id = R.string.report_deleted_message),
+            message = currentReportDeletionMessage,
             onExit = {
                 exitDialogVisible = false
             },
