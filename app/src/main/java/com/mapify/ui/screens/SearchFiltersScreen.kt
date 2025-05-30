@@ -570,7 +570,7 @@ fun Buttons(
                 .fillMaxWidth()
                 .padding(horizontal = Spacing.Sides)
                 .height(40.dp),
-            enabled = true,
+            enabled = filtersChanged && !isLoading.value,
             onClick = onClickApplyFilters,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
