@@ -269,8 +269,10 @@ fun EditReportScreen(
                         updatedReport.images = photos.toList()
                         updatedReport.location = locationNotVisible
                         updatedReport.isResolved = switchChecked
-                        if (hasChanges && updatedReport.rejectionDate != null) {
+                        if (updatedReport.rejectionDate != null) {
                             updatedReport.rejectionDate = null
+                            updatedReport.rejectionMessage = null
+                            updatedReport.status = ReportStatus.NOT_VERIFIED
                         }
                         reportsViewModel.update(updatedReport, 1)
                         navigateAfterUpdate = true
