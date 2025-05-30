@@ -216,7 +216,7 @@ fun CreateReportScreen(
                     description = description,
                     location = Location.stringToLocation(locationVisible),
                     images = photos,
-                    userId = userId?: ""
+                    userId = userId ?: ""
                 )
                 reportsViewModel.create(newReport)
                 navigateAfterCreate = true
