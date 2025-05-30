@@ -1,6 +1,7 @@
 package com.mapify.ui.screens
 
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
@@ -25,15 +26,10 @@ import com.mapify.model.*
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.ReportForm
 import com.mapify.ui.components.SimpleTopBar
-import com.mapify.utils.isImageValid
-import kotlinx.coroutines.delay
-import java.time.LocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.mapify.ui.navigation.LocalMainViewModel
-import com.mapify.utils.RequestResult
 import com.mapify.utils.RequestResultEffectHandler
 import com.mapify.utils.SharedPreferencesUtils
-import okhttp3.internal.wait
 import updateCityCountry
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -47,16 +43,12 @@ fun CreateReportScreen(
 ) {
 
     val context = LocalContext.current
-
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
     val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
     var navigateAfterCreate by remember { mutableStateOf(false) }
     val createdReportId by reportsViewModel.createdReportId.collectAsState()
-
-    var isValidating by remember { mutableStateOf(false) }
-    var isLoading = rememberSaveable { mutableStateOf(false) }
 
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
@@ -72,74 +64,28 @@ fun CreateReportScreen(
     var descriptionTouched by rememberSaveable { mutableStateOf(false) }
     val descriptionError = descriptionTouched && (description.isBlank() || description.length < 10)
 
+    var photos by remember { mutableStateOf(emptyList<String>()) }
+
     var location by rememberSaveable { mutableStateOf("") }
     val locationError = false
 
-    var photos by rememberSaveable { mutableStateOf(listOf("")) }
-    var photoTouchedList by rememberSaveable { mutableStateOf(List(photos.size) { false }) }
-    var photoErrors by remember { mutableStateOf(List(photos.size) { false }) }
-    var validatingImageIndex by remember { mutableStateOf<Int?>(null) }
-    var changedPhotoIndex by remember { mutableStateOf<Int?>(null) }
-
-    LaunchedEffect(photos, photoTouchedList) {
-        isValidating = true
-        val index = changedPhotoIndex
-        if (index != null && index in photos.indices) {
-            validatingImageIndex = index
-            delay(100)
-
-            val isInvalid = !isImageValid(context, photos[index])
-            photoErrors = photoErrors.toMutableList().also {
-                if (index < it.size) it[index] = isInvalid
-            }
-
-            validatingImageIndex = null
-            changedPhotoIndex = null
-        }
-        isValidating = false
-    }
-
-    LaunchedEffect(photos.size) {
-        photoTouchedList = List(photos.size) { i -> photoTouchedList.getOrElse(i) { false } }
-        photoErrors = List(photos.size) { i -> photoErrors.getOrElse(i) { false } }
-    }
-
-    val onAddPhoto = {
-        photos = photos + ""
-        photoTouchedList = photoTouchedList + false
-        photoErrors = photoErrors + false
+    val onAddPhoto: (String) -> Unit = { newPhotoUrl ->
+        photos = photos + newPhotoUrl
     }
 
     val onRemovePhoto: (Int) -> Unit = { index ->
         if (index in photos.indices) {
             photos = photos.toMutableList().also { it.removeAt(index) }
-            photoTouchedList = photoTouchedList.toMutableList().also { if (index < it.size) it.removeAt(index) }
-            photoErrors = photoErrors.toMutableList().also { if (index < it.size) it.removeAt(index) }
         }
     }
 
-    val onValueChangePhotos: (List<String>) -> Unit = { updatedList ->
-        val changedIndex = updatedList.indexOfFirstIndexed { i, url -> url != photos.getOrNull(i) }
-        photos = updatedList
-        photoTouchedList = photoTouchedList.toMutableList().apply {
-            while (size < updatedList.size) add(false)
-            if (changedIndex in updatedList.indices) this[changedIndex] = true
-        }
-        photoErrors = photoErrors.toMutableList().apply {
-            while (size < updatedList.size) add(false)
-        }
-        changedPhotoIndex = changedIndex
-    }
+    var isLoading = rememberSaveable { mutableStateOf(false) }
 
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
     var publishReportVisible by rememberSaveable { mutableStateOf(false) }
 
     BackHandler { exitDialogVisible = true }
     var locationVisible by rememberSaveable { mutableStateOf("") }
-
-    BackHandler(enabled = true) {
-        exitDialogVisible = true
-    }
 
     LaunchedEffect(Unit) {
         if (latitude != null && longitude != null) {
@@ -218,17 +164,15 @@ fun CreateReportScreen(
                     },
                     locationError = locationError,
                     navigateToReportLocation = navigateToReportLocation,
-                    onClickCreate = { if (!isValidating) publishReportVisible = true },
+                    onClickCreate = { if (photos.isNotEmpty()) publishReportVisible = true },
                     editMode = false,
                     photos = photos,
-                    photoErrors = photoErrors,
-                    onValueChangePhotos = onValueChangePhotos,
                     onAddPhoto = onAddPhoto,
                     onRemovePhoto = onRemovePhoto,
-                    validatingImageIndex = validatingImageIndex,
-                    isLoading = !isValidating && isLoading.value,
+                    isLoading = isLoading.value,
                     latitude = latitude,
-                    longitude = longitude
+                    longitude = longitude,
+                    context = context
                 )
                 RequestResultEffectHandler(
                     requestResult = reportRequestResult,
@@ -281,11 +225,4 @@ fun CreateReportScreen(
             onExitText = stringResource(R.string.publish)
         )
     }
-}
-
-private inline fun <T> List<T>.indexOfFirstIndexed(predicate: (index: Int, T) -> Boolean): Int {
-    for (i in indices) {
-        if (predicate(i, this[i])) return i
-    }
-    return -1
 }

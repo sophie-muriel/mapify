@@ -52,11 +52,11 @@ class ReportsViewModel: ViewModel() {
     private val _currentReport = MutableStateFlow<Report?>(null)
     val currentReport: StateFlow<Report?> = _currentReport.asStateFlow()
 
-    private var reportListener: ListenerRegistration? = null
     private var currentReportListener: ListenerRegistration? = null
 
     init{
-        listenToReportsRealtime()
+        getReports()
+        resetUserReports()
     }
     
     fun create(report: Report) {
@@ -87,7 +87,7 @@ class ReportsViewModel: ViewModel() {
         return createdReportDocument.id
     }
 
-    private fun getReports() {
+    fun getReports() {
         viewModelScope.launch {
             _reports.value = findAllFirebase()
         }
@@ -95,10 +95,11 @@ class ReportsViewModel: ViewModel() {
 
     private suspend fun findAllFirebase(): List<Report> {
         val query = db.collection("reports")
+            .whereEqualTo("isDeleted", false)
             .get()
             .await()
 
-        return query.documents.mapNotNull { document ->
+        val reports = query.documents.mapNotNull { document ->
             try {
                 val report = deserializeReport(document)
                 report
@@ -107,26 +108,8 @@ class ReportsViewModel: ViewModel() {
                 null
             }
         }
-    }
-
-    private fun listenToReportsRealtime() {
-        reportListener?.remove()
-        reportListener = db.collection("reports")
-            .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) {
-                    error?.printStackTrace()
-                    return@addSnapshotListener
-                }
-                val reportsList = snapshot.documents.mapNotNull { document ->
-                    try {
-                        deserializeReport(document)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        null
-                    }
-                }
-                _reports.value = reportsList
-            }
+        return reports.filter { !it.isDeleted }
+            .sortedByDescending { it.date }
     }
 
     fun listenToCurrentReportRealTime(reportId: String) {
@@ -149,7 +132,6 @@ class ReportsViewModel: ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        reportListener?.remove()
         currentReportListener?.remove()
         resetCurrentReport()
         resetReports()
@@ -269,14 +251,8 @@ class ReportsViewModel: ViewModel() {
         }
     }
 
-    fun resetReportsListener() {
-        reportListener?.remove()
-        reportListener = null
-    }
-
-    fun restartReportsRealtime() {
-        resetReportsListener()
-        listenToReportsRealtime()
+    fun resetUserReports() {
+        _userReports.value = emptyList()
     }
 
     fun getReportsWithFilters(
@@ -347,22 +323,38 @@ class ReportsViewModel: ViewModel() {
 
     fun getReportsByUserId(userId: String) {
         viewModelScope.launch {
-
+            _reportRequestResult.value = RequestResult.Loading
             val result = runCatching {
                 getReportsByUserIdFirebase(userId)
             }
-
-            _userReports.value = result.getOrDefault(emptyList())
+            _reportRequestResult.value = result.fold(
+                onSuccess = {
+                    _userReports.value = it
+                    RequestResult.Success("Reports found")
+                },
+                onFailure = { RequestResult.Failure(it.message ?: "Reports not found") }
+            )
         }
     }
 
     private suspend fun getReportsByUserIdFirebase(userId: String): List<Report> {
-        val query = db.collection("reports")
+        val activeReportsQuery = db.collection("reports")
             .whereEqualTo("userId", userId)
+            .whereEqualTo("isDeleted", false)
+            .whereNotEqualTo("status", "NOT_VERIFIED")
             .get()
             .await()
 
-        val reports = query.documents.mapNotNull { document ->
+        val deletedReportsQuery = db.collection("reports")
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("isDeleted", true)
+            .whereNotEqualTo("deletionMessage", null)
+            .get()
+            .await()
+
+        val combinedDocuments = activeReportsQuery.documents + deletedReportsQuery.documents
+
+        val reports = combinedDocuments.mapNotNull { document ->
             try {
                 deserializeReport(document)
             } catch (e: Exception) {
@@ -431,7 +423,9 @@ class ReportsViewModel: ViewModel() {
                 )
             },
             "isDeleted" to report.isDeleted,
-            "isHighPriority" to report.isHighPriority
+            "isHighPriority" to report.isHighPriority,
+            "deletionMessage" to report.deletionMessage,
+            "lastAdminActionDate" to report.lastAdminActionDate?.toString()
         )
     }
 
@@ -457,6 +451,8 @@ class ReportsViewModel: ViewModel() {
             rejectionMessage = document.getString("rejectionMessage"),
             reportBoosters = document.get("reportBoosters") as? MutableList<String> ?: mutableListOf(),
             comments = parseCommentsListFromMap(document.get("comments")),
+            deletionMessage = document.getString("deletionMessage"),
+            lastAdminActionDate = document.getString("lastAdminActionDate")?.let { parseDate(it) }
         )
     }
 

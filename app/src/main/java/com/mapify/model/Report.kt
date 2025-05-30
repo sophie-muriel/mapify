@@ -18,8 +18,10 @@ class Report(
     var rejectionDate: LocalDateTime? = null,
     var isDeletedManually: Boolean = false,
     var rejectionMessage: String? = null,
+    var deletionMessage: String? = null,
     var reportBoosters: MutableList<String> = mutableListOf(),
-    var comments: MutableList<Comment> = mutableListOf()
+    var comments: MutableList<Comment> = mutableListOf(),
+    var lastAdminActionDate: LocalDateTime? = null
 ) {
     init {
         require(images.size in 1..5) { "A report must have between 1 and 5 images." }
@@ -45,4 +47,10 @@ class Report(
 
     val isDeleted: Boolean
         get() = isDeletedManually || (remainingDaysToDeletion == 0 && rejectionDate != null)
+
+    fun generateDeletionMessage(){
+        if (remainingDaysToDeletion == 0 && rejectionDate != null) {
+            deletionMessage = "Report deleted for not being corrected within 5 days after its rejection."
+        }
+    }
 }

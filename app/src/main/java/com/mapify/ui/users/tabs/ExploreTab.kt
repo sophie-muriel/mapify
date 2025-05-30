@@ -25,7 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -60,6 +59,7 @@ fun ExploreTab(
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
     val context = LocalContext.current
+    val reports by reportsViewModel.reports.collectAsState()
 
     val permission = android.Manifest.permission.ACCESS_FINE_LOCATION
 
@@ -72,21 +72,16 @@ fun ExploreTab(
     }
 
     LaunchedEffect(Unit) {
-        reportsViewModel.restartReportsRealtime()
-    }
-    DisposableEffect(Unit) {
-        onDispose {
-            reportsViewModel.resetReportsListener()
-        }
+        reportsViewModel.getReports()
+
     }
 
-    val allReports by reportsViewModel.reports.collectAsState()
     val filteredReports by reportsViewModel.filteredReports.collectAsState()
     val searchFilters by reportsViewModel.searchFilters.collectAsState()
-    var reportsToDisplay by rememberSaveable { mutableStateOf(allReports) }
+    var reportsToDisplay by rememberSaveable { mutableStateOf(reports) }
     var isPopUpVisible by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(searchFilters) {
+    LaunchedEffect(searchFilters, reports) {
         isPopUpVisible = searchFilters.areSet
         if (searchFilters.areSet) {
             reportsToDisplay = filteredReports
@@ -98,7 +93,7 @@ fun ExploreTab(
                 )
             }
         }else {
-            reportsToDisplay = allReports
+            reportsToDisplay = reports
         }
 
         if (searchFilters.isJustDistance) {
@@ -109,10 +104,6 @@ fun ExploreTab(
             )
         }
     }
-
-    val visibleReports = reportsToDisplay
-        .filter { !it.isDeleted }
-        .sortedByDescending { it.date }
 
     if (isPopUpVisible) {
         if (reportsToDisplay.isEmpty()){
@@ -133,7 +124,7 @@ fun ExploreTab(
             .padding(horizontal = Spacing.Sides),
         verticalArrangement = Arrangement.spacedBy(Spacing.Large),
     ) {
-        items(visibleReports) {
+        items(reportsToDisplay) {
             ReportCard(
                 report = it,
                 navigateToDetail = navigateToDetail
