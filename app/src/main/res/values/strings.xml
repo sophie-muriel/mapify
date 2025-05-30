@@ -210,4 +210,10 @@
     <string name="image_access_permission_denied">Image access permission denied</string>
     <string name="select_images">Select images</string>
 
+    <string name="distance_calculator">Distance Calculator</string>
+    <string name="waiting_for_report_to_load">Waiting for report to load</string>
+    
+    <string name="km">%s KM</string>
+    <string name="km_away">%s KM awy</string>
+
 </resources>
