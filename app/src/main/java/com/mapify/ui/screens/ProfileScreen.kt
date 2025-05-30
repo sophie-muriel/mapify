@@ -107,6 +107,7 @@ fun ProfileScreen(
     var dialogMessage by remember { mutableStateOf("") }
 
     val hasChanges = name != initialName || email != initialEmail
+    val isEditEnabled = hasChanges && !nameError && !emailError
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -252,7 +253,8 @@ fun ProfileScreen(
                         }
                         dialogVisible = true
                     }
-                }
+                },
+                isEnabled = isEditEnabled
             )
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen / 2))
@@ -343,7 +345,8 @@ fun ProfileContent(
     onRefreshLocation: () -> Unit,
     isRefreshingLocation: Boolean,
     isLoading: Boolean,
-    onClickRecoverPassword: () -> Unit
+    onClickRecoverPassword: () -> Unit,
+    isEnabled: Boolean,
 ) {
     Column(
         modifier = Modifier
@@ -456,12 +459,12 @@ fun ProfileContent(
             Spacer(modifier = Modifier.height(Spacing.Inline * 2))
             Button(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.Sides).height(40.dp),
-                enabled = name.isNotEmpty() && email.isNotEmpty(),
                 onClick = onClickEdit,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                ),
+                enabled = isEnabled,
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
