@@ -102,7 +102,7 @@ fun SearchFiltersScreen(
     )
     var formattedDate by rememberSaveable { mutableStateOf(searchFilters.thisDate) }
     var sliderPosition by rememberSaveable { mutableFloatStateOf(searchFilters.thisDistance.toFloat()) }
-    
+
     Scaffold(
         topBar = {
             SimpleTopBar(
@@ -123,22 +123,22 @@ fun SearchFiltersScreen(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Top
         ) {
-           SearchFilters(
-               priorityChecked = priorityChecked,
-               onChangePriorityCheck = { priorityChecked = it },
-               resolvedChecked = resolvedChecked,
-               onChangeReSolvedCheck = { resolvedChecked = it },
-               myPostsChecked = myPostsChecked,
-               onChangeMyPostsCheck = { myPostsChecked = it },
-               verifiedChecked = verifiedChecked,
-               onChangeVerifiedChecked = { verifiedChecked = it },
-               datePressed = datePressed,
-               onChangeDatePressed = { datePressed = it },
-               dateSelected = dateSelected,
-               distancePressed = distancePressed,
-               onChangeDistancePressed = { distancePressed = it },
-               distanceSelected = distanceSelected
-           )
+            SearchFilters(
+                priorityChecked = priorityChecked,
+                onChangePriorityCheck = { priorityChecked = it },
+                resolvedChecked = resolvedChecked,
+                onChangeReSolvedCheck = { resolvedChecked = it },
+                myPostsChecked = myPostsChecked,
+                onChangeMyPostsCheck = { myPostsChecked = it },
+                verifiedChecked = verifiedChecked,
+                onChangeVerifiedChecked = { verifiedChecked = it },
+                datePressed = datePressed,
+                onChangeDatePressed = { datePressed = it },
+                dateSelected = dateSelected,
+                distancePressed = distancePressed,
+                onChangeDistancePressed = { distancePressed = it },
+                distanceSelected = distanceSelected
+            )
             Spacer(modifier = Modifier.height(Spacing.Sides))
 
             Buttons(
@@ -159,7 +159,7 @@ fun SearchFiltersScreen(
                     }
                 },
                 onClickCleanFilters = {
-                    if(priorityChecked || resolvedChecked || verifiedChecked || myPostsChecked || dateSelected || distanceSelected){
+                    if (priorityChecked || resolvedChecked || verifiedChecked || myPostsChecked || dateSelected || distanceSelected) {
                         reportsViewModel.clearFilters()
                         priorityChecked = false
                         resolvedChecked = false
@@ -189,7 +189,7 @@ fun SearchFiltersScreen(
         val distance = stringResource(id = R.string.select_distance) + " "
         val distanceKm = " " + stringResource(id = R.string.kilo_meter)
 
-        if(datePressed){
+        if (datePressed) {
             DatePickerForFilter(
                 onDismissRequest = { datePressed = false },
                 datePickerState = datePikerState,
@@ -210,25 +210,25 @@ fun SearchFiltersScreen(
                 },
                 onClickCancel = { datePressed = false }
             )
-        }else if(distancePressed){
+        } else if (distancePressed) {
             DistanceSelectionDialog(
                 onClose = {
                     distancePressed = false
-                    if(sliderPosition != 0f){
+                    if (sliderPosition != 0f) {
                         Toast.makeText(
                             context,
                             distance + sliderPosition.toString().dropLast(2) + distanceKm,
                             Toast.LENGTH_SHORT
                         ).show()
                         distanceSelected = true
-                    }else{
+                    } else {
                         distanceSelected = false
                     }
                 },
                 sliderPosition = sliderPosition,
                 onSliderPositionChange = { sliderPosition = it.toInt().toFloat() },
                 onCancel = {
-                    if(!distanceSelected){
+                    if (!distanceSelected) {
                         sliderPosition = 0f
                     }
                     distancePressed = false
@@ -284,7 +284,7 @@ fun SearchFilters(
     distancePressed: Boolean,
     distanceSelected: Boolean,
     onChangeDistancePressed: (Boolean) -> Unit
-){
+) {
     FilterRow(
         icon = Icons.Filled.Star,
         description = stringResource(id = R.string.star_icon),
@@ -351,7 +351,7 @@ fun FilterRow(
     statusTwo: Boolean = false,
     onStatusChange: (Boolean) -> Unit,
     isSwitch: Boolean
-){
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -368,7 +368,7 @@ fun FilterRow(
             Icon(
                 imageVector = icon,
                 contentDescription = description,
-                tint = when{
+                tint = when {
                     isSwitch && status -> MaterialTheme.colorScheme.primary
                     !isSwitch && statusTwo -> MaterialTheme.colorScheme.primary
                     else -> MaterialTheme.colorScheme.secondary
@@ -381,18 +381,19 @@ fun FilterRow(
             )
         }
 
-        if(isSwitch){
+        if (isSwitch) {
             Switch(
                 checked = status,
                 onCheckedChange = onStatusChange
             )
-        }else{
+        } else {
             IconButton(onClick = { onStatusChange(!status) }) {
                 Icon(
-                imageVector = Icons.Filled.PlayArrow,
-                contentDescription = stringResource(id = R.string.play_arrow_icon),
-                tint = MaterialTheme.colorScheme.secondary
-            )}
+                    imageVector = Icons.Filled.PlayArrow,
+                    contentDescription = stringResource(id = R.string.play_arrow_icon),
+                    tint = MaterialTheme.colorScheme.secondary
+                )
+            }
         }
     }
     Spacer(modifier = Modifier.height(Spacing.Inline))
@@ -405,7 +406,7 @@ fun DatePickerForFilter(
     datePickerState: DatePickerState,
     onClickOk: () -> Unit,
     onClickCancel: () -> Unit
-){
+) {
     DatePickerDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
@@ -437,7 +438,7 @@ fun DatePickerForFilter(
                 )
             }
         }
-    ){
+    ) {
         DatePicker(
             state = datePickerState,
             dateFormatter = CustomDateFormatter(),
@@ -461,7 +462,7 @@ fun DistanceSelectionDialog(
         ) {
             Spacer(modifier = Modifier.height(Spacing.Sides))
 
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)){
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(
                     text = stringResource(id = R.string.select_distance),
                     textAlign = TextAlign.Left,
@@ -485,7 +486,7 @@ fun DistanceSelectionDialog(
                     modifier = Modifier
                         .padding(horizontal = Spacing.Sides),
                     verticalArrangement = Arrangement.spacedBy(Spacing.Inline)
-                ){
+                ) {
                     Slider(
                         value = sliderPosition,
                         onValueChange = onSliderPositionChange,
@@ -506,7 +507,7 @@ fun DistanceSelectionDialog(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(modifier = Modifier.weight(1f)){
+                    Row(modifier = Modifier.weight(1f)) {
                         Text(text = sliderPosition.toString().dropLast(2) + " KM")
                     }
 
@@ -547,14 +548,14 @@ fun Buttons(
     onClickApplyFilters: () -> Unit,
     onClickCleanFilters: () -> Unit,
     isLoading: MutableState<Boolean>
-){
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = Spacing.Sides),
         verticalArrangement = Arrangement.spacedBy(Spacing.Sides)
 
-    ){
+    ) {
         Button(
             modifier = Modifier
                 .fillMaxWidth()
@@ -567,13 +568,13 @@ fun Buttons(
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ),
         ) {
-            if (isLoading.value){
+            if (isLoading.value) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(20.dp),
                     strokeWidth = 2.dp
                 )
-            }else{
+            } else {
                 Text(
                     text = stringResource(id = R.string.apply_filters),
                     style = MaterialTheme.typography.bodyMedium
