@@ -269,7 +269,8 @@ fun RegistrationScreen(
                 onResetResult = { usersViewModel.resetRegisterResult() },
                 onNavigate = {
                     android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                            resetFields() }, 100)
+                        resetFields()
+                    }, 100)
                     navigateBack()
                 }
             )
