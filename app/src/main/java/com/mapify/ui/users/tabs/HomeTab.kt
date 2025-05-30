@@ -25,14 +25,14 @@ fun HomeTab(
 
     LaunchedEffect(Unit) {
         reportsViewModel.getReports()
-        reportsViewModel.getReportsByUserId(userId?: "")
+        reportsViewModel.getReportsByUserId(userId ?: "")
     }
 
     RequestResultEffectHandler(
         requestResult = reportRequestResult,
         context = context,
         onResetResult = { reportsViewModel.resetReportRequestResult() },
-        onNavigate = {  },
+        onNavigate = { },
         showsMessage = false
     )
 
