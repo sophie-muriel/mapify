@@ -103,6 +103,13 @@ fun SearchFiltersScreen(
     var formattedDate by rememberSaveable { mutableStateOf(searchFilters.thisDate) }
     var sliderPosition by rememberSaveable { mutableFloatStateOf(searchFilters.thisDistance.toFloat()) }
 
+    val filtersChanged = priorityChecked != searchFilters.onlyPriority ||
+            resolvedChecked != searchFilters.onlyResolved ||
+            verifiedChecked != searchFilters.onlyVerified ||
+            myPostsChecked != searchFilters.onlyMyPosts ||
+            (dateSelected && formattedDate != searchFilters.thisDate) ||
+            (distanceSelected && sliderPosition.toDouble() != searchFilters.thisDistance)
+
     Scaffold(
         topBar = {
             SimpleTopBar(
