@@ -215,6 +215,7 @@ fun Navigation(
                                 latitude.value = null
                                 longitude.value = null
                                 navController.popBackStack()
+                                navController.popBackStack()
                             },
                             navigateToReportLocation = { lat, long ->
                                 navController.navigate(
