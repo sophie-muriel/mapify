@@ -53,7 +53,7 @@ fun ProfileScreen(
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
     val user by usersViewModel.user.collectAsState()
 
-    var name by rememberSaveable { mutableStateOf( "Loading...") }
+    var name by rememberSaveable { mutableStateOf("Loading...") }
     var email by rememberSaveable { mutableStateOf("Loading...") }
     var locationText by rememberSaveable { mutableStateOf("Loading...") }
 
@@ -76,7 +76,8 @@ fun ProfileScreen(
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     val nameError = nameTouched && name.isBlank()
-    val emailError = emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
+    val emailError =
+        emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
     var initialName by rememberSaveable { mutableStateOf("") }
     var initialEmail by rememberSaveable { mutableStateOf("") }
 
@@ -94,11 +95,18 @@ fun ProfileScreen(
     val permission = android.Manifest.permission.ACCESS_FINE_LOCATION
 
     var hasPermission by remember {
-        mutableStateOf(ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
+        )
     }
 
-    val locationAccessPermissionGranted = stringResource(id = R.string.location_access_permission_granted)
-    val locationAccessPermissionDenied = stringResource(id = R.string.location_access_permission_denied)
+    val locationAccessPermissionGranted =
+        stringResource(id = R.string.location_access_permission_granted)
+    val locationAccessPermissionDenied =
+        stringResource(id = R.string.location_access_permission_denied)
 
     var isRefreshingLocation by rememberSaveable { mutableStateOf(false) }
     var isLoading by rememberSaveable { mutableStateOf(false) }
@@ -123,7 +131,7 @@ fun ProfileScreen(
                 locationText = userLocation?.toString() ?: "Unable to get location"
 
                 userLocation?.let { location ->
-                    if(user!=null){
+                    if (user != null) {
                         val updatedUser = User(
                             id = user!!.id,
                             fullName = user!!.fullName,
@@ -152,7 +160,7 @@ fun ProfileScreen(
                 locationText = userLocation?.toString() ?: "Unable to get location"
 
                 userLocation?.let { location ->
-                    if(user!=null){
+                    if (user != null) {
                         val updatedUser = User(
                             id = user!!.id,
                             fullName = user!!.fullName,
@@ -316,7 +324,7 @@ fun ProfileScreen(
             onExit = {
                 exitDialogVisible = false
                 if (editMode) {
-                    if(user!=null) {
+                    if (user != null) {
                         name = user!!.fullName
                         email = user!!.email
                         editMode = false
@@ -358,7 +366,9 @@ fun ProfileContent(
             Icon(
                 imageVector = Icons.Outlined.AccountCircle,
                 contentDescription = stringResource(id = R.string.name_icon_description),
-                modifier = Modifier.size(100.dp).padding(bottom = Spacing.Inline),
+                modifier = Modifier
+                    .size(100.dp)
+                    .padding(bottom = Spacing.Inline),
                 tint = MaterialTheme.colorScheme.primary
             )
             Text(
@@ -371,7 +381,9 @@ fun ProfileContent(
             Text(
                 text = stringResource(id = R.string.edit_profile_label),
                 style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.Sides),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacing.Sides),
                 textAlign = TextAlign.Start
             )
             Spacer(modifier = Modifier.padding(Spacing.Inline))
@@ -386,7 +398,11 @@ fun ProfileContent(
             readOnly = !isEditMode,
             isSingleLine = true,
             leadingIcon = {
-                Icon(Icons.Outlined.AccountCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    Icons.Outlined.AccountCircle,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         )
 
@@ -399,7 +415,11 @@ fun ProfileContent(
             readOnly = true,
             isSingleLine = true,
             leadingIcon = {
-                Icon(Icons.Outlined.Email, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    Icons.Outlined.Email,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         )
 
@@ -411,7 +431,11 @@ fun ProfileContent(
             readOnly = true,
             isSingleLine = true,
             leadingIcon = {
-                Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    Icons.Outlined.LocationOn,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
             },
             showTrailingIcon = true,
             trailingIcon = {
@@ -425,7 +449,11 @@ fun ProfileContent(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Icon(Icons.Outlined.Replay, contentDescription = "Refresh location", tint = MaterialTheme.colorScheme.primary)
+                        Icon(
+                            Icons.Outlined.Replay,
+                            contentDescription = "Refresh location",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }
@@ -433,7 +461,10 @@ fun ProfileContent(
 
         Spacer(modifier = Modifier.height(Spacing.Inline * 2))
         Button(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.Sides).height(40.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.Sides)
+                .height(40.dp),
             enabled = true,
             onClick = onClickRecoverPassword,
             colors = ButtonDefaults.buttonColors(
@@ -458,7 +489,10 @@ fun ProfileContent(
         if (isEditMode) {
             Spacer(modifier = Modifier.height(Spacing.Inline * 2))
             Button(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.Sides).height(40.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacing.Sides)
+                    .height(40.dp),
                 onClick = onClickEdit,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
