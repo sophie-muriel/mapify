@@ -32,7 +32,8 @@ import com.mapify.ui.users.HomeScreen
 import com.mapify.utils.SharedPreferencesUtils
 import com.mapify.viewmodel.MainViewModel
 
-val LocalMainViewModel = staticCompositionLocalOf<MainViewModel> { error("MainViewModel not found!") }
+val LocalMainViewModel =
+    staticCompositionLocalOf<MainViewModel> { error("MainViewModel not found!") }
 
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
@@ -45,7 +46,7 @@ fun Navigation(
 
     Log.d("ROLE viewmodel", map["role"].toString())
 
-    val startDestination = if(map.isNotEmpty()) RouteScreen.Home else RouteScreen.Login
+    val startDestination = if (map.isNotEmpty()) RouteScreen.Home else RouteScreen.Login
 
     val latitude = rememberSaveable { mutableStateOf<Double?>(null) }
     val longitude = rememberSaveable { mutableStateOf<Double?>(null) }
@@ -69,7 +70,11 @@ fun Navigation(
                             },
                             navigateToHome = {
                                 mainViewModel.usersViewModel.user.value?.let { currentUser ->
-                                    SharedPreferencesUtils.savePreference(context, currentUser.id, currentUser.role)
+                                    SharedPreferencesUtils.savePreference(
+                                        context,
+                                        currentUser.id,
+                                        currentUser.role
+                                    )
                                     navController.navigate(RouteScreen.Home) {
                                         popUpTo(RouteScreen.Login) { inclusive = true }
                                     }
@@ -99,7 +104,12 @@ fun Navigation(
                                 navController.navigate(RouteScreen.Settings)
                             },
                             navigateToConversation = { conversationId, isConversation ->
-                                navController.navigate(RouteScreen.Conversation(conversationId, isConversation))
+                                navController.navigate(
+                                    RouteScreen.Conversation(
+                                        conversationId,
+                                        isConversation
+                                    )
+                                )
                             },
                             navigateToReportView = { id, status ->
                                 navController.navigate(
@@ -232,7 +242,12 @@ fun Navigation(
                         SearchContactScreen(
                             navigateBack = { navController.popBackStack() },
                             onUserSelected = { conversationId, isConversation ->
-                                navController.navigate(RouteScreen.Conversation(conversationId, isConversation))
+                                navController.navigate(
+                                    RouteScreen.Conversation(
+                                        conversationId,
+                                        isConversation
+                                    )
+                                )
                             },
                         )
                     }
