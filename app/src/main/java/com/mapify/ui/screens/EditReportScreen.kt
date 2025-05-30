@@ -28,7 +28,6 @@ import com.mapify.model.*
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.ReportForm
 import com.mapify.ui.components.SimpleTopBar
-import com.mapify.utils.isImageValid
 import kotlinx.coroutines.delay
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.unit.dp
@@ -45,13 +44,14 @@ fun EditReportScreen(
     latitude: Double? = null,
     longitude: Double? = null
 ) {
+
     val context = LocalContext.current
-    var isValidating by remember { mutableStateOf(false) }
-    var isLoading = rememberSaveable { mutableStateOf(false) }
-    var navigateAfterUpdate by remember { mutableStateOf(false) }
 
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
     val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
+    var isLoading = rememberSaveable { mutableStateOf(false) }
+
+    var navigateAfterUpdate by remember { mutableStateOf(false) }
 
     LaunchedEffect(reportId) {
         reportsViewModel.findById(reportId)
@@ -90,75 +90,22 @@ fun EditReportScreen(
 
     val locationError = false
 
-    var photos by rememberSaveable { mutableStateOf(report!!.images.toMutableList()) }
-    var photoTouchedList by rememberSaveable { mutableStateOf(List(photos.size) { false }) }
-    var photoErrors by remember { mutableStateOf(List(photos.size) { false }) }
-    var validatingImageIndex by remember { mutableStateOf<Int?>(null) }
-    var changedPhotoIndex by remember { mutableStateOf<Int?>(null) }
+    var photos by remember { mutableStateOf(report!!.images) }
 
-    LaunchedEffect(photos, photoTouchedList) {
-        isValidating = true
-        val index = changedPhotoIndex
-        if (index != null && index in photos.indices) {
-            validatingImageIndex = index
-            delay(100)
-
-            val isInvalid = !isImageValid(context, photos[index])
-            photoErrors = photoErrors.toMutableList().also {
-                if (index < it.size) it[index] = isInvalid
-            }
-
-            validatingImageIndex = null
-            changedPhotoIndex = null
-        }
-        isValidating = false
-    }
-
-    LaunchedEffect(photos.size) {
-        if (photoTouchedList.size != photos.size) {
-            photoTouchedList = List(photos.size) { i -> photoTouchedList.getOrElse(i) { false } }
-        }
-        if (photoErrors.size != photos.size) {
-            photoErrors = List(photos.size) { i -> photoErrors.getOrElse(i) { false } }
-        }
-    }
-
-    val onAddPhoto = {
-        photos = photos.toMutableList().apply { add("") }
-        photoTouchedList = photoTouchedList.toMutableList().apply { add(false) }
-        photoErrors = photoErrors.toMutableList().apply { add(false) }
+    val onAddPhoto: (String) -> Unit = { newPhotoUrl ->
+        photos = photos + newPhotoUrl
     }
 
     val onRemovePhoto: (Int) -> Unit = { index ->
         if (index in photos.indices) {
             photos = photos.toMutableList().also { it.removeAt(index) }
-            photoTouchedList = photoTouchedList.toMutableList().also { it.removeAt(index) }
-            photoErrors = photoErrors.toMutableList().also { it.removeAt(index) }
-            if (changedPhotoIndex == index || (changedPhotoIndex ?: -1) >= photos.size) {
-                changedPhotoIndex = null
-            }
-            if (validatingImageIndex == index || (validatingImageIndex ?: -1) >= photos.size) {
-                validatingImageIndex = null
-            }
         }
-    }
-
-    val onValueChangePhotos: (List<String>) -> Unit = { updatedList ->
-        val changedIndex = updatedList.indexOfFirstIndexed { i, url -> url != photos.getOrNull(i) }
-        photos = updatedList.toMutableList()
-        photoTouchedList = photoTouchedList.toMutableList().also {
-            if (changedIndex in updatedList.indices) {
-                while (it.size < updatedList.size) it.add(false)
-                it[changedIndex] = true
-            }
-        }
-        changedPhotoIndex = changedIndex
     }
 
     var locationVisible by rememberSaveable { mutableStateOf("") }
     var locationNotVisible by remember { mutableStateOf<Location?>(null) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(latitude, longitude, report) {
         if (latitude != null && longitude != null) {
             val loc = Location(latitude, longitude)
             loc.updateCityCountry(context)
@@ -170,14 +117,21 @@ fun EditReportScreen(
             locationNotVisible = loc
             locationVisible = loc?.toString().orEmpty()
         }
-        delay(2000)
+        delay(1000)
     }
 
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
     var saveReportVisible by rememberSaveable { mutableStateOf(false) }
 
-    if (titleTouched || dropDownTouched || descriptionTouched || photoTouchedList.any { it }) {
-        BackHandler { exitDialogVisible = true }
+    val hasChanges = remember(title, dropDownValue, description, photos, switchChecked, latitude, longitude, report) {
+        title != report!!.title || dropDownValue != report!!.category.displayName ||
+                description != report!!.description || photos != report!!.images ||
+                switchChecked != report!!.isResolved ||
+                (latitude != null && longitude != null && (latitude != report!!.location?.latitude || longitude != report!!.location?.longitude))
+    }
+
+    BackHandler(enabled = hasChanges) {
+        exitDialogVisible = true
     }
 
     Scaffold(
@@ -188,9 +142,11 @@ fun EditReportScreen(
                 navIconVector = Icons.AutoMirrored.Filled.ArrowBack,
                 navIconDescription = stringResource(id = R.string.back_arrow_icon),
                 onClickNavIcon = {
-                    if (titleTouched || dropDownTouched || descriptionTouched || photoTouchedList.any { it }) {
+                    if (hasChanges) {
                         exitDialogVisible = true
-                    } else navigateBack()
+                    } else {
+                        navigateBack()
+                    }
                 },
                 actions = false
             )
@@ -250,11 +206,9 @@ fun EditReportScreen(
                         }
                     },
                     onClickCreate = {
-                        if (!isValidating) saveReportVisible = true
+                        if (photos.isNotEmpty()) saveReportVisible = true
                     },
                     photos = photos,
-                    photoErrors = photoErrors,
-                    onValueChangePhotos = onValueChangePhotos,
                     onAddPhoto = onAddPhoto,
                     onRemovePhoto = onRemovePhoto,
                     editMode = true,
@@ -262,11 +216,11 @@ fun EditReportScreen(
                     switchCheckedOnClick = {
                         switchChecked = it
                     },
-                    validatingImageIndex = validatingImageIndex,
-                    isLoading = !isValidating && isLoading.value,
+                    isLoading = isLoading.value,
                     latitude = latitude,
                     longitude = longitude,
-                    isEditing = true
+                    isEditing = true,
+                    context = context
                 )
                 RequestResultEffectHandler(
                     requestResult = reportRequestResult,
@@ -313,7 +267,7 @@ fun EditReportScreen(
                         updatedReport.images = photos.toList()
                         updatedReport.location = locationNotVisible
                         updatedReport.isResolved = switchChecked
-                        if ((titleTouched || dropDownTouched || descriptionTouched || photoTouchedList.any { it }) && report!!.rejectionDate != null) {
+                        if (hasChanges && updatedReport.rejectionDate != null) {
                             updatedReport.rejectionDate = null
                         }
                         reportsViewModel.update(updatedReport, 1)
@@ -328,11 +282,4 @@ fun EditReportScreen(
             onExitText = stringResource(id = R.string.edit)
         )
     }
-}
-
-private inline fun <T> List<T>.indexOfFirstIndexed(predicate: (index: Int, T) -> Boolean): Int {
-    for (i in indices) {
-        if (predicate(i, this[i])) return i
-    }
-    return -1
 }
