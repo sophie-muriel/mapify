@@ -51,7 +51,7 @@ fun NotificationsTab(
     var isLoading = rememberSaveable { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        reportsViewModel.getReportsByUserId(userId?: "")
+        reportsViewModel.getReportsByUserId(userId ?: "")
     }
 
     var remainingDays by rememberSaveable { mutableIntStateOf(-1) }
@@ -61,7 +61,7 @@ fun NotificationsTab(
         context = context,
         isLoading = isLoading,
         onResetResult = { reportsViewModel.resetReportRequestResult() },
-        onNavigate = {  },
+        onNavigate = { },
         showsMessage = false
     )
 
@@ -86,36 +86,46 @@ fun NotificationsTab(
         verticalArrangement = Arrangement.spacedBy(Spacing.Large)
     ) {
         items(storedReports) { report ->
-            if(report.isDeleted){
+            if (report.isDeleted) {
                 report.generateDeletionMessage()
                 currentReportDeletionMessage = report.deletionMessage ?: ""
                 Log.d("NotificationsTab", "Report deletion message: $currentReportDeletionMessage")
                 NotificationItem(
                     title = stringResource(id = R.string.report_deleted),
                     status = stringResource(id = R.string.deleted),
-                    supportingText = formatNotificationOrMessageDate(report.lastAdminActionDate ?: LocalDateTime.now()),
-                    statusMessage = report.deletionMessage ?: "", //id = R.string.report_deleted_message
+                    supportingText = formatNotificationOrMessageDate(
+                        report.lastAdminActionDate ?: LocalDateTime.now()
+                    ),
+                    statusMessage = report.deletionMessage
+                        ?: "", //id = R.string.report_deleted_message
                     onClick = {
                         exitDialogVisible = true
                     },
                     statusColor = MaterialTheme.colorScheme.error
                 )
-            }else if (report.status == ReportStatus.PENDING_VERIFICATION){
+            } else if (report.status == ReportStatus.PENDING_VERIFICATION) {
                 remainingDays = report.remainingDaysToDeletion
                 NotificationItem(
                     title = report.title,
                     status = stringResource(id = R.string.rejected),
-                    supportingText = formatNotificationOrMessageDate(report.lastAdminActionDate ?: LocalDateTime.now()),
-                    statusMessage = stringResource(id = R.string.report_rejected_days_remaining, remainingDays),
+                    supportingText = formatNotificationOrMessageDate(
+                        report.lastAdminActionDate ?: LocalDateTime.now()
+                    ),
+                    statusMessage = stringResource(
+                        id = R.string.report_rejected_days_remaining,
+                        remainingDays
+                    ),
                     imageUrl = report.images.first(),
                     onClick = { navigateToReportView(report.id, report.status) },
                     statusColor = MaterialTheme.colorScheme.error
                 )
-            }else{
+            } else {
                 NotificationItem(
                     title = report.title,
                     status = stringResource(id = R.string.verified),
-                    supportingText = formatNotificationOrMessageDate(report.lastAdminActionDate ?: LocalDateTime.now()),
+                    supportingText = formatNotificationOrMessageDate(
+                        report.lastAdminActionDate ?: LocalDateTime.now()
+                    ),
                     statusMessage = stringResource(id = R.string.report_verified_message),
                     imageUrl = report.images.first(),
                     onClick = { navigateToReportView(report.id, report.status) },
