@@ -59,7 +59,7 @@ fun Map(
     reports: List<Report>? = null,
     isCenteredOnUser: Boolean = false,
     hasPrimaryFab: Boolean = true
-){
+) {
     val context = LocalContext.current
 
     var userLocationLongitude by rememberSaveable { mutableStateOf<Double?>(null) }
@@ -68,7 +68,12 @@ fun Map(
     val permission = android.Manifest.permission.ACCESS_FINE_LOCATION
 
     var hasPermission by remember {
-        mutableStateOf(ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
+        )
     }
 
     val mapViewportState = rememberMapViewportState {
@@ -95,7 +100,7 @@ fun Map(
         painter = painterResource(markerResourceId)
     )
 
-    Box(modifier = Modifier.fillMaxSize()){
+    Box(modifier = Modifier.fillMaxSize()) {
         MapboxMap(
             modifier = Modifier.fillMaxSize(),
             mapViewportState = mapViewportState,
@@ -103,7 +108,7 @@ fun Map(
                 gesturesSettings = GesturesSettings { pitchEnabled = true }
             },
             onMapClickListener = onMapClickListener
-        ){
+        ) {
             MapEffect(Unit) { mapView ->
                 mapView.location.updateSettings {
                     locationPuck = createDefault2DPuck(withBearing = true)
@@ -115,7 +120,7 @@ fun Map(
             }
 
             if (isOneReport) {
-                if(isReadOnly){
+                if (isReadOnly) {
                     val pointToShow = if (latitude != null && longitude != null) {
                         Point.fromLngLat(longitude, latitude)
                     } else {
@@ -131,7 +136,7 @@ fun Map(
                             pitch(45.0)
                         }
                     }
-                }else{
+                } else {
                     val pointToShow = clickedPoint ?: if (latitude != null && longitude != null) {
                         Point.fromLngLat(longitude, latitude)
                     } else {
@@ -141,7 +146,7 @@ fun Map(
                         PointAnnotation(point = point) {
                             iconImage = marker
                         }
-                        if(clickedPoint != null){
+                        if (clickedPoint != null) {
                             mapViewportState.easeTo(
                                 cameraOptions = CameraOptions.Builder()
                                     .center(point)
@@ -152,7 +157,7 @@ fun Map(
                                     duration(500L)
                                 }
                             )
-                        }else{
+                        } else {
                             mapViewportState.setCameraOptions {
                                 center(point)
                                 zoom(16.4)
@@ -161,12 +166,15 @@ fun Map(
                         }
                     }
                 }
-            }else{
-                reports?.forEach{ report ->
-                    if(!report.isDeleted){
+            } else {
+                reports?.forEach { report ->
+                    if (!report.isDeleted) {
                         PointAnnotation(
-                            point = Point.fromLngLat(report.location!!.longitude, report.location!!.latitude)
-                        ){
+                            point = Point.fromLngLat(
+                                report.location!!.longitude,
+                                report.location!!.latitude
+                            )
+                        ) {
                             iconImage = marker
                             interactionsState.onClicked {
                                 navigateToDetail(report.id)
@@ -179,7 +187,7 @@ fun Map(
         }
         if (isCenteredOnUser && showFab.value) {
             Box(
-                modifier = if(hasPrimaryFab) Modifier
+                modifier = if (hasPrimaryFab) Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 16.dp, bottom = 88.dp)
                 else Modifier
@@ -196,8 +204,9 @@ fun Map(
                             userLocationLatitude = fetchedLocation?.latitude
                             val point = userLocationLongitude?.let { lng ->
                                 userLocationLatitude?.let { lat ->
-                                Point.fromLngLat(lng, lat)
-                            } }
+                                    Point.fromLngLat(lng, lat)
+                                }
+                            }
                             mapViewportState.easeTo(
                                 cameraOptions = CameraOptions.Builder()
                                     .center(point)
