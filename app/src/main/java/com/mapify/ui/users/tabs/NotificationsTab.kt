@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -13,15 +14,18 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.model.*
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.NotificationItem
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
+import com.mapify.utils.RequestResultEffectHandler
 import com.mapify.utils.SharedPreferencesUtils
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -37,16 +41,43 @@ fun NotificationsTab(
 
     val storedReports by reportsViewModel.userReports.collectAsState()
 
+    val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
+
     val context = LocalContext.current
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
 
     var currentReportDeletionMessage by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(storedReports) {
+    var isLoading = rememberSaveable { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
         reportsViewModel.getReportsByUserId(userId?: "")
     }
 
     var remainingDays by rememberSaveable { mutableIntStateOf(-1) }
+
+    RequestResultEffectHandler(
+        requestResult = reportRequestResult,
+        context = context,
+        isLoading = isLoading,
+        onResetResult = { reportsViewModel.resetReportRequestResult() },
+        onNavigate = {  },
+        showsMessage = false
+    )
+
+    if (isLoading.value && storedReports.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(40.dp),
+                strokeWidth = 4.dp
+            )
+        }
+        return
+    }
 
     LazyColumn(
         modifier = Modifier
