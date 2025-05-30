@@ -129,6 +129,7 @@ fun ReportViewScreen(
     DisposableEffect(Unit) {
         onDispose {
             reportsViewModel.removeCurrentReportListener()
+            //reportsViewModel.resetReportRequestResult()
         }
     }
 
@@ -162,7 +163,7 @@ fun ReportViewScreen(
         if (exitDialogVisible && reportStatusP == ReportStatus.PENDING_VERIFICATION) {
             GenericDialog(
                 title = stringResource(id = R.string.report_rejected),
-                message = stringResource(id = R.string.report_rejected_message),
+                message = stringResource(id = R.string.report_rejected_message) + " \n\n ${report!!.rejectionMessage} \n",
                 onClose = {
                     exitDialogVisible = false
                 },
@@ -185,7 +186,6 @@ fun ReportViewScreen(
     val tint =
         if (report!!.isHighPriority) MaterialTheme.colorScheme.primary else LocalContentColor.current
 
-    Log.d("ReportViewScreen", report!!.images.size.toString())
     var state = rememberCarouselState { report!!.images.size }
     val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     var showComments by remember { mutableStateOf(false) }
