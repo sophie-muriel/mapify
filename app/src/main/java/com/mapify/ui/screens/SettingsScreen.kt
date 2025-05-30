@@ -163,7 +163,7 @@ fun SettingsScreen(
             message = stringResource(id = R.string.account_deleted_message),
             onExit = {
                 accountDeletedDialogVisible = false
-                usersViewModel.delete(userId?: "")
+                usersViewModel.delete(userId ?: "")
                 SharedPreferencesUtils.clearPreference(context)
                 usersViewModel.logout()
                 usersViewModel.resetRegisterResult()
