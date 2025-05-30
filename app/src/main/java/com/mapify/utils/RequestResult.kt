@@ -30,6 +30,7 @@ fun RequestResultEffectHandler(
             null -> {
                 isLoading.value = false
             }
+
             is RequestResult.Success -> {
                 isLoading.value = false
                 if (showsMessage) {
@@ -45,6 +46,7 @@ fun RequestResultEffectHandler(
                     onNavigate()
                 }
             }
+
             is RequestResult.Failure -> {
                 isLoading.value = false
                 if (showsMessage) {
@@ -53,6 +55,7 @@ fun RequestResultEffectHandler(
                 delay(600)
                 onResetResult()
             }
+
             is RequestResult.Loading -> {
                 isLoading.value = true
             }
