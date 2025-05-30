@@ -71,6 +71,7 @@ fun HomeScreen(
                         firstOnClickAction = { navigateToSettings() }
                     )
                 }
+
                 UserRouteTab.Explore::class.qualifiedName -> {
                     SimpleTopBar(
                         contentAlignment = alignment,
@@ -89,6 +90,7 @@ fun HomeScreen(
                         areFiltersActive = searchFilters.areSet
                     )
                 }
+
                 UserRouteTab.Notifications::class.qualifiedName -> {
                     SimpleTopBar(
                         contentAlignment = alignment,
@@ -102,6 +104,7 @@ fun HomeScreen(
                         firstOnClickAction = { navigateToSettings() }
                     )
                 }
+
                 UserRouteTab.Messages::class.qualifiedName -> {
                     SimpleTopBar(
                         contentAlignment = alignment,
@@ -131,6 +134,7 @@ fun HomeScreen(
                         iconDescription = stringResource(id = R.string.add_icon_description)
                     )
                 }
+
                 UserRouteTab.Messages::class.qualifiedName -> {
                     CreateFAB(
                         onClick = { navigateToSearchContact() },
