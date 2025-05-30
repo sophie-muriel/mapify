@@ -112,7 +112,7 @@ fun EditReportScreen(
             loc.updateCityCountry(context)
             locationNotVisible = loc
             locationVisible = loc.toString()
-        }else{
+        } else {
             val loc = report!!.location
             loc?.updateCityCountry(context)
             locationNotVisible = loc
@@ -124,7 +124,16 @@ fun EditReportScreen(
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
     var saveReportVisible by rememberSaveable { mutableStateOf(false) }
 
-    val hasChanges = remember(title, dropDownValue, description, photos, switchChecked, latitude, longitude, report) {
+    val hasChanges = remember(
+        title,
+        dropDownValue,
+        description,
+        photos,
+        switchChecked,
+        latitude,
+        longitude,
+        report
+    ) {
         title != report!!.title || dropDownValue != report!!.category.displayName ||
                 description != report!!.description || photos != report!!.images ||
                 switchChecked != report!!.isResolved ||
@@ -200,10 +209,13 @@ fun EditReportScreen(
                     onValueChangeLocation = { },
                     locationError = locationError,
                     navigateToReportLocation = {
-                        if(latitude != null && longitude != null){
+                        if (latitude != null && longitude != null) {
                             navigateToReportLocation(latitude, longitude)
-                        }else{
-                            navigateToReportLocation(report!!.location?.latitude, report!!.location?.longitude)
+                        } else {
+                            navigateToReportLocation(
+                                report!!.location?.latitude,
+                                report!!.location?.longitude
+                            )
                         }
                     },
                     onClickCreate = {
@@ -230,7 +242,7 @@ fun EditReportScreen(
                     isLoading = isLoading,
                     onResetResult = { reportsViewModel.resetReportRequestResult() },
                     onNavigate = {
-                        if(navigateAfterUpdate){
+                        if (navigateAfterUpdate) {
                             navigateBack()
                         }
                     }
@@ -262,9 +274,10 @@ fun EditReportScreen(
                 saveReportVisible = false
                 try {
                     val updatedReport = createUpdatedReport(report)
-                    if (updatedReport != null){
+                    if (updatedReport != null) {
                         updatedReport.title = title
-                        updatedReport.category = Category.entries.first { it.displayName == dropDownValue }
+                        updatedReport.category =
+                            Category.entries.first { it.displayName == dropDownValue }
                         updatedReport.description = description
                         updatedReport.images = photos.toList()
                         updatedReport.location = locationNotVisible
@@ -279,7 +292,8 @@ fun EditReportScreen(
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Toast.makeText(context, "Report saving error: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Report saving error: ${e.message}", Toast.LENGTH_LONG)
+                        .show()
                 }
             },
             onCloseText = stringResource(id = R.string.cancel),
