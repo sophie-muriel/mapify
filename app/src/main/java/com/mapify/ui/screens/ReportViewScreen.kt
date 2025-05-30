@@ -419,6 +419,9 @@ fun ReportViewScreen(
             )
         }
 
+        val reportDeleted = stringResource(id = R.string.report_deleted)
+        val reportDeletedMessage = stringResource(id = R.string.report_deleted_message)
+
         if(showDeleteDialogVisible){
             GenericDialog(
                 title = if(isCreator)
@@ -431,6 +434,10 @@ fun ReportViewScreen(
                     val deactivatedReport = createUpdatedReport(report)
                     if (deactivatedReport != null) {
                         isDeleting.value = true
+                        deactivatedReport.deletionMessage = if (isCreator) null else reportDeletedMessage
+                        if (!isCreator) {
+                            deactivatedReport.lastAdminActionDate = LocalDateTime.now()
+                        }
                         reportsViewModel.deactivate(deactivatedReport)
                     }
                     showDeleteDialogVisible = false
@@ -440,7 +447,6 @@ fun ReportViewScreen(
             )
         }
 
-        //val reportVerified = stringResource(id = R.string.report_verified)
         val reportVerifiedMessage = stringResource(id = R.string.report_already_verified)
 
         if(showVerifyDialog && reportStatus != ReportStatus.VERIFIED){
@@ -449,7 +455,6 @@ fun ReportViewScreen(
                 message = stringResource(id = R.string.verify_report_description),
                 onClose = { showVerifyDialog = false },
                 onExit = {
-                    //Toast.makeText(context, reportVerified, Toast.LENGTH_SHORT).show()
                     showVerifyDialog = false
                     val updatedReport = createUpdatedReport(report)
                     if(report!!.rejectionMessage != null){
@@ -461,6 +466,7 @@ fun ReportViewScreen(
                     reportStatus = ReportStatus.VERIFIED
                     if (updatedReport != null) {
                         updatedReport.status = ReportStatus.VERIFIED
+                        updatedReport.lastAdminActionDate = LocalDateTime.now()
                         reportsViewModel.update(updatedReport, 3)
                     }
                 },
@@ -472,7 +478,6 @@ fun ReportViewScreen(
             showVerifyDialog = false
         }
 
-        //val rejectionMessageSend = stringResource(id = R.string.rejection_message_send)
         val rejectionMessageToast = stringResource(id = R.string.ten_characters_message)
         val reportAlreadyRejected = stringResource(id = R.string.report_already_rejected)
 
@@ -486,7 +491,6 @@ fun ReportViewScreen(
                         Toast.makeText(context, rejectionMessageToast, Toast.LENGTH_SHORT).show()
                         return@GenericDialog
                     }
-                    //Toast.makeText(context, rejectionMessageSend, Toast.LENGTH_SHORT).show()
                     showRejectionInputDialog = false
                     val updatedReport = createUpdatedReport(report)
                     if (updatedReport != null) {
@@ -494,6 +498,7 @@ fun ReportViewScreen(
                         reportStatus = ReportStatus.PENDING_VERIFICATION
                         updatedReport.status = ReportStatus.PENDING_VERIFICATION
                         updatedReport.rejectionDate = LocalDateTime.now()
+                        updatedReport.lastAdminActionDate = updatedReport.rejectionDate
                         reportsViewModel.update(updatedReport, 4)
                     }
                     rejectionMessage = ""
@@ -518,11 +523,9 @@ fun ReportViewScreen(
             showRejectionInputDialog = false
         }
 
-        //val reportBoosted = stringResource(id = R.string.report_boosted)
         val reportAlreadyBoosted = stringResource(id = R.string.report_already_boosted)
 
         if(showBoostToast && canBoost && !boosted){
-            //Toast.makeText(context, reportBoosted, Toast.LENGTH_SHORT).show()
             val updatedReport = createUpdatedReport(report)
             if (updatedReport != null) {
                 updatedReport.priorityCounter++

@@ -18,11 +18,12 @@ sealed class RequestResult {
 fun RequestResultEffectHandler(
     requestResult: RequestResult?,
     context: Context,
-    isLoading: MutableState<Boolean>,
+    isLoading: MutableState<Boolean> = mutableStateOf(false),
     isDeleting: MutableState<Boolean> = mutableStateOf(false),
     onResetResult: () -> Unit,
     onNavigate: () -> Unit = {},
-    isReportViewScreen: Boolean = false
+    isReportViewScreen: Boolean = false,
+    showsMessage: Boolean = true
 ) {
     LaunchedEffect(requestResult) {
         when (requestResult) {
@@ -31,7 +32,9 @@ fun RequestResultEffectHandler(
             }
             is RequestResult.Success -> {
                 isLoading.value = false
-                Toast.makeText(context, requestResult.message, Toast.LENGTH_SHORT).show()
+                if (showsMessage) {
+                    Toast.makeText(context, requestResult.message, Toast.LENGTH_SHORT).show()
+                }
                 delay(600)
                 onResetResult()
                 if (isDeleting.value) {
@@ -44,7 +47,9 @@ fun RequestResultEffectHandler(
             }
             is RequestResult.Failure -> {
                 isLoading.value = false
-                Toast.makeText(context, requestResult.message, Toast.LENGTH_SHORT).show()
+                if (showsMessage) {
+                    Toast.makeText(context, requestResult.message, Toast.LENGTH_SHORT).show()
+                }
                 delay(600)
                 onResetResult()
             }

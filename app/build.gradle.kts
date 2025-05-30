@@ -67,4 +67,5 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.cloudinary.android)
 }
