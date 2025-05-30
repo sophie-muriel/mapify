@@ -20,6 +20,7 @@ coilCompose = "2.7.0"
 googleGmsGoogleServices = "4.4.2"
 firebaseFirestore = "25.1.4"
 firebaseAuth = "23.2.0"
+cloudinary = "3.0.2"
 
 [libraries]
 android = { module = "com.mapbox.maps:android", version.ref = "android" }
@@ -47,6 +48,7 @@ maps-compose = { module = "com.mapbox.extension:maps-compose", version.ref = "ma
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
+cloudinary-android = { group = "com.cloudinary", name = "cloudinary-android", version.ref = "cloudinary" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
