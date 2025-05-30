@@ -120,7 +120,6 @@ class UsersViewModel : ViewModel() {
             .await()
 
 
-
         val authUser = auth.currentUser
         if (authUser != null && authUser.uid == user.id) {
             if (authUser.email != user.email) {
@@ -162,7 +161,7 @@ class UsersViewModel : ViewModel() {
         _user.value = null
     }
 
-    fun resetFoundUser(){
+    fun resetFoundUser() {
         _foundUser.value = null
     }
 
@@ -184,9 +183,9 @@ class UsersViewModel : ViewModel() {
         viewModelScope.launch {
             _registerResult.value = RequestResult.Loading
             _registerResult.value = kotlin.runCatching { deleteFirebase(userId) }
-                .fold (
+                .fold(
                     onSuccess = { RequestResult.Success("User deleted successfully") },
-                    onFailure = { RequestResult.Failure(it.message?: "Error deleting user") }
+                    onFailure = { RequestResult.Failure(it.message ?: "Error deleting user") }
                 )
         }
     }
@@ -218,7 +217,7 @@ class UsersViewModel : ViewModel() {
 
     fun logout() {
         auth.signOut()
-        _user.value= null
+        _user.value = null
     }
 
     private suspend fun loginFirebase(email: String, password: String) {
