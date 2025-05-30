@@ -1,5 +1,6 @@
 package com.mapify.ui.users.tabs
 
+import DistanceCalculator
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -28,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -125,9 +127,17 @@ fun ExploreTab(
         verticalArrangement = Arrangement.spacedBy(Spacing.Large),
     ) {
         items(reportsToDisplay) {
+            var individualReportDistance = remember { mutableDoubleStateOf(0.0) }
+            DistanceCalculator(
+                context = context,
+                report = it,
+                distance = individualReportDistance
+            )
+            val formattedDistance = "%.1f".format(individualReportDistance.value)
             ReportCard(
                 report = it,
-                navigateToDetail = navigateToDetail
+                navigateToDetail = navigateToDetail,
+                formattedDistance = formattedDistance
             )
         }
     }
@@ -136,7 +146,8 @@ fun ExploreTab(
 @Composable
 fun ReportCard(
     report: Report,
-    navigateToDetail: (String) -> Unit
+    navigateToDetail: (String) -> Unit,
+    formattedDistance: String
 ) {
     ElevatedCard(
         onClick = {
@@ -219,7 +230,7 @@ fun ReportCard(
                         }
                         append(report.category.displayName)
                         append(" \u2022 ")
-                        append("1.2 KM away") // TODO: Replace with actual distance
+                        append(stringResource(id = R.string.km_away, formattedDistance))
                     }
 
                     Text(
