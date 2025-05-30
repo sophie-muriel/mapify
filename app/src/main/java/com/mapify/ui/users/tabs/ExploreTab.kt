@@ -86,7 +86,7 @@ fun ExploreTab(
     var reportsToDisplay by rememberSaveable { mutableStateOf(allReports) }
     var isPopUpVisible by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(searchFilters) {
+    LaunchedEffect(searchFilters, allReports) {
         isPopUpVisible = searchFilters.areSet
         if (searchFilters.areSet) {
             reportsToDisplay = filteredReports
