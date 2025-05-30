@@ -18,6 +18,7 @@ class Report(
     var rejectionDate: LocalDateTime? = null,
     var isDeletedManually: Boolean = false,
     var rejectionMessage: String? = null,
+    var deletionMessage: String? = null,
     var reportBoosters: MutableList<String> = mutableListOf(),
     var comments: MutableList<Comment> = mutableListOf()
 ) {
@@ -45,4 +46,10 @@ class Report(
 
     val isDeleted: Boolean
         get() = isDeletedManually || (remainingDaysToDeletion == 0 && rejectionDate != null)
+
+    fun generateDeletionMessage(){
+        if (remainingDaysToDeletion == 0 && rejectionDate != null) {
+            deletionMessage = "Report deleted for not being corrected within 5 days after its rejection."
+        }
+    }
 }
