@@ -9,6 +9,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -167,10 +168,11 @@ fun ReportForm(
                     .fillMaxWidth()
             ) {
                 itemsIndexed(photos) { index, photoUrl ->
-                    Card(
+                    ElevatedCard(
                         modifier = Modifier
                             .aspectRatio(1f)
                             .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.background)
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -178,7 +180,7 @@ fun ReportForm(
                         ) {
                             AsyncImage(
                                 model = photoUrl,
-                                contentDescription = "Image" + " ${index + 1}",
+                                contentDescription = stringResource(id = R.string.upload_image_description, index + 1),
                                 modifier = Modifier.fillMaxSize()
                             )
                             IconButton(
@@ -190,7 +192,7 @@ fun ReportForm(
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.Cancel,
-                                    contentDescription = "Remove image",
+                                    contentDescription = stringResource(R.string.remove_uploaded_image),
                                     tint = MaterialTheme.colorScheme.secondary
                                 )
                             }
@@ -269,6 +271,7 @@ fun ReportImages(
     val scope = rememberCoroutineScope()
     val cloudinary = Cloudinary(config)
 
+    val errorUploadingImage = stringResource(id = R.string.error_uploading_image)
     val fileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -284,22 +287,24 @@ fun ReportImages(
                         isLoading = false
                     }
                 } catch (e: Exception) {
-                    Log.e("Upload", "Error uploading image: ${e.message}", e)
                     with(Dispatchers.Main) {
-                        Toast.makeText(context, "Error uploading image", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, errorUploadingImage, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
     }
 
+    val imageAccessPermissionGranted = stringResource(id = R.string.image_access_permission_granted)
+    val imageAccessPermissionDenied = stringResource(id = R.string.image_access_permission_denied)
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ){
         if(it){
-            Toast.makeText(context, "Permission granted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, imageAccessPermissionGranted, Toast.LENGTH_SHORT).show()
         }else{
-            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, imageAccessPermissionDenied, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -334,7 +339,7 @@ fun ReportImages(
                     strokeWidth = 2.dp
                 )
             }else {
-                Text(text = "Select images")
+                Text(text = stringResource(id = R.string.select_images))
             }
         }
     }
