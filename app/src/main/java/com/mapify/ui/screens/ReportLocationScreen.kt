@@ -58,7 +58,7 @@ fun ReportLocationScreen(
             verticalArrangement = Arrangement.Top
         ) {
             Map(
-                navigateToDetail = {  },
+                navigateToDetail = { },
                 isOneReport = true,
                 isReadOnly = isReadOnly,
                 isCenteredOnUser = isCenteredOnUser,
