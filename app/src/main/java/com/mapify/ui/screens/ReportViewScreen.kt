@@ -434,7 +434,7 @@ fun ReportViewScreen(
                     val deactivatedReport = createUpdatedReport(report)
                     if (deactivatedReport != null) {
                         isDeleting.value = true
-                        deactivatedReport.deletionMessage = if (isCreator) reportDeleted else reportDeletedMessage
+                        deactivatedReport.deletionMessage = if (isCreator) null else reportDeletedMessage
                         if (!isCreator) {
                             deactivatedReport.lastAdminActionDate = LocalDateTime.now()
                         }
