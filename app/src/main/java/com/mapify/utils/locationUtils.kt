@@ -11,21 +11,27 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.android.gms.location.LocationServices
+import com.mapify.R
 import com.mapify.model.Location
+import com.mapify.model.Report
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.navigation.RouteScreen
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlin.math.sqrt
@@ -190,4 +196,66 @@ fun calculateDistanceMeters(
     val deltaLon = lon2 - lon1
     val metersPerDegree = 111_320.0
     return metersPerDegree * sqrt(deltaLat * deltaLat + deltaLon * deltaLon)
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Composable
+fun DistanceCalculator(
+    context: Context,
+    report: Report?,
+    distance: MutableState<Double>
+) {
+    val permission = Manifest.permission.ACCESS_FINE_LOCATION
+
+    var hasPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val permissionDenied = stringResource(id = R.string.location_access_permission_denied)
+    val distanceCalculator = stringResource(id = R.string.distance_calculator)
+    val waiting = stringResource(id = R.string.waiting_for_report_to_load)
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasPermission = isGranted
+        if (!isGranted) {
+            Toast.makeText(context, permissionDenied, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    LaunchedEffect(hasPermission, report?.location) {
+        if (hasPermission && report != null && report.location != null) {
+            val userLocation = fetchUserLocation(context)
+            val reportLocation = report.location
+
+            if (userLocation != null) {
+                if (reportLocation != null) {
+                    distance.value = calculateDistanceMeters(
+                        lat1 = userLocation.latitude,
+                        lon1 = userLocation.longitude,
+                        lat2 = reportLocation.latitude,
+                        lon2 = reportLocation.longitude
+                    ) / 1000.0
+                }
+            } else {
+                distance.value = 0.0
+            }
+        } else if (hasPermission && report == null) {
+            Log.d(distanceCalculator, waiting)
+            distance.value = 0.0
+        } else if (!hasPermission) {
+            Log.d(distanceCalculator, permissionDenied)
+            distance.value = 0.0
+        }
+    }
+
+    if (!hasPermission) {
+        permissionLauncher.launch(permission)
+    }
 }
