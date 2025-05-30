@@ -32,7 +32,10 @@ fun MinimalDropdownMenu(
     val expanded = remember { mutableStateOf(false) }
 
     IconButton(onClick = { expanded.value = !expanded.value }) {
-        Icon(Icons.Default.MoreVert, contentDescription = stringResource(id = R.string.more_options_icon))
+        Icon(
+            Icons.Default.MoreVert,
+            contentDescription = stringResource(id = R.string.more_options_icon)
+        )
     }
 
     DropdownMenu(
