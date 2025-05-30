@@ -1,7 +1,13 @@
 package com.mapify.ui.screens
 
+import DistanceCalculator
+import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -91,10 +97,13 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import calculateDistanceMeters
 import com.mapify.model.Comment
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
@@ -102,8 +111,14 @@ import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.utils.RequestResultEffectHandler
 import com.mapify.utils.SharedPreferencesUtils
+import fetchUserLocation
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportViewScreen(
@@ -199,12 +214,22 @@ fun ReportViewScreen(
     var showRejectionInputDialog by rememberSaveable { mutableStateOf(false) }
     var rejectionMessage by remember { mutableStateOf("") }
     var canBoost by rememberSaveable { mutableStateOf(false) }
-    if(userId !in report!!.reportBoosters){
+    if (userId !in report!!.reportBoosters) {
         canBoost = true
     }
 
     var boosted by rememberSaveable { mutableStateOf(false) }
     var showBoostToast by rememberSaveable { mutableStateOf(false) }
+
+    var distance = remember { mutableDoubleStateOf(0.0) }
+
+    DistanceCalculator(
+        context = context,
+        report = report,
+        distance = distance
+    )
+
+    val formattedDistance = "%.1f".format(distance.value)
 
     val menuItems =
         if (isCreator) {
@@ -353,7 +378,7 @@ fun ReportViewScreen(
                     )
                     InfoChip(
                         icon = Icons.Default.Place,
-                        text = "1.2KM",
+                        text = stringResource(id = R.string.km, formattedDistance),
                         onClick = {
                             navigateToReportLocation(report!!.location?.latitude, report!!.location?.longitude)
                         },
