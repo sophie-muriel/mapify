@@ -77,11 +77,15 @@ fun ProfileScreen(
 
     val nameError = nameTouched && name.isBlank()
     val emailError = emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
+    var initialName by rememberSaveable { mutableStateOf("") }
+    var initialEmail by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(user) {
         user?.let {
             name = it.fullName
             email = it.email
+            initialName = it.fullName
+            initialEmail = it.email
             it.location?.updateCityCountry(context)
             locationText = it.location.toString()
         }
