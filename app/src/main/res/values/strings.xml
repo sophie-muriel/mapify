@@ -203,4 +203,11 @@
     <string name="no_reports_found">No reports found</string>
     <string name="no_reports_found_message">No reports could be found with the selected filters. Please change or clean your filters.</string>
 
+    <string name="upload_image_description">Image %s</string>
+    <string name="remove_uploaded_image">Remove image</string>
+    <string name="error_uploading_image">Error uploading image</string>
+    <string name="image_access_permission_granted">Image access permission granted</string>
+    <string name="image_access_permission_denied">Image access permission denied</string>
+    <string name="select_images">Select images</string>
+
 </resources>
