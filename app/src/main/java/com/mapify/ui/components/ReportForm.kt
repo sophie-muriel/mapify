@@ -40,6 +40,10 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.saveable.rememberSaveable
+import kotlinx.coroutines.delay
 
 @Composable
 fun ReportForm(
@@ -73,8 +77,11 @@ fun ReportForm(
     latitude: Double? = null,
     longitude: Double? = null,
     isEditing: Boolean = false,
+    hasChanged: Boolean = false,
     context: Context,
 ) {
+    var internalIsLoading = rememberSaveable { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -137,7 +144,8 @@ fun ReportForm(
             photosCount = photos.size,
             onPhotoSelected = { newPhotoUrl ->
                 onAddPhoto(newPhotoUrl)
-            }
+            },
+            isLoading = internalIsLoading
         )
         Spacer(Modifier.height(Spacing.Large))
 
@@ -183,8 +191,15 @@ fun ReportForm(
                                 contentDescription = stringResource(id = R.string.upload_image_description, index + 1),
                                 modifier = Modifier.fillMaxSize()
                             )
+                            val scope = rememberCoroutineScope()
                             IconButton(
-                                onClick = { onRemovePhoto(index) },
+                                onClick = {
+                                    scope.launch {
+                                        internalIsLoading.value = true
+                                        onRemovePhoto(index)
+                                        internalIsLoading.value = false
+                                    }
+                                },
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
                                     .size(32.dp)
@@ -225,7 +240,15 @@ fun ReportForm(
 
         Spacer(Modifier.height(Spacing.Large))
 
-        val isButtonEnabled = !titleError && title.isNotBlank() && !dropDownError && !descriptionError && description.isNotBlank() && !isLoading && photos.size > 0 && (isEditing || latitude != null && longitude != null)
+        var isButtonEnabled = false
+        if(!internalIsLoading.value && !isLoading){
+            if(isEditing && hasChanged && photos.size > 0){
+                isButtonEnabled = true
+            }else if(!isEditing){
+                isButtonEnabled = !titleError && title.isNotBlank() && !dropDownError && !descriptionError && description.isNotBlank() && !isLoading && photos.size > 0 && (isEditing || latitude != null && longitude != null)
+            }
+        }
+
         Button(
             modifier = Modifier
                 .fillMaxWidth()
@@ -240,7 +263,7 @@ fun ReportForm(
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(20.dp),
                     strokeWidth = 2.dp
                 )
@@ -259,10 +282,9 @@ fun ReportForm(
 fun ReportImages(
     context: Context,
     photosCount: Int,
-    onPhotoSelected: (String) -> Unit
+    onPhotoSelected: (String) -> Unit,
+    isLoading: MutableState<Boolean> = mutableStateOf(false),
 ){
-    var isLoading by remember { mutableStateOf(false) }
-
     val config = mapOf(
         "cloud_name" to "dz06v0ogd",
         "api_key" to "712516261436128",
@@ -277,14 +299,14 @@ fun ReportImages(
     ) { uri: Uri? ->
         uri?.let {
             scope.launch(Dispatchers.IO) {
-                isLoading = true
+                isLoading.value = true
                 try {
                     val inputStream = context.contentResolver.openInputStream(it)
                     inputStream?.let { stream ->
                         val result = cloudinary.uploader().upload(stream, ObjectUtils.emptyMap())
                         val photoUrl = result["secure_url"].toString()
                         onPhotoSelected(photoUrl)
-                        isLoading = false
+                        isLoading.value = false
                     }
                 } catch (e: Exception) {
                     with(Dispatchers.Main) {
@@ -332,7 +354,7 @@ fun ReportImages(
             },
             enabled = photosCount < 5,
         ) {
-            if (isLoading){
+            if (isLoading.value){
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(20.dp),
