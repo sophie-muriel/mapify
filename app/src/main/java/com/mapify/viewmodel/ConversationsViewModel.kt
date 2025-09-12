@@ -76,11 +76,13 @@ class ConversationsViewModel() : ViewModel() {
                 mapOf(
                     "id" to message.id,
                     "senderId" to message.senderId,
+                    "senderName" to message.senderName,
                     "content" to message.content,
-                    "timestamp" to message.timestamp
+                    "timestamp" to message.timestamp.toString()
                 )
             },
-            "isRead" to conversationCopy.isRead
+            "isRead" to conversationCopy.isRead,
+            "deletedFor" to conversationCopy.deletedFor
         )
 
         conversationRef.set(conversationMap).await()
@@ -169,7 +171,8 @@ class ConversationsViewModel() : ViewModel() {
                     "timestamp" to it.timestamp.toString()
                 )
             },
-            "isRead" to conversation.isRead
+            "isRead" to conversation.isRead,
+            "deletedFor" to conversation.deletedFor
         )
         db.collection("conversations").document(conversation.id).set(conversationMap).await()
     }
@@ -213,24 +216,19 @@ class ConversationsViewModel() : ViewModel() {
     }
 
     fun deleteForUser(conversationId: String, userId: String) {
-        _conversations.update { currentList ->
-            currentList.map { conversation ->
-                if (conversation.id == conversationId) {
-                    val updatedDeletedFor = conversation.deletedFor.toMutableList()
-                    if (!updatedDeletedFor.contains(userId)) {
-                        updatedDeletedFor.add(userId)
-                    }
-                    conversation.copy(deletedFor = updatedDeletedFor)
-                } else {
-                    conversation
-                }
-            }
-        }
-
         viewModelScope.launch {
-            db.collection("conversations").document(conversationId)
-                .update("deletedFor", FieldValue.arrayUnion(userId))
-                .await()
+            Log.d("ConversationsViewModel", "Initiating deletion of conversation $conversationId for user $userId")
+            _conversationResult.value = RequestResult.Loading
+            try {
+                db.collection("conversations").document(conversationId)
+                    .update("deletedFor", FieldValue.arrayUnion(userId))
+                    .await()
+                Log.d("ConversationsViewModel", "Successfully marked conversation $conversationId as deleted for user $userId")
+                _conversationResult.value = RequestResult.Success("Conversation deleted successfully")
+            } catch (e: Exception) {
+                Log.e("ConversationsViewModel", "Failed to update Firestore for conversation $conversationId: ${e.message}", e)
+                _conversationResult.value = RequestResult.Failure("Failed to delete conversation: ${e.message}")
+            }
         }
     }
 
@@ -276,7 +274,7 @@ class ConversationsViewModel() : ViewModel() {
         }
     }
 
-    fun observeMessages(conversationId: String) {
+    fun observeMessages(conversationId: String, userId: String) {
         db.collection("conversations")
             .document(conversationId)
             .addSnapshotListener { snapshot, e ->
@@ -287,8 +285,13 @@ class ConversationsViewModel() : ViewModel() {
 
                 if (snapshot != null && snapshot.exists()) {
                     val data = snapshot.data
-                    val messagesRaw =
-                        data?.get("messages") as? List<Map<String, Any?>> ?: emptyList()
+                    val deletedForList = data?.get("deletedFor") as? List<String> ?: emptyList()
+                    if (userId in deletedForList) {
+                        _messages.value = emptyList()
+                        return@addSnapshotListener
+                    }
+
+                    val messagesRaw = data?.get("messages") as? List<Map<String, Any?>> ?: emptyList()
                     val formatter = java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
                     val messages = messagesRaw.mapNotNull { msg ->
@@ -298,12 +301,10 @@ class ConversationsViewModel() : ViewModel() {
                                 senderId = msg["senderId"] as String,
                                 senderName = msg["senderName"] as String,
                                 content = msg["content"] as String,
-                                timestamp = LocalDateTime.parse(
-                                    msg["timestamp"] as String,
-                                    formatter
-                                )
+                                timestamp = LocalDateTime.parse(msg["timestamp"] as String, formatter)
                             )
                         } catch (e: Exception) {
+                            Log.e("ParseMessage", "Failed to parse message: ${e.message}")
                             null
                         }
                     }
@@ -311,6 +312,7 @@ class ConversationsViewModel() : ViewModel() {
                     _messages.value = messages.reversed()
                 } else {
                     Log.d("Firestore", "Current data: null")
+                    _messages.value = emptyList()
                 }
             }
     }
@@ -391,5 +393,9 @@ class ConversationsViewModel() : ViewModel() {
 
     fun getVisibleConversationsForUser(userId: String): List<Conversation> {
         return _conversations.value.filter { !it.deletedFor.contains(userId) }
+    }
+
+    suspend fun userExists(userId: String): Boolean {
+        return db.collection("users").document(userId).get().await().exists()
     }
 }

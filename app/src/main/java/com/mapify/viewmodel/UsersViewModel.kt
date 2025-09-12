@@ -1,5 +1,6 @@
 package com.mapify.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -16,12 +17,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class UsersViewModel : ViewModel() {
-
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db = Firebase.firestore
 
     private val _user = MutableStateFlow<User?>(null)
-    val user: StateFlow<User?> get() = _user.asStateFlow()
+    val user: StateFlow<User?> = _user.asStateFlow()
+
+    private val _userResult = MutableStateFlow<RequestResult?>(null)
+    val userResult: StateFlow<RequestResult?> = _userResult.asStateFlow()
 
     private val _users = MutableStateFlow(emptyList<User>())
     val users: StateFlow<List<User>> = _users.asStateFlow()
@@ -37,8 +40,22 @@ class UsersViewModel : ViewModel() {
     }
 
     fun loadUser(userId: String?) {
-        if (userId != null && user.value == null) {
-            viewModelScope.launch { findByIdFirebase(userId, true) }
+        if (userId != null && _user.value == null) {
+            viewModelScope.launch {
+                _userResult.value = RequestResult.Loading
+                try {
+                    val user = findByIdFirebase(userId, true)
+                    if (user != null) {
+                        _userResult.value = RequestResult.Success("User loaded successfully")
+                        _user.value = user
+                    } else {
+                        _userResult.value = RequestResult.Failure("User not found for ID: $userId")
+                    }
+                } catch (e: Exception) {
+                    Log.e("UsersViewModel", "Error loading user $userId: ${e.message}", e)
+                    _userResult.value = RequestResult.Failure("Failed to load user: ${e.message}")
+                }
+            }
         }
     }
 
@@ -165,18 +182,30 @@ class UsersViewModel : ViewModel() {
         _foundUser.value = null
     }
 
-    private suspend fun findByIdFirebase(userId: String, current: Boolean) {
-        val query = db.collection("users")
-            .document(userId)
-            .get()
-            .await()
+    private suspend fun findByIdFirebase(userId: String, current: Boolean): User? {
+        Log.d("UsersViewModel", "Fetching user with ID: $userId")
+        try {
+            val query = db.collection("users")
+                .document(userId)
+                .get()
+                .await()
 
-        val user = query.toObject(User::class.java)?.apply {
-            id = query.id
-            location = query.getLocationFromFirebase()
+            if (!query.exists()) {
+                Log.w("UsersViewModel", "No user document found for ID: $userId")
+                return null
+            }
+
+            val user = query.toObject(User::class.java)?.apply {
+                id = query.id
+                location = query.getLocationFromFirebase()
+            }
+            Log.d("UsersViewModel", "User fetched: ${user?.fullName} (ID: $userId)")
+            if (current) _user.value = user else _foundUser.value = user
+            return user
+        } catch (e: Exception) {
+            Log.e("UsersViewModel", "Error fetching user $userId: ${e.message}", e)
+            throw e
         }
-
-        if (current) _user.value = user else _foundUser.value = user
     }
 
     fun delete(userId: String) {

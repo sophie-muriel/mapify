@@ -215,5 +215,6 @@
     
     <string name="km">%s KM</string>
     <string name="km_away">%s KM awy</string>
+    <string name="no_conversations">No conversations...</string>
 
 </resources>

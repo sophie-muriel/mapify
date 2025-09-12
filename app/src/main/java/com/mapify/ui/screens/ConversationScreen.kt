@@ -51,6 +51,12 @@ fun ConversationScreen(
 
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
 
+    if (userId.isNullOrBlank()) {
+        Toast.makeText(context, "User not logged in", Toast.LENGTH_SHORT).show()
+        navigateBack()
+        return
+    }
+
     val user by usersViewModel.user.collectAsState()
     var userName by rememberSaveable { mutableStateOf("") }
 
@@ -98,8 +104,12 @@ fun ConversationScreen(
         }
     }
 
-    LaunchedEffect(conversationId) {
-        conversationsViewModel.observeMessages(conversationId!!)
+    LaunchedEffect(conversationId, userId) {
+        val cId = conversationId
+        val uId = userId
+        if (cId != null && uId != null) {
+            conversationsViewModel.observeMessages(cId, uId)
+        }
     }
 
     if (isLoading || conversationId == null) {

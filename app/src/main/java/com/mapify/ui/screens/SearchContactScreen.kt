@@ -17,12 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.mapify.R
+import com.mapify.model.Participant
 import com.mapify.model.User
-import com.mapify.ui.theme.Spacing
 import com.mapify.ui.components.SearchUserItem
 import com.mapify.ui.components.SimpleTopBar
 import com.mapify.ui.navigation.LocalMainViewModel
+import com.mapify.ui.theme.Spacing
 import com.mapify.utils.SharedPreferencesUtils
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
@@ -31,20 +33,32 @@ fun SearchContactScreen(
     onUserSelected: (String, Boolean) -> Unit
 ) {
     val context = LocalContext.current
-
     val userId = SharedPreferencesUtils.getPreference(context)["userId"]
+    if (userId == null) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Text(
+                text = "error user id missing",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(Spacing.Large)
+            )
+        }
+        return
+    }
 
     val usersViewModel = LocalMainViewModel.current.usersViewModel
     val conversationsViewModel = LocalMainViewModel.current.conversationsViewModel
-
     val allUsers by usersViewModel.users.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-    usersViewModel.loadUser(userId)
-
-    conversationsViewModel.getVisibleConversationsForUser(userId ?: "")
-
-    val conversations = conversationsViewModel.conversations.collectAsState().value
+    val conversations by conversationsViewModel.conversations.collectAsState()
     val recentSearches = conversationsViewModel.recentSearches
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(userId) {
+        usersViewModel.loadUser(userId)
+        conversationsViewModel.getVisibleConversationsForUser(userId)
+    }
 
     val userConversations = conversations.filter { conv ->
         conv.participants.any { it.id == userId }
@@ -95,7 +109,7 @@ fun SearchContactScreen(
                             )
                         }
                     } else {
-                        items(recentSearches) { u ->
+                        items(recentSearches, key = { it.id }) { u ->
                             RecentSearchItem(
                                 user = u,
                                 onClick = {
@@ -103,9 +117,23 @@ fun SearchContactScreen(
                                         conv.participants.any { it.id == userId } &&
                                                 conv.participants.any { it.id == u.id }
                                     }
-                                    onUserSelected(conversation?.id ?: u.id, conversation != null)
                                     if (conversation != null) {
-                                        conversationsViewModel.markAsRead(conversation.id, userId!!)
+                                        conversationsViewModel.markAsRead(conversation.id, userId)
+                                        onUserSelected(conversation.id, true)
+                                    } else {
+                                        scope.launch {
+                                            val user = usersViewModel.user.value
+                                            if (user == null) {
+                                                Log.e("SearchContact", "Current user not found")
+                                                return@launch
+                                            }
+                                            val newConversation = conversationsViewModel.createConversation(
+                                                sender = Participant(userId, user.fullName),
+                                                recipient = Participant(u.id, u.fullName)
+                                            )
+                                            conversationsViewModel.addRecentSearch(u)
+                                            onUserSelected(newConversation.id, false)
+                                        }
                                     }
                                 }
                             )
@@ -121,7 +149,7 @@ fun SearchContactScreen(
                             )
                         }
                     } else {
-                        items(filteredUsers) { u ->
+                        items(filteredUsers, key = { it.id }) { u ->
                             SearchUserItem(
                                 fullName = u.fullName,
                                 email = u.email,
@@ -130,11 +158,24 @@ fun SearchContactScreen(
                                         conv.participants.any { it.id == userId } &&
                                                 conv.participants.any { it.id == u.id }
                                     }
-                                    onUserSelected(conversation?.id ?: u.id, conversation != null)
                                     if (conversation != null) {
-                                        conversationsViewModel.markAsRead(conversation.id, userId!!)
+                                        conversationsViewModel.markAsRead(conversation.id, userId)
+                                        onUserSelected(conversation.id, true)
+                                    } else {
+                                        scope.launch {
+                                            val user = usersViewModel.user.value
+                                            if (user == null) {
+                                                Log.e("SearchContact", "Current user not found")
+                                                return@launch
+                                            }
+                                            val newConversation = conversationsViewModel.createConversation(
+                                                sender = Participant(userId, user.fullName),
+                                                recipient = Participant(u.id, u.fullName)
+                                            )
+                                            conversationsViewModel.addRecentSearch(u)
+                                            onUserSelected(newConversation.id, false)
+                                        }
                                     }
-                                    conversationsViewModel.addRecentSearch(u)
                                 }
                             )
                         }

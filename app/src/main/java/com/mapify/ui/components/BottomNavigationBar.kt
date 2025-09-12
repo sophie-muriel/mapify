@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.mapify.R
 import com.mapify.ui.users.navigation.UserRouteTab
@@ -24,14 +25,14 @@ fun BottomNavigationBar(
 
     NavigationBar(modifier = Modifier.fillMaxWidth()) {
         bottomNavItems().forEach { item ->
-            val selected = currentDestination?.route == item.route::class.qualifiedName
+            val selected = currentDestination?.hasRoute(item.route::class) == true
             NavigationBarItem(
                 selected = selected,
                 onClick = {
+                    println("Navigating to ${item.route::class.simpleName}")
                     navController.navigate(item.route) {
-                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
                         launchSingleTop = true
-                        restoreState = true
                     }
                 },
                 icon = {
