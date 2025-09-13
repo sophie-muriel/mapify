@@ -36,10 +36,8 @@ fun HomeScreen(
     navigateToCreateReport: () -> Unit,
     navigateToDetail: (String) -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToConversation: (String, Boolean) -> Unit,
     navigateToReportView: (String, ReportStatus) -> Unit,
-    navigateToSearchFilters: () -> Unit,
-    navigateToSearchContact: () -> Unit
+    navigateToSearchFilters: () -> Unit
 ) {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
@@ -104,20 +102,6 @@ fun HomeScreen(
                         firstOnClickAction = { navigateToSettings() }
                     )
                 }
-
-                UserRouteTab.Messages::class.qualifiedName -> {
-                    SimpleTopBar(
-                        contentAlignment = alignment,
-                        text = stringResource(id = R.string.messages_label),
-                        navIconVector = navIconVector,
-                        navIconDescription = navIconDescription,
-                        onClickNavIcon = onClickNavIcon,
-                        actions = actions,
-                        firstActionIconVector = settingsIconVector,
-                        firstActionIconDescription = settingsIconDescription,
-                        firstOnClickAction = { navigateToSettings() }
-                    )
-                }
             }
         },
         bottomBar = {
@@ -134,14 +118,6 @@ fun HomeScreen(
                         iconDescription = stringResource(id = R.string.add_icon_description)
                     )
                 }
-
-                UserRouteTab.Messages::class.qualifiedName -> {
-                    CreateFAB(
-                        onClick = { navigateToSearchContact() },
-                        icon = Icons.Filled.Mail,
-                        iconDescription = stringResource(id = R.string.messages_icon)
-                    )
-                }
             }
         }
     ) { padding ->
@@ -149,8 +125,7 @@ fun HomeScreen(
             padding = padding,
             navController = navController,
             navigateToDetail = navigateToDetail,
-            navigateToReportView = navigateToReportView,
-            navigateToConversation = navigateToConversation
+            navigateToReportView = navigateToReportView
         )
         Box(
             modifier = Modifier

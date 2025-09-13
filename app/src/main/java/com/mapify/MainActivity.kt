@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.mapify.ui.navigation.Navigation
 import com.mapify.ui.theme.MapifyTheme
-import com.mapify.viewmodel.ConversationsViewModel
 import com.mapify.viewmodel.MainViewModel
 import com.mapify.viewmodel.ReportsViewModel
 import com.mapify.viewmodel.UsersViewModel
@@ -21,7 +20,6 @@ class MainActivity : ComponentActivity() {
 
     private val usersViewModel: UsersViewModel by viewModels()
     private val reportsViewModel: ReportsViewModel by viewModels()
-    private val conversationsViewModel: ConversationsViewModel by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,8 +28,7 @@ class MainActivity : ComponentActivity() {
 
         val mainViewModel = MainViewModel(
             usersViewModel = usersViewModel,
-            reportsViewModel = reportsViewModel,
-            conversationsViewModel = conversationsViewModel
+            reportsViewModel = reportsViewModel
         )
 
         enableEdgeToEdge()

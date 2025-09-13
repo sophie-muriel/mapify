@@ -17,7 +17,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.mapify.ui.screens.ConversationScreen
 import com.mapify.ui.screens.CreateReportScreen
 import com.mapify.ui.screens.EditReportScreen
 import com.mapify.ui.screens.LoginScreen
@@ -25,7 +24,6 @@ import com.mapify.ui.screens.RegistrationScreen
 import com.mapify.ui.screens.ProfileScreen
 import com.mapify.ui.screens.ReportLocationScreen
 import com.mapify.ui.screens.ReportViewScreen
-import com.mapify.ui.screens.SearchContactScreen
 import com.mapify.ui.screens.SettingsScreen
 import com.mapify.ui.screens.SearchFiltersScreen
 import com.mapify.ui.users.HomeScreen
@@ -103,14 +101,6 @@ fun Navigation(
                             navigateToSettings = {
                                 navController.navigate(RouteScreen.Settings)
                             },
-                            navigateToConversation = { conversationId, isConversation ->
-                                navController.navigate(
-                                    RouteScreen.Conversation(
-                                        conversationId,
-                                        isConversation
-                                    )
-                                )
-                            },
                             navigateToReportView = { id, status ->
                                 navController.navigate(
                                     RouteScreen.ReportView(
@@ -121,9 +111,6 @@ fun Navigation(
                             },
                             navigateToSearchFilters = {
                                 navController.navigate(RouteScreen.SearchFilters)
-                            },
-                            navigateToSearchContact = {
-                                navController.navigate(RouteScreen.SearchContact)
                             }
                         )
                     }
@@ -236,29 +223,6 @@ fun Navigation(
                                 )
                             },
                             reportId = args.reportId
-                        )
-                    }
-                    composable<RouteScreen.SearchContact> {
-                        SearchContactScreen(
-                            navigateBack = { navController.popBackStack() },
-                            onUserSelected = { conversationId, isConversation ->
-                                navController.navigate(
-                                    RouteScreen.Conversation(
-                                        conversationId,
-                                        isConversation
-                                    )
-                                )
-                            },
-                        )
-                    }
-                    composable<RouteScreen.Conversation> { backStackEntry ->
-                        val args = backStackEntry.toRoute<RouteScreen.Conversation>()
-                        ConversationScreen(
-                            id = args.id,
-                            isConversation = args.isConversation,
-                            navigateBack = {
-                                navController.popBackStack()
-                            }
                         )
                     }
                 }

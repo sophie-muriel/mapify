@@ -66,12 +66,6 @@ private fun bottomNavItems(): List<UserNavigationBar> = listOf(
         outlinedIcon = Icons.Outlined.Notifications,
         filledIcon = Icons.Filled.Notifications,
         labelRes = R.string.notifications_icon
-    ),
-    navItem(
-        route = UserRouteTab.Messages,
-        outlinedIcon = Icons.Outlined.QuestionAnswer,
-        filledIcon = Icons.Filled.QuestionAnswer,
-        labelRes = R.string.messages_icon
     )
 )
 

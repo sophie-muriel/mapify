@@ -120,25 +120,41 @@ fun ExploreTab(
         }
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Spacing.Sides),
-        verticalArrangement = Arrangement.spacedBy(Spacing.Large),
-    ) {
-        items(reportsToDisplay) {
-            var individualReportDistance = remember { mutableDoubleStateOf(0.0) }
-            DistanceCalculator(
-                context = context,
-                report = it,
-                distance = individualReportDistance
+    if (reportsToDisplay.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(id = R.string.no_reports_found),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                ),
+                color = MaterialTheme.colorScheme.onSurface
             )
-            val formattedDistance = "%.1f".format(individualReportDistance.value)
-            ReportCard(
-                report = it,
-                navigateToDetail = navigateToDetail,
-                formattedDistance = formattedDistance
-            )
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = Spacing.Sides),
+            verticalArrangement = Arrangement.spacedBy(Spacing.Large),
+        ) {
+            items(reportsToDisplay) {
+                var individualReportDistance = remember { mutableDoubleStateOf(0.0) }
+                DistanceCalculator(
+                    context = context,
+                    report = it,
+                    distance = individualReportDistance
+                )
+                val formattedDistance = "%.1f".format(individualReportDistance.value)
+                ReportCard(
+                    report = it,
+                    navigateToDetail = navigateToDetail,
+                    formattedDistance = formattedDistance
+                )
+            }
         }
     }
 }

@@ -79,63 +79,78 @@ fun NotificationsTab(
         return
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Spacing.Sides),
-        verticalArrangement = Arrangement.spacedBy(Spacing.Large)
-    ) {
-        items(storedReports) { report ->
-            if (report.isDeleted) {
-                report.generateDeletionMessage()
-                currentReportDeletionMessage = report.deletionMessage ?: ""
-                Log.d("NotificationsTab", "Report deletion message: $currentReportDeletionMessage")
-                NotificationItem(
-                    title = stringResource(id = R.string.report_deleted),
-                    status = stringResource(id = R.string.deleted),
-                    supportingText = formatNotificationOrMessageDate(
-                        report.lastAdminActionDate ?: LocalDateTime.now()
-                    ),
-                    statusMessage = report.deletionMessage
-                        ?: "", //id = R.string.report_deleted_message
-                    onClick = {
-                        exitDialogVisible = true
-                    },
-                    statusColor = MaterialTheme.colorScheme.error
-                )
-            } else if (report.status == ReportStatus.PENDING_VERIFICATION) {
-                remainingDays = report.remainingDaysToDeletion
-                NotificationItem(
-                    title = report.title,
-                    status = stringResource(id = R.string.rejected),
-                    supportingText = formatNotificationOrMessageDate(
-                        report.lastAdminActionDate ?: LocalDateTime.now()
-                    ),
-                    statusMessage = stringResource(
-                        id = R.string.report_rejected_days_remaining,
-                        remainingDays
-                    ),
-                    imageUrl = report.images.first(),
-                    onClick = { navigateToReportView(report.id, report.status) },
-                    statusColor = MaterialTheme.colorScheme.error
-                )
-            } else {
-                NotificationItem(
-                    title = report.title,
-                    status = stringResource(id = R.string.verified),
-                    supportingText = formatNotificationOrMessageDate(
-                        report.lastAdminActionDate ?: LocalDateTime.now()
-                    ),
-                    statusMessage = stringResource(id = R.string.report_verified_message),
-                    imageUrl = report.images.first(),
-                    onClick = { navigateToReportView(report.id, report.status) },
-                    statusColor = MaterialTheme.colorScheme.primary
-                )
-            }
+    if (storedReports.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(id = R.string.no_notifications_found),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                ),
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
-        if (storedReports.isNotEmpty()) {
-            item {
-                Spacer(modifier = Modifier.height(Spacing.Large))
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = Spacing.Sides),
+            verticalArrangement = Arrangement.spacedBy(Spacing.Large)
+        ) {
+            items(storedReports) { report ->
+                if (report.isDeleted) {
+                    report.generateDeletionMessage()
+                    currentReportDeletionMessage = report.deletionMessage ?: ""
+                    Log.d("NotificationsTab", "Report deletion message: $currentReportDeletionMessage")
+                    NotificationItem(
+                        title = stringResource(id = R.string.report_deleted),
+                        status = stringResource(id = R.string.deleted),
+                        supportingText = formatNotificationOrMessageDate(
+                            report.lastAdminActionDate ?: LocalDateTime.now()
+                        ),
+                        statusMessage = report.deletionMessage
+                            ?: "", //id = R.string.report_deleted_message
+                        onClick = {
+                            exitDialogVisible = true
+                        },
+                        statusColor = MaterialTheme.colorScheme.error
+                    )
+                } else if (report.status == ReportStatus.PENDING_VERIFICATION) {
+                    remainingDays = report.remainingDaysToDeletion
+                    NotificationItem(
+                        title = report.title,
+                        status = stringResource(id = R.string.rejected),
+                        supportingText = formatNotificationOrMessageDate(
+                            report.lastAdminActionDate ?: LocalDateTime.now()
+                        ),
+                        statusMessage = stringResource(
+                            id = R.string.report_rejected_days_remaining,
+                            remainingDays
+                        ),
+                        imageUrl = report.images.first(),
+                        onClick = { navigateToReportView(report.id, report.status) },
+                        statusColor = MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    NotificationItem(
+                        title = report.title,
+                        status = stringResource(id = R.string.verified),
+                        supportingText = formatNotificationOrMessageDate(
+                            report.lastAdminActionDate ?: LocalDateTime.now()
+                        ),
+                        statusMessage = stringResource(id = R.string.report_verified_message),
+                        imageUrl = report.images.first(),
+                        onClick = { navigateToReportView(report.id, report.status) },
+                        statusColor = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+            if (storedReports.isNotEmpty()) {
+                item {
+                    Spacer(modifier = Modifier.height(Spacing.Large))
+                }
             }
         }
     }

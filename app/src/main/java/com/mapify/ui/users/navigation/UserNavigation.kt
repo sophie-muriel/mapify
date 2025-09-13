@@ -11,10 +11,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.mapify.model.ReportStatus
 import com.mapify.ui.navigation.RouteScreen
-import com.mapify.ui.screens.SearchContactScreen
 import com.mapify.ui.users.tabs.ExploreTab
 import com.mapify.ui.users.tabs.HomeTab
-import com.mapify.ui.users.tabs.MessagesTab
 import com.mapify.ui.users.tabs.NotificationsTab
 
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
@@ -23,8 +21,7 @@ fun UserNavigation(
     padding: PaddingValues,
     navController: NavHostController,
     navigateToDetail: (String) -> Unit,
-    navigateToReportView: (String, ReportStatus) -> Unit,
-    navigateToConversation: (String, Boolean) -> Unit
+    navigateToReportView: (String, ReportStatus) -> Unit
 ) {
     NavHost(
         modifier = Modifier.padding(padding),
@@ -44,19 +41,6 @@ fun UserNavigation(
         composable<UserRouteTab.Notifications> {
             NotificationsTab(
                 navigateToReportView = navigateToReportView
-            )
-        }
-        composable<UserRouteTab.Messages> {
-            MessagesTab(
-                navigateToConversation = navigateToConversation
-            )
-        }
-        composable("SearchContact") {
-            SearchContactScreen(
-                navigateBack = { navController.popBackStack() },
-                onUserSelected = { id, isConversation ->
-                    navController.navigate(RouteScreen.Conversation(id, isConversation))
-                }
             )
         }
     }
