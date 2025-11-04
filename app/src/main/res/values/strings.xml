@@ -14,7 +14,7 @@
     <string name="register_account">Dont have an account? Register</string>
     <string name="enter_information_label">Please enter your information</string>
     <string name="name_label">Name</string>
-    <string name="name_supporting_text">Please enter your name</string>
+    <string name="name_supporting_text">Please enter your name (max 50 characters)</string>
     <string name="name_icon_description">User icon</string>
     <string name="password_confirmation_label">Confirm password</string>
     <string name="password_confirmation_supporting_text">Passwords do not match</string>
@@ -27,11 +27,11 @@
     <string name="recovery_email_sent">Recovery email sent</string>
     <string name="back">Back</string>
     <string name="title">Title</string>
-    <string name="title_supporting_text">You must provide a title</string>
+    <string name="title_supporting_text">You must provide a title between 5 and 50 characters</string>
     <string name="category">Category</string>
-    <string name="category_suporting_test">You must select a category</string>
+    <string name="category_supporting_test">You must select a category</string>
     <string name="description">Description</string>
-    <string name="description_supporting_text">You must provide at least a 10 characters description</string>
+    <string name="description_supporting_text">You must provide a description between 10 and 500 characters</string>
     <string name="location">Location</string>
     <string name="location_supporting_text">A location must be selected</string>
     <string name="location_icon">Location Icon</string>

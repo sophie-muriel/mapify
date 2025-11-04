@@ -51,13 +51,11 @@ import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.GenericTextField
 import com.mapify.ui.theme.Spacing
 import com.mapify.ui.navigation.LocalMainViewModel
-import com.mapify.utils.RequestResult
 import com.mapify.utils.RequestResultEffectHandler
 import fetchUserLocation
 import getLocationName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
