@@ -52,7 +52,7 @@ fun CreateReportScreen(
 
     var title by rememberSaveable { mutableStateOf("") }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
-    val titleError = titleTouched && title.isBlank()
+    val titleError = titleTouched && (title.isBlank() || title.length > 50 || title.length < 5)
 
     var dropDownValue by rememberSaveable { mutableStateOf("") }
     var dropDownExpanded by rememberSaveable { mutableStateOf(false) }
@@ -62,7 +62,8 @@ fun CreateReportScreen(
 
     var description by rememberSaveable { mutableStateOf("") }
     var descriptionTouched by rememberSaveable { mutableStateOf(false) }
-    val descriptionError = descriptionTouched && (description.isBlank() || description.length < 10)
+    val descriptionError = descriptionTouched && (description.isBlank() || description.length < 10
+            || description.length > 500)
 
     var photos by remember { mutableStateOf(emptyList<String>()) }
 

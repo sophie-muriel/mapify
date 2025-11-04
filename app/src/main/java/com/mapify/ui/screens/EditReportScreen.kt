@@ -77,7 +77,7 @@ fun EditReportScreen(
     var switchChecked by rememberSaveable { mutableStateOf(report!!.isResolved) }
     var title by rememberSaveable { mutableStateOf(report!!.title) }
     var titleTouched by rememberSaveable { mutableStateOf(false) }
-    val titleError = titleTouched && title.isBlank()
+    val titleError = titleTouched && (title.isBlank() || title.length > 50 || title.length < 5)
 
     var dropDownValue by rememberSaveable { mutableStateOf(report!!.category.displayName) }
     var dropDownExpanded by rememberSaveable { mutableStateOf(false) }
@@ -87,7 +87,7 @@ fun EditReportScreen(
 
     var description by rememberSaveable { mutableStateOf(report!!.description) }
     var descriptionTouched by rememberSaveable { mutableStateOf(false) }
-    val descriptionError = descriptionTouched && (description.isBlank() || description.length < 10)
+    val descriptionError = descriptionTouched && (description.isBlank() || description.length < 10 || description.length > 500)
 
     val locationError = false
 
