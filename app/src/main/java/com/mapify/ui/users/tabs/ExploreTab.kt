@@ -36,6 +36,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -187,7 +188,7 @@ fun ReportCard(
                     modifier = Modifier.fillMaxSize(),
                     model = report.images[0],
                     contentDescription = stringResource(id = R.string.report_image),
-                    contentScale = ContentScale.FillBounds
+                    contentScale = ContentScale.Crop
                 )
             }
 
@@ -243,7 +244,15 @@ fun ReportCard(
                             }
                             append(" \u2022 ")
                         }
-                        append(report.category.displayName)
+                        withStyle(
+                            style = SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        ) {
+                            append(report.category.displayName)
+                        }
+
                         append(" \u2022 ")
                         append(stringResource(id = R.string.km_away, formattedDistance))
                     }
