@@ -208,6 +208,6 @@
     <string name="waiting_for_report_to_load">Waiting for report to load</string>
     
     <string name="km">%s KM</string>
-    <string name="km_away">%s KM awy</string>
+    <string name="km_away">%s KM away</string>
 
 </resources>
