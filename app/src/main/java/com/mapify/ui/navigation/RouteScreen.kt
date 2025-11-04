@@ -1,6 +1,5 @@
 package com.mapify.ui.navigation
 
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.mapify.model.ReportStatus
 import kotlinx.serialization.Serializable
 
