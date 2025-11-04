@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -16,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.mapbox.geojson.Point
 import com.mapify.R
@@ -27,12 +29,13 @@ import com.mapify.ui.components.SimpleTopBar
 fun ReportLocationScreen(
     latitude: Double?,
     longitude: Double?,
+    backIcon: Boolean,
     navigateBack: (Double?, Double?) -> Unit,
     isReadOnly: Boolean,
     isCenteredOnUser: Boolean,
     hasPrimaryFab: Boolean
 ) {
-
+    val icon = if (backIcon) Icons.AutoMirrored.Filled.ArrowBack else Icons.Filled.Check
     var clickedPoint by remember { mutableStateOf<Point?>(null) }
 
     Scaffold(
@@ -40,7 +43,7 @@ fun ReportLocationScreen(
             SimpleTopBar(
                 contentAlignment = Alignment.CenterStart,
                 text = stringResource(id = R.string.report_location),
-                navIconVector = Icons.AutoMirrored.Filled.ArrowBack,
+                navIconVector = icon,
                 navIconDescription = stringResource(id = R.string.back_arrow_icon),
                 onClickNavIcon = {
                     val capturedLatitude = clickedPoint?.latitude()
