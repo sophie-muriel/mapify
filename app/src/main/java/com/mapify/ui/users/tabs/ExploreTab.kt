@@ -75,7 +75,6 @@ fun ExploreTab(
 
     LaunchedEffect(Unit) {
         reportsViewModel.getReports()
-
     }
 
     val filteredReports by reportsViewModel.filteredReports.collectAsState()
@@ -142,7 +141,7 @@ fun ExploreTab(
             verticalArrangement = Arrangement.spacedBy(Spacing.Large),
         ) {
             items(reportsToDisplay) {
-                var individualReportDistance = remember { mutableDoubleStateOf(0.0) }
+                val individualReportDistance = remember { mutableDoubleStateOf(0.0) }
                 DistanceCalculator(
                     context = context,
                     report = it,

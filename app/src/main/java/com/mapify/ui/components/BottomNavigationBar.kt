@@ -29,10 +29,12 @@ fun BottomNavigationBar(
             NavigationBarItem(
                 selected = selected,
                 onClick = {
-                    println("Navigating to ${item.route::class.simpleName}")
                     navController.navigate(item.route) {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
                         launchSingleTop = true
+                        restoreState = true
                     }
                 },
                 icon = {
