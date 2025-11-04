@@ -128,7 +128,7 @@ fun Navigation(
                                     RouteScreen.ReportLocation(
                                         latitude = latitude.value,
                                         longitude = longitude.value,
-                                        isCenteredOnUser = true,
+                                        isCenteredOnUser = latitude.value == null && longitude.value == null,
                                         hasPrimaryFab = false,
                                         backIcon = false
                                     )

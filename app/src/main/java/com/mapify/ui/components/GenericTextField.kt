@@ -1,5 +1,6 @@
 package com.mapify.ui.components
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,11 +32,13 @@ fun GenericTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isPassword: Boolean = false,
     readOnly: Boolean = false,
-    showTrailingIcon: Boolean = true
+    showTrailingIcon: Boolean = true,
+    interactionSource: MutableInteractionSource ? = null
 ) {
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
     OutlinedTextField(
+        interactionSource = interactionSource,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = Spacing.Sides, vertical = Spacing.Small),

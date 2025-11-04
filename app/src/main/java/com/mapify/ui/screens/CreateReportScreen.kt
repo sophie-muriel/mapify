@@ -85,11 +85,12 @@ fun CreateReportScreen(
     BackHandler { exitDialogVisible = true }
     var locationVisible by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(latitude, longitude) {
         if (latitude != null && longitude != null) {
             val loc = Location(latitude, longitude)
             loc.updateCityCountry(context)
             locationVisible = loc.toString()
+            location = locationVisible
         }
     }
 
@@ -156,7 +157,7 @@ fun CreateReportScreen(
                         descriptionTouched = true
                     },
                     descriptionError = descriptionError,
-                    location = if (latitude != null && longitude != null) locationVisible else location,
+                    location = locationVisible.ifEmpty { location },
                     onValueChangeLocation = {
                         location = it
                     },

@@ -36,7 +36,15 @@ fun ReportLocationScreen(
     hasPrimaryFab: Boolean
 ) {
     val icon = if (backIcon) Icons.AutoMirrored.Filled.ArrowBack else Icons.Filled.Check
-    var clickedPoint by remember { mutableStateOf<Point?>(null) }
+    var clickedPoint by remember(latitude, longitude) {
+        mutableStateOf(
+            if (latitude != null && longitude != null) {
+                Point.fromLngLat(longitude, latitude)
+            } else {
+                null
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
