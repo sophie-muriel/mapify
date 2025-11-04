@@ -81,9 +81,11 @@ fun RegistrationScreen(
     var locationShared by rememberSaveable { mutableStateOf(false) }
     var locationForm by rememberSaveable { mutableStateOf(false) }
 
-    val nameError = nameTouched && name.isBlank()
-    val emailError =
-        emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
+    val nameError = nameTouched && (name.isBlank() || name.length > 50)
+    val emailError = emailTouched && !(
+            (email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches()) &&
+                    email.length <= 100
+            )
     val passwordError = passwordTouched && password.length < 6
     val passwordConfirmationError = passwordConfirmationTouched && passwordConfirmation != password
 

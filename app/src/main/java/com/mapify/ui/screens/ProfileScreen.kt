@@ -75,9 +75,11 @@ fun ProfileScreen(
     var editMode by rememberSaveable { mutableStateOf(false) }
     var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
 
-    val nameError = nameTouched && name.isBlank()
-    val emailError =
-        emailTouched && !(email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches())
+    val nameError = nameTouched && (name.isBlank() || name.length > 50)
+    val emailError = emailTouched && !(
+            (email == "root" || Patterns.EMAIL_ADDRESS.matcher(email).matches()) &&
+                    email.length <= 100
+            )
     var initialName by rememberSaveable { mutableStateOf("") }
     var initialEmail by rememberSaveable { mutableStateOf("") }
 
