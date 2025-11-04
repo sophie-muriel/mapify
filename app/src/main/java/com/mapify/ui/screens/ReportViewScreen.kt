@@ -1,12 +1,8 @@
 package com.mapify.ui.screens
 
 import DistanceCalculator
-import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -102,8 +98,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
-import calculateDistanceMeters
 import com.mapify.model.Comment
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.components.MenuAction
@@ -111,12 +105,7 @@ import com.mapify.ui.components.MinimalDropdownMenu
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.utils.RequestResultEffectHandler
 import com.mapify.utils.SharedPreferencesUtils
-import fetchUserLocation
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -374,6 +363,7 @@ fun ReportViewScreen(
                     InfoChip(
                         icon = Icons.Outlined.Sell,
                         text = report!!.category.displayName,
+                        highlight = true,
                         onClick = { }
                     )
                     InfoChip(
@@ -852,6 +842,7 @@ fun Carousel(
 fun InfoChip(
     icon: ImageVector,
     text: String,
+    highlight: Boolean = false,
     isClickable: Boolean = false,
     onClick: () -> Unit
 ) {
@@ -867,7 +858,11 @@ fun InfoChip(
         Row(
             modifier = Modifier
                 .background(
-                    color = MaterialTheme.colorScheme.inverseOnSurface,
+                    color = if (!highlight)
+                        MaterialTheme.colorScheme.inverseOnSurface
+                    else
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                    ,
                     shape = RoundedCornerShape(8.dp)
                 )
                 .padding(horizontal = 12.dp, vertical = 8.dp),
@@ -877,12 +872,13 @@ fun InfoChip(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp),
-                tint = MaterialTheme.colorScheme.onSurface
+                tint = if (!highlight) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyMedium,
+                color = if (!highlight) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary
             )
         }
     }
