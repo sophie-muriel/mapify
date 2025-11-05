@@ -19,8 +19,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.IndeterminateCheckBox
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material.icons.outlined.IndeterminateCheckBox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +52,7 @@ import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.mapify.R
 import com.mapify.model.Report
+import com.mapify.model.ReportStatus
 import com.mapify.ui.components.GenericDialog
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
@@ -208,12 +212,33 @@ fun ReportCard(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = report.title,
-                            style = MaterialTheme.typography.titleSmall,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.Inline),
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f, fill = false)
+                        ) {
+                            Text(
+                                text = report.title,
+                                style = MaterialTheme.typography.titleSmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false)
+                            )
+                            Icon(
+                                modifier = Modifier.size(16.dp),
+                                imageVector = when (report.status) {
+                                    ReportStatus.VERIFIED -> Icons.Filled.CheckBox
+                                    ReportStatus.NOT_VERIFIED -> Icons.Outlined.IndeterminateCheckBox
+                                    else -> Icons.Filled.IndeterminateCheckBox
+                                },
+                                contentDescription = stringResource(id = R.string.star_icon),
+                                tint = when (report.status) {
+                                    ReportStatus.VERIFIED -> MaterialTheme.colorScheme.primary
+                                    ReportStatus.NOT_VERIFIED -> MaterialTheme.colorScheme.primary
+                                    else -> MaterialTheme.colorScheme.tertiaryContainer
+                                }
+                            )
+                        }
                         Icon(
                             imageVector = if (report.isHighPriority)
                                 Icons.Filled.Star
@@ -221,7 +246,7 @@ fun ReportCard(
                                 Icons.Filled.StarOutline,
                             contentDescription = stringResource(id = R.string.star_icon),
                             modifier = Modifier
-                                .padding(end = Spacing.Small * 3)
+                                .padding(start = Spacing.Small)
                                 .size(20.dp),
                             tint = if (report.priorityCounter > 20)
                                 MaterialTheme.colorScheme.primary
@@ -240,14 +265,15 @@ fun ReportCard(
                                     fontWeight = FontWeight.Bold
                                 )
                             ) {
+                                append("[")
                                 append(stringResource(id = R.string.resolved))
+                                append("]")
                             }
                             append(" \u2022 ")
                         }
                         withStyle(
                             style = SpanStyle(
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.Bold,
                             )
                         ) {
                             append(report.category.displayName)
