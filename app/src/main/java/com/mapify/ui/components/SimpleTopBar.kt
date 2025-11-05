@@ -31,9 +31,9 @@ import com.mapify.ui.theme.Spacing
 fun SimpleTopBar(
     contentAlignment: Alignment = Alignment.Center,
     text: String = "",
-    navIconVector: ImageVector,
-    navIconDescription: String,
-    onClickNavIcon: () -> Unit,
+    navIconVector: ImageVector? = null,
+    navIconDescription: String ? = "",
+    onClickNavIcon: (() -> Unit)? = null,
     actions: Boolean,
     firstActionIconVector: ImageVector? = null,
     firstActionIconDescription: String = "",
@@ -69,11 +69,13 @@ fun SimpleTopBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = onClickNavIcon) {
-                Icon(
-                    imageVector = navIconVector,
-                    contentDescription = navIconDescription
-                )
+            if (onClickNavIcon != null && navIconVector != null) {
+                IconButton(onClick = onClickNavIcon) {
+                    Icon(
+                        imageVector = navIconVector,
+                        contentDescription = navIconDescription
+                    )
+                }
             }
         },
         actions = {

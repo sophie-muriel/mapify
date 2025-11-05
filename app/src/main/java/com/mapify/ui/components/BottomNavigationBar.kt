@@ -68,6 +68,12 @@ private fun bottomNavItems(): List<UserNavigationBar> = listOf(
         outlinedIcon = Icons.Outlined.Notifications,
         filledIcon = Icons.Filled.Notifications,
         labelRes = R.string.notifications_icon
+    ),
+    navItem(
+        route = UserRouteTab.Profile,
+        outlinedIcon = Icons.Outlined.AccountCircle,
+        filledIcon = Icons.Filled.AccountCircle,
+        labelRes = R.string.profile_icon
     )
 )
 

@@ -14,6 +14,7 @@ import com.mapify.ui.navigation.RouteScreen
 import com.mapify.ui.users.tabs.ExploreTab
 import com.mapify.ui.users.tabs.HomeTab
 import com.mapify.ui.users.tabs.NotificationsTab
+import com.mapify.ui.users.tabs.ProfileTab
 
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
@@ -42,6 +43,9 @@ fun UserNavigation(
             NotificationsTab(
                 navigateToReportView = navigateToReportView
             )
+        }
+        composable<UserRouteTab.Profile> {
+            ProfileTab()
         }
     }
 }

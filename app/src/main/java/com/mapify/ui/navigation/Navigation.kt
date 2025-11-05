@@ -21,7 +21,6 @@ import com.mapify.ui.screens.CreateReportScreen
 import com.mapify.ui.screens.EditReportScreen
 import com.mapify.ui.screens.LoginScreen
 import com.mapify.ui.screens.RegistrationScreen
-import com.mapify.ui.screens.ProfileScreen
 import com.mapify.ui.screens.ReportLocationScreen
 import com.mapify.ui.screens.ReportViewScreen
 import com.mapify.ui.screens.SettingsScreen
@@ -44,7 +43,7 @@ fun Navigation(
 
     Log.d("ROLE viewmodel", map["role"].toString())
 
-    val startDestination = if (map.isNotEmpty()) RouteScreen.Home else RouteScreen.Login
+    val startDestination = if (map.isNotEmpty()) RouteScreen.Home() else RouteScreen.Login
 
     val latitude = rememberSaveable { mutableStateOf<Double?>(null) }
     val longitude = rememberSaveable { mutableStateOf<Double?>(null) }
@@ -88,10 +87,9 @@ fun Navigation(
                         )
                     }
                     composable<RouteScreen.Home> {
+                        val args = it.toRoute<RouteScreen.Home>()
                         HomeScreen(
-                            navigateToProfile = {
-                                navController.navigate(RouteScreen.Profile)
-                            },
+                            initialSelectedTab = args.selectedTab,
                             navigateToCreateReport = {
                                 navController.navigate(RouteScreen.CreateReport())
                             },
@@ -183,17 +181,14 @@ fun Navigation(
                             }
                         )
                     }
-                    composable<RouteScreen.Profile> {
-                        ProfileScreen(
-                            navigateBack = {
-                                navController.popBackStack()
-                            }
-                        )
-                    }
                     composable<RouteScreen.Settings> {
                         SettingsScreen(
                             navigateBack = { navController.popBackStack() },
-                            navigateToProfile = { navController.navigate(RouteScreen.Profile) },
+                            navigateToProfile = {
+                                navController.navigate(RouteScreen.Home(selectedTab = 3)) {
+                                    popUpTo<RouteScreen.Home> { inclusive = true }
+                                }
+                            },
                             navigateToLogin = {
                                 navController.navigate(RouteScreen.Login) {
                                     popUpTo(0) { inclusive = true }

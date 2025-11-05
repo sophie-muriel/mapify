@@ -5,13 +5,12 @@ import kotlinx.serialization.Serializable
 
 sealed class RouteScreen {
 
-    @Serializable data object Home : RouteScreen()
+    @Serializable data class Home(val selectedTab: Int = 0) : RouteScreen()
     @Serializable data object Login : RouteScreen()
     @Serializable data object Registration : RouteScreen()
     @Serializable data class CreateReport(val latitude: Double? = null, val longitude: Double? = null) : RouteScreen()
     @Serializable data class ReportLocation(val latitude: Double? = null, val longitude: Double? = null, val isReadOnly: Boolean = false, val isCenteredOnUser: Boolean = false, val hasPrimaryFab: Boolean = true, val backIcon: Boolean = true) : RouteScreen()
     @Serializable data class ReportView(val reportId: String, val reportStatus: ReportStatus? = null) : RouteScreen()
-    @Serializable data object Profile : RouteScreen()
     @Serializable data object Settings : RouteScreen()
     @Serializable data object SearchFilters : RouteScreen()
     @Serializable data class EditReport(val reportId: String, val latitude: Double? = null, val longitude: Double? = null) : RouteScreen()

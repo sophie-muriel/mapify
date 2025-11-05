@@ -13,11 +13,15 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mapify.R
@@ -32,7 +36,7 @@ import com.mapify.ui.users.navigation.UserRouteTab
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun HomeScreen(
-    navigateToProfile: () -> Unit,
+    initialSelectedTab: Int = 0,
     navigateToCreateReport: () -> Unit,
     navigateToDetail: (String) -> Unit,
     navigateToSettings: () -> Unit,
@@ -40,15 +44,30 @@ fun HomeScreen(
     navigateToSearchFilters: () -> Unit
 ) {
     val navController = rememberNavController()
+
+    LaunchedEffect(initialSelectedTab) {
+        when (initialSelectedTab) {
+            0 -> navController.navigate(UserRouteTab.Home::class.qualifiedName!!) {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            }
+            1 -> navController.navigate(UserRouteTab.Explore::class.qualifiedName!!) {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            }
+            2 -> navController.navigate(UserRouteTab.Notifications::class.qualifiedName!!) {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            }
+            3 -> navController.navigate(UserRouteTab.Profile::class.qualifiedName!!) {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            }
+        }
+    }
+
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
     val currentRoute = navBackStackEntry?.destination?.route
     val reportsViewModel = LocalMainViewModel.current.reportsViewModel
     val searchFilters by reportsViewModel.searchFilters.collectAsState()
 
-    val alignment = Alignment.Center
-    val navIconVector = Icons.Filled.AccountCircle
-    val navIconDescription = stringResource(id = R.string.name_icon_description)
-    val onClickNavIcon = { navigateToProfile() }
+    val alignment = Alignment.CenterStart
     val actions = true
     val settingsIconVector = Icons.Filled.Settings
     val settingsIconDescription = stringResource(id = R.string.settings_icon)
@@ -59,10 +78,7 @@ fun HomeScreen(
                 UserRouteTab.Home::class.qualifiedName -> {
                     SimpleTopBar(
                         contentAlignment = alignment,
-                        text = stringResource(id = R.string.app_name),
-                        navIconVector = navIconVector,
-                        navIconDescription = navIconDescription,
-                        onClickNavIcon = onClickNavIcon,
+                        text = stringResource(id = R.string.home_screen),
                         actions = actions,
                         firstActionIconVector = settingsIconVector,
                         firstActionIconDescription = settingsIconDescription,
@@ -74,9 +90,6 @@ fun HomeScreen(
                     SimpleTopBar(
                         contentAlignment = alignment,
                         text = stringResource(id = R.string.explore_screen),
-                        navIconVector = navIconVector,
-                        navIconDescription = navIconDescription,
-                        onClickNavIcon = onClickNavIcon,
                         actions = actions,
                         firstActionIconVector = Icons.Filled.Search,
                         firstActionIconDescription = stringResource(id = R.string.search_icon),
@@ -93,9 +106,17 @@ fun HomeScreen(
                     SimpleTopBar(
                         contentAlignment = alignment,
                         text = stringResource(id = R.string.notifications),
-                        navIconVector = navIconVector,
-                        navIconDescription = navIconDescription,
-                        onClickNavIcon = onClickNavIcon,
+                        actions = actions,
+                        firstActionIconVector = settingsIconVector,
+                        firstActionIconDescription = settingsIconDescription,
+                        firstOnClickAction = { navigateToSettings() }
+                    )
+                }
+
+                UserRouteTab.Profile::class.qualifiedName -> {
+                    SimpleTopBar(
+                        contentAlignment = alignment,
+                        text = stringResource(id = R.string.profile),
                         actions = actions,
                         firstActionIconVector = settingsIconVector,
                         firstActionIconDescription = settingsIconDescription,

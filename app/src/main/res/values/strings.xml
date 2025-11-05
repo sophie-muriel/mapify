@@ -43,6 +43,7 @@
     <string name="back_arrow_icon">Back Arrow Icon</string>
     <string name="check_icon">Check Icon</string>
     <string name="exit_report_creation">Are you sure you want to exit report creation?</string>
+    <string name="profile">Profile</string>
     <string name="exit_profile_edit">Are you sure you want to exit profile editing?</string>
     <string name="logout_confirmation">Are you sure you want to log out?</string>
     <string name="exit_report_editing">Are you sure you want to exit report editing?</string>
@@ -89,6 +90,7 @@
     <string name="home_icon">Home Icon</string>
     <string name="search_icon">Search Icon</string>
     <string name="notifications_icon">Notifications Icon</string>
+    <string name="profile_icon">Profile Icon</string>
 
     <string name="report_image">The report image</string>
     <string name="settings_icon">Settings Icon</string>
@@ -101,6 +103,7 @@
 
     <string name="more_options_icon">More Options Icon</string>
 
+    <string name="home_screen">Mapify - Home</string>
     <string name="explore_screen">Nearby Reports</string>
     <string name="settings_screen">Settings</string>
 
