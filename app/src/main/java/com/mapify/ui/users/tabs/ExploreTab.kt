@@ -36,7 +36,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -140,6 +139,7 @@ fun ExploreTab(
                 .fillMaxSize()
                 .padding(horizontal = Spacing.Sides),
             verticalArrangement = Arrangement.spacedBy(Spacing.Large),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = Spacing.Large)
         ) {
             items(reportsToDisplay) {
                 val individualReportDistance = remember { mutableDoubleStateOf(0.0) }

@@ -97,7 +97,8 @@ fun NotificationsTab(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = Spacing.Sides),
-            verticalArrangement = Arrangement.spacedBy(Spacing.Large)
+            verticalArrangement = Arrangement.spacedBy(Spacing.Large),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = Spacing.Large)
         ) {
             items(storedReports) { report ->
                 if (report.isDeleted) {
