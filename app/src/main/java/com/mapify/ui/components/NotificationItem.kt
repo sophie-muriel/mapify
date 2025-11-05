@@ -73,7 +73,7 @@ private fun NotificationImage(imageUrl: String?) {
                 modifier = Modifier.fillMaxSize(),
                 model = it,
                 contentDescription = stringResource(id = R.string.report_image),
-                contentScale = ContentScale.FillBounds
+                contentScale = ContentScale.Crop
             )
         }
     }
