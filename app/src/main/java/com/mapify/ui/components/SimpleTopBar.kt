@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 import com.mapify.R
 import com.mapify.ui.theme.Spacing
@@ -46,7 +47,8 @@ fun SimpleTopBar(
     searchQuery: String = "",
     onSearchQueryChange: (String) -> Unit = {},
     secondActionContent: (@Composable () -> Unit)? = null,
-    areFiltersActive: Boolean = false
+    areFiltersActive: Boolean = false,
+    firstActionEnabled: Boolean = true
 ) {
     TopAppBar(
         title = {
@@ -77,8 +79,19 @@ fun SimpleTopBar(
         actions = {
             if (!isSearch) {
                 if (actions && firstActionIconVector != null) {
-                    IconButton(onClick = firstOnClickAction) {
+                    if (firstActionEnabled) {
+                        IconButton(onClick = firstOnClickAction) {
+                            Icon(
+                                imageVector = firstActionIconVector,
+                                contentDescription = firstActionIconDescription,
+                                tint = if (areFiltersActive) MaterialTheme.colorScheme.primary else tint
+                            )
+                        }
+                    } else {
                         Icon(
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .clearAndSetSemantics {},
                             imageVector = firstActionIconVector,
                             contentDescription = firstActionIconDescription,
                             tint = if (areFiltersActive) MaterialTheme.colorScheme.primary else tint

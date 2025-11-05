@@ -311,6 +311,7 @@ fun ReportViewScreen(
                 onClickNavIcon = { navigateBack() },
                 actions = true,
                 firstActionIconVector = starIcon,
+                firstActionEnabled = false,
                 firstActionIconDescription = starIconDescription,
                 firstOnClickAction = {},
                 secondAction = true,
@@ -357,6 +358,7 @@ fun ReportViewScreen(
                         InfoChip(
                             icon = Icons.Outlined.Check,
                             text = stringResource(id = R.string.resolved),
+                            highlight = true,
                             onClick = { }
                         )
                     }
