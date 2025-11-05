@@ -6,8 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -26,7 +24,6 @@ import com.mapify.ui.components.NotificationItem
 import com.mapify.ui.navigation.LocalMainViewModel
 import com.mapify.ui.theme.Spacing
 import com.mapify.utils.RequestResultEffectHandler
-import com.mapify.utils.SharedPreferencesUtils
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -44,15 +41,10 @@ fun NotificationsTab(
     val reportRequestResult by reportsViewModel.reportRequestResult.collectAsState()
 
     val context = LocalContext.current
-    val userId = SharedPreferencesUtils.getPreference(context)["userId"]
 
     var currentReportDeletionMessage by rememberSaveable { mutableStateOf("") }
 
     var isLoading = rememberSaveable { mutableStateOf(true) }
-
-    LaunchedEffect(Unit) {
-        reportsViewModel.getReportsByUserId(userId ?: "")
-    }
 
     var remainingDays by rememberSaveable { mutableIntStateOf(-1) }
 
@@ -98,7 +90,7 @@ fun NotificationsTab(
                 .fillMaxSize()
                 .padding(horizontal = Spacing.Sides),
             verticalArrangement = Arrangement.spacedBy(Spacing.Large),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = Spacing.Large)
+            contentPadding = PaddingValues(bottom = Spacing.Large)
         ) {
             items(storedReports) { report ->
                 if (report.isDeleted) {

@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -143,7 +144,7 @@ fun ExploreTab(
                 .fillMaxSize()
                 .padding(horizontal = Spacing.Sides),
             verticalArrangement = Arrangement.spacedBy(Spacing.Large),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = Spacing.Large)
+            contentPadding = PaddingValues(bottom = Spacing.Large)
         ) {
             items(reportsToDisplay) {
                 val individualReportDistance = remember { mutableDoubleStateOf(0.0) }
