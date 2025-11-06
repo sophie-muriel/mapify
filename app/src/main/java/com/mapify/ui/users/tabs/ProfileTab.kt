@@ -87,6 +87,7 @@ fun ProfileTab(
     var locationText by rememberSaveable { mutableStateOf("Loading...") }
 
     LaunchedEffect(Unit) {
+        onEditModeChange(false)
         usersViewModel.resetFoundUser()
         usersViewModel.resetCurrentUser()
         usersViewModel.loadUser(userId)
@@ -110,8 +111,10 @@ fun ProfileTab(
         user?.let {
             name = it.fullName
             email = it.email
-            initialName = it.fullName
-            initialEmail = it.email
+            if (!editMode) {
+                initialName = it.fullName
+                initialEmail = it.email
+            }
             it.location?.updateCityCountry(context)
             locationText = it.location.toString()
         }
@@ -135,6 +138,7 @@ fun ProfileTab(
 
     var isRefreshingLocation by rememberSaveable { mutableStateOf(false) }
     var isLoading by rememberSaveable { mutableStateOf(false) }
+    var isResetPasswordLoading by rememberSaveable { mutableStateOf(false) }
     var dialogVisible by remember { mutableStateOf(false) }
     var dialogTitle by remember { mutableStateOf("") }
     var dialogMessage by remember { mutableStateOf("") }
@@ -248,6 +252,7 @@ fun ProfileTab(
                 isRefreshingLocation = isRefreshingLocation,
                 isLoading = isLoading,
                 onClickRecoverPassword = {
+                    isResetPasswordLoading = true
                     usersViewModel.sendPasswordReset(user!!.email) { success, error ->
                         if (success) {
                             dialogTitle = context.getString(R.string.email_sent)
@@ -257,9 +262,11 @@ fun ProfileTab(
                             dialogMessage = error ?: context.getString(R.string.unknown_error)
                         }
                         dialogVisible = true
+                        isResetPasswordLoading = false
                     }
                 },
-                isEnabled = isEditEnabled
+                isEnabled = isEditEnabled,
+                isResetPasswordLoading = isResetPasswordLoading
             )
 
             Spacer(modifier = Modifier.height(Spacing.TopBottomScreen / 2))
@@ -277,7 +284,10 @@ fun ProfileTab(
                             (registerResult as RequestResult.Success).message,
                             Toast.LENGTH_SHORT
                         ).show()
+                        initialName = name
+                        initialEmail = email
                         onEditModeChange(false)
+                        usersViewModel.loadUser(userId)
                         delay(2000)
                         usersViewModel.resetRegisterResult()
                     }
@@ -350,6 +360,7 @@ fun ProfileContent(
     onRefreshLocation: () -> Unit,
     isRefreshingLocation: Boolean,
     isLoading: Boolean,
+    isResetPasswordLoading: Boolean,
     onClickRecoverPassword: () -> Unit,
     isEnabled: Boolean,
 ) {
@@ -465,14 +476,14 @@ fun ProfileContent(
                 .fillMaxWidth()
                 .padding(horizontal = Spacing.Sides)
                 .height(40.dp),
-            enabled = true,
+            enabled = !isResetPasswordLoading,
             onClick = onClickRecoverPassword,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
-            if (isLoading) {
+            if (isResetPasswordLoading) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.size(20.dp),
