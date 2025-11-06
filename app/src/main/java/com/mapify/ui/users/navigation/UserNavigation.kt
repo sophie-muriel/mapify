@@ -10,7 +10,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.mapify.model.ReportStatus
-import com.mapify.ui.navigation.RouteScreen
 import com.mapify.ui.users.tabs.ExploreTab
 import com.mapify.ui.users.tabs.HomeTab
 import com.mapify.ui.users.tabs.NotificationsTab
@@ -22,7 +21,17 @@ fun UserNavigation(
     padding: PaddingValues,
     navController: NavHostController,
     navigateToDetail: (String) -> Unit,
-    navigateToReportView: (String, ReportStatus) -> Unit
+    navigateToReportView: (String, ReportStatus) -> Unit,
+    profileEditMode: Boolean,
+    onProfileEditModeChange: (Boolean) -> Unit,
+    profileNameTouched: Boolean,
+    onProfileNameTouchedChange: (Boolean) -> Unit,
+    profileEmailTouched: Boolean,
+    onProfileEmailTouchedChange: (Boolean) -> Unit,
+    profilePasswordTouched: Boolean,
+    onProfilePasswordTouchedChange: (Boolean) -> Unit,
+    profileExitDialogVisible: Boolean,
+    onProfileExitDialogVisibleChange: (Boolean) -> Unit
 ) {
     NavHost(
         modifier = Modifier.padding(padding),
@@ -45,7 +54,18 @@ fun UserNavigation(
             )
         }
         composable<UserRouteTab.Profile> {
-            ProfileTab()
+            ProfileTab(
+                editMode = profileEditMode,
+                onEditModeChange = onProfileEditModeChange,
+                nameTouched = profileNameTouched,
+                onNameTouchedChange = onProfileNameTouchedChange,
+                emailTouched = profileEmailTouched,
+                onEmailTouchedChange = onProfileEmailTouchedChange,
+                passwordTouched = profilePasswordTouched,
+                onPasswordTouchedChange = onProfilePasswordTouchedChange,
+                exitDialogVisible = profileExitDialogVisible,
+                onExitDialogVisibleChange = onProfileExitDialogVisibleChange
+            )
         }
     }
 }

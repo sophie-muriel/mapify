@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Replay
@@ -40,7 +41,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.mapify.R
@@ -61,7 +61,18 @@ import updateCityCountry
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun ProfileTab() {
+fun ProfileTab(
+    editMode: Boolean,
+    onEditModeChange: (Boolean) -> Unit,
+    nameTouched: Boolean,
+    onNameTouchedChange: (Boolean) -> Unit,
+    emailTouched: Boolean,
+    onEmailTouchedChange: (Boolean) -> Unit,
+    passwordTouched: Boolean,
+    onPasswordTouchedChange: (Boolean) -> Unit,
+    exitDialogVisible: Boolean,
+    onExitDialogVisibleChange: (Boolean) -> Unit
+) {
 
     val context = LocalContext.current
     val usersViewModel = LocalMainViewModel.current.usersViewModel
@@ -86,12 +97,6 @@ fun ProfileTab() {
             locationText = "Loading..."
         }
     }
-
-    var nameTouched by rememberSaveable { mutableStateOf(false) }
-    var emailTouched by rememberSaveable { mutableStateOf(false) }
-    var passwordTouched by rememberSaveable { mutableStateOf(false) }
-    var editMode by rememberSaveable { mutableStateOf(false) }
-    var exitDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     val nameError = nameTouched && (name.isBlank() || name.length > 50)
     val emailError = emailTouched && !(
@@ -199,11 +204,11 @@ fun ProfileTab() {
     }
 
     BackHandler(enabled = editMode && (nameTouched || emailTouched || passwordTouched)) {
-        exitDialogVisible = true
+        onExitDialogVisibleChange(true)
     }
 
     BackHandler(enabled = editMode && !(nameTouched || emailTouched || passwordTouched)) {
-        editMode = false
+        onEditModeChange(false)
     }
 
     Scaffold() { padding ->
@@ -220,8 +225,8 @@ fun ProfileTab() {
                 email = email,
                 location = locationText,
                 isEditMode = editMode,
-                onValueChangeName = { name = it; nameTouched = true },
-                onValueChangeEmail = { email = it; emailTouched = true },
+                onValueChangeName = { name = it; onNameTouchedChange(true) },
+                onValueChangeEmail = { email = it; onEmailTouchedChange(true) },
                 onClickEdit = {
                     user!!.let {
                         val updatedUser = User(
@@ -233,9 +238,9 @@ fun ProfileTab() {
                         )
                         usersViewModel.update(user = updatedUser)
                     }
-                    nameTouched = false
-                    emailTouched = false
-                    passwordTouched = false
+                    onNameTouchedChange(false)
+                    onEmailTouchedChange(false)
+                    onPasswordTouchedChange(false)
                 },
                 nameError = nameError,
                 emailError = emailError,
@@ -272,7 +277,7 @@ fun ProfileTab() {
                             (registerResult as RequestResult.Success).message,
                             Toast.LENGTH_SHORT
                         ).show()
-                        editMode = false
+                        onEditModeChange(false)
                         delay(2000)
                         usersViewModel.resetRegisterResult()
                     }
@@ -312,14 +317,14 @@ fun ProfileTab() {
         GenericDialog(
             title = stringResource(id = R.string.exit_profile_edit),
             message = stringResource(id = R.string.exit_profile_edit_description),
-            onClose = { exitDialogVisible = false },
+            onClose = { onExitDialogVisibleChange(false) },
             onExit = {
-                exitDialogVisible = false
+                onExitDialogVisibleChange(false)
                 if (editMode) {
                     if (user != null) {
                         name = user!!.fullName
                         email = user!!.email
-                        editMode = false
+                        onEditModeChange(false)
                     }
                 } else {
                     // navigateBack()
@@ -369,16 +374,19 @@ fun ProfileContent(
             )
             Spacer(modifier = Modifier.height(Spacing.Inline * 2))
         } else {
-            Spacer(modifier = Modifier.height(100.dp))
-            Text(
-                text = stringResource(id = R.string.edit_profile_label),
-                style = MaterialTheme.typography.headlineSmall,
+            Icon(
+                imageVector = Icons.Outlined.Edit,
+                contentDescription = stringResource(id = R.string.edit_icon_description),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = Spacing.Sides),
-                textAlign = TextAlign.Start
+                    .size(100.dp)
+                    .padding(bottom = Spacing.Inline),
+                tint = MaterialTheme.colorScheme.primary
             )
-            Spacer(modifier = Modifier.padding(Spacing.Inline))
+            Text(
+                text = stringResource(id = R.string.edit_profile_label, name),
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Spacer(modifier = Modifier.height(Spacing.Inline * 2))
         }
 
         GenericTextField(

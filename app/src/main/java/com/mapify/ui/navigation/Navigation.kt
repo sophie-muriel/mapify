@@ -72,7 +72,7 @@ fun Navigation(
                                         currentUser.id,
                                         currentUser.role
                                     )
-                                    navController.navigate(RouteScreen.Home) {
+                                    navController.navigate(RouteScreen.Home()) {
                                         popUpTo(RouteScreen.Login) { inclusive = true }
                                     }
                                 } ?: Log.w("Login", "User is null, not navigating")
@@ -185,8 +185,10 @@ fun Navigation(
                         SettingsScreen(
                             navigateBack = { navController.popBackStack() },
                             navigateToProfile = {
+                                navController.popBackStack()
                                 navController.navigate(RouteScreen.Home(selectedTab = 3)) {
-                                    popUpTo<RouteScreen.Home> { inclusive = true }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
                             },
                             navigateToLogin = {
