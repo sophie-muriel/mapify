@@ -16,8 +16,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -63,9 +61,6 @@ fun SettingsScreen(
         usersViewModel.loadUser(userId)
     }
 
-    val sendNotifications = remember { mutableStateOf(true) }
-    val notificationVibration = remember { mutableStateOf(false) }
-
     var logoutDialogVisible by rememberSaveable { mutableStateOf(false) }
     var deleteAccountDialogVisible by rememberSaveable { mutableStateOf(false) }
     var accountDeletedDialogVisible by rememberSaveable { mutableStateOf(false) }
@@ -91,16 +86,9 @@ fun SettingsScreen(
         ) {
             SettingsSection(title = "General") {
                 SettingItem(
-                    icon = Icons.Filled.Notifications,
-                    label = "Send notifications",
-                    switchChecked = sendNotifications.value,
-                    onSwitchChange = { sendNotifications.value = it }
-                )
-                SettingItem(
-                    icon = Icons.Filled.NotificationsActive,
-                    label = "Notification vibration",
-                    switchChecked = notificationVibration.value,
-                    onSwitchChange = { notificationVibration.value = it }
+                    icon = Icons.AutoMirrored.Filled.Logout,
+                    label = "Logout",
+                    onClick = { logoutDialogVisible = true }
                 )
             }
 
@@ -111,11 +99,6 @@ fun SettingsScreen(
                     icon = Icons.Filled.AccountCircle,
                     label = "Edit Profile",
                     onClick = { navigateToProfile() }
-                )
-                SettingItem(
-                    icon = Icons.AutoMirrored.Filled.Logout,
-                    label = "Logout",
-                    onClick = { logoutDialogVisible = true }
                 )
                 SettingItem(
                     icon = Icons.Filled.Delete,
