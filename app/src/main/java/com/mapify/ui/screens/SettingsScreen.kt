@@ -27,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -201,7 +200,7 @@ fun SettingItem(
 
         if (isToggle) {
             Switch(
-                checked = switchChecked!!,
+                checked = switchChecked,
                 onCheckedChange = onSwitchChange,
                 modifier = Modifier
                     .scale(0.85f)
