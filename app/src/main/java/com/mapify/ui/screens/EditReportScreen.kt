@@ -90,7 +90,7 @@ fun EditReportScreen(
 
     val locationError = false
 
-    var photos by remember { mutableStateOf(report!!.images) }
+    var photos by rememberSaveable { mutableStateOf(report!!.images) }
 
     val onAddPhoto: (String) -> Unit = { newPhotoUrl ->
         photos = photos + newPhotoUrl

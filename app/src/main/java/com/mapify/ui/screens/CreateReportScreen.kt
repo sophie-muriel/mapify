@@ -62,7 +62,7 @@ fun CreateReportScreen(
     val descriptionError = descriptionTouched && (description.isBlank() || description.length < 10
             || description.length > 500)
 
-    var photos by remember { mutableStateOf(emptyList<String>()) }
+    var photos by rememberSaveable { mutableStateOf(emptyList<String>()) }
 
     var location by rememberSaveable { mutableStateOf("") }
     val locationError = false
